@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import OTP from "@/models/OTP";
-import { generateOTP, isValidEmail, isValidMobile } from "@/lib/otp";
+import { generateOTP, isValidEmail } from "@/lib/otp";
 import { sendEmail, generateOTPEmailTemplate } from "@/lib/email";
 
 export const runtime = 'nodejs';
@@ -11,33 +11,19 @@ export const runtime = 'nodejs';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { firstName, lastName, email, mobile, password } = body;
+    const { firstName, lastName, email, password } = body;
 
     // Validation
-    if (!firstName || !lastName || !password) {
+    if (!firstName || !lastName || !email || !password) {
       return NextResponse.json(
-        { error: "First name, last name, and password are required" },
+        { error: "First name, last name, email, and password are required" },
         { status: 400 }
       );
     }
 
-    if (!email && !mobile) {
-      return NextResponse.json(
-        { error: "Either email or mobile number is required" },
-        { status: 400 }
-      );
-    }
-
-    if (email && !isValidEmail(email)) {
+    if (!isValidEmail(email)) {
       return NextResponse.json(
         { error: "Please enter a valid email address" },
-        { status: 400 }
-      );
-    }
-
-    if (mobile && !isValidMobile(mobile)) {
-      return NextResponse.json(
-        { error: "Please enter a valid 10-digit mobile number" },
         { status: 400 }
       );
     }
@@ -52,16 +38,11 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     // Check if user already exists
-    const existingUser = await User.findOne({
-      $or: [
-        ...(email ? [{ email }] : []),
-        ...(mobile ? [{ mobile }] : [])
-      ]
-    });
+    const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "User with this email or mobile number already exists" },
+        { error: "User with this email already exists" },
         { status: 400 }
       );
     }
@@ -73,8 +54,7 @@ export async function POST(request: NextRequest) {
     const user = new User({
       firstName,
       lastName,
-      email: email || undefined,
-      mobile: mobile || undefined,
+      email,
       password: hashedPassword,
     });
 
@@ -85,39 +65,37 @@ export async function POST(request: NextRequest) {
     
     // Store OTP in database
     const otp = new OTP({
-      identifier: email || mobile!,
+      identifier: email,
       otp: otpCode,
-      type: email ? 'email' : 'mobile',
+      type: 'email',
       purpose: 'registration'
     });
 
     await otp.save();
 
-    // Send OTP via email (if email provided)
-    if (email) {
-      try {
-        await sendEmail({
-          to: email,
-          subject: "AVS Family Tree - OTP Verification",
-          html: generateOTPEmailTemplate(otpCode, 'registration')
-        });
-      } catch (error) {
-        console.error("Email sending failed (non-blocking):", error);
-        // Don't fail registration if email fails in development
-      }
+    // Send OTP via email
+    try {
+      await sendEmail({
+        to: email,
+        subject: "AVS Family Tree - OTP Verification",
+        html: generateOTPEmailTemplate(otpCode, 'registration')
+      });
+    } catch (error) {
+      console.error("Email sending failed (non-blocking):", error);
+      // Don't fail registration if email fails in development
     }
 
     // In development mode, log the OTP for easy testing
     if (process.env.NODE_ENV === 'development') {
-      console.log('🔐 [DEV MODE] OTP for', email || mobile, ':', otpCode);
+      console.log('🔐 [DEV MODE] OTP for', email, ':', otpCode);
     }
 
     return NextResponse.json({
       message: "User registered successfully. Please verify your OTP.",
       userId: user._id,
       verificationRequired: true,
-      identifier: email || mobile,
-      type: email ? 'email' : 'mobile',
+      identifier: email,
+      type: 'email',
       // Include OTP in response for development only
       ...(process.env.NODE_ENV === 'development' && { devOtp: otpCode })
     });

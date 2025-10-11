@@ -17,7 +17,6 @@ export default function RegisterPage() {
     firstName: "",
     lastName: "",
     email: "",
-    mobile: "",
     password: "",
     confirmPassword: ""
   });
@@ -39,13 +38,8 @@ export default function RegisterPage() {
     setSuccess("");
 
     // Validation
-    if (!formData.firstName || !formData.lastName || !formData.password) {
-      setError("First name, last name, and password are required");
-      return;
-    }
-
-    if (!formData.email && !formData.mobile) {
-      setError("Either email or mobile number is required");
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+      setError("First name, last name, email, and password are required");
       return;
     }
 
@@ -70,8 +64,7 @@ export default function RegisterPage() {
         body: JSON.stringify({
           firstName: formData.firstName,
           lastName: formData.lastName,
-          email: formData.email || undefined,
-          mobile: formData.mobile || undefined,
+          email: formData.email,
           password: formData.password,
         }),
       });
@@ -83,7 +76,7 @@ export default function RegisterPage() {
         return;
       }
 
-      setSuccess("Registration successful! Please check your email/mobile for OTP verification.");
+      setSuccess("Registration successful! Please check your email for OTP verification.");
       
       // Store password temporarily in sessionStorage for auto-login after OTP verification
       if (typeof window !== 'undefined') {
@@ -239,7 +232,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">Email *</Label>
                 <Input
                   id="email"
                   name="email"
@@ -247,23 +240,9 @@ export default function RegisterPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="your@email.com"
+                  required
                   className="mt-1"
                 />
-                <p className="text-sm text-gray-500 mt-1">Provide either email or mobile number</p>
-              </div>
-
-              <div>
-                <Label htmlFor="mobile">Mobile Number</Label>
-                <Input
-                  id="mobile"
-                  name="mobile"
-                  type="tel"
-                  value={formData.mobile}
-                  onChange={handleInputChange}
-                  placeholder="9876543210"
-                  className="mt-1"
-                />
-                <p className="text-sm text-gray-500 mt-1">10-digit mobile number</p>
               </div>
 
               <div>

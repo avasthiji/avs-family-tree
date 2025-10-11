@@ -17,61 +17,102 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
-    const query = searchParams.get('q');
-    const filter = searchParams.get('filter');
+    const isAdvanced = searchParams.get('advanced') === 'true';
     const status = searchParams.get('status'); // 'approved', 'pending', 'all'
     const limit = parseInt(searchParams.get('limit') || '50');
 
-    if (!query || query.trim().length < 2) {
-      return NextResponse.json({ users: [] });
-    }
-
     await connectDB();
 
-    const searchQuery = query.trim();
     let mongoQuery: any = {};
 
     // Filter by approval status for admin
     if (status === 'approved') {
       mongoQuery.isApprovedByAdmin = true;
-    } else if (status === 'pending') {
-      mongoQuery.isApprovedByAdmin = false;
     }
-    // 'all' or no status means no filter
+    // 'all' or no status means no filter (includes both approved and pending)
 
-    // Build search conditions
-    const searchConditions: any[] = [];
+    if (isAdvanced) {
+      // Advanced Search - AND logic for multiple fields
+      const name = searchParams.get('name');
+      const nativePlace = searchParams.get('nativePlace');
+      const gothiram = searchParams.get('gothiram');
 
-    if (!filter || filter === 'all' || filter === 'name') {
-      searchConditions.push(
-        { firstName: { $regex: searchQuery, $options: 'i' } },
-        { lastName: { $regex: searchQuery, $options: 'i' } }
-      );
-    }
+      // Check if at least one field is provided
+      if (!name && !nativePlace && !gothiram) {
+        return NextResponse.json({ users: [] });
+      }
 
-    if (!filter || filter === 'all' || filter === 'email') {
-      searchConditions.push({ email: { $regex: searchQuery, $options: 'i' } });
-    }
+      const advancedConditions: any[] = [];
 
-    if (!filter || filter === 'all' || filter === 'mobile') {
-      searchConditions.push({ mobile: { $regex: searchQuery, $options: 'i' } });
-    }
+      if (name && name.trim().length >= 2) {
+        const nameQuery = name.trim();
+        advancedConditions.push({
+          $or: [
+            { firstName: { $regex: nameQuery, $options: 'i' } },
+            { lastName: { $regex: nameQuery, $options: 'i' } }
+          ]
+        });
+      }
 
-    if (!filter || filter === 'all' || filter === 'gothiram') {
-      searchConditions.push({ gothiram: { $regex: searchQuery, $options: 'i' } });
-    }
+      if (nativePlace && nativePlace.trim().length >= 2) {
+        advancedConditions.push({
+          nativePlace: { $regex: nativePlace.trim(), $options: 'i' }
+        });
+      }
 
-    if (!filter || filter === 'all' || filter === 'place') {
-      searchConditions.push(
-        { nativePlace: { $regex: searchQuery, $options: 'i' } },
-        { city: { $regex: searchQuery, $options: 'i' } },
-        { state: { $regex: searchQuery, $options: 'i' } },
-        { workPlace: { $regex: searchQuery, $options: 'i' } }
-      );
-    }
+      if (gothiram && gothiram.trim()) {
+        advancedConditions.push({
+          gothiram: { $regex: `^${gothiram.trim()}$`, $options: 'i' }
+        });
+      }
 
-    if (searchConditions.length > 0) {
-      mongoQuery.$or = searchConditions;
+      if (advancedConditions.length > 0) {
+        mongoQuery.$and = advancedConditions;
+      }
+
+    } else {
+      // Quick Search - OR logic (original behavior)
+      const query = searchParams.get('q');
+      const filter = searchParams.get('filter');
+
+      if (!query || query.trim().length < 2) {
+        return NextResponse.json({ users: [] });
+      }
+
+      const searchQuery = query.trim();
+      const searchConditions: any[] = [];
+
+      if (!filter || filter === 'all' || filter === 'name') {
+        searchConditions.push(
+          { firstName: { $regex: searchQuery, $options: 'i' } },
+          { lastName: { $regex: searchQuery, $options: 'i' } }
+        );
+      }
+
+      if (!filter || filter === 'all' || filter === 'email') {
+        searchConditions.push({ email: { $regex: searchQuery, $options: 'i' } });
+      }
+
+      if (!filter || filter === 'all' || filter === 'mobile') {
+        searchConditions.push({ mobile: { $regex: searchQuery, $options: 'i' } });
+      }
+
+      if (!filter || filter === 'all' || filter === 'gothiram') {
+        searchConditions.push({ gothiram: { $regex: searchQuery, $options: 'i' } });
+      }
+
+      if (!filter || filter === 'all' || filter === 'place') {
+        searchConditions.push(
+          { nativePlace: { $regex: searchQuery, $options: 'i' } },
+          { city: { $regex: searchQuery, $options: 'i' } },
+          { state: { $regex: searchQuery, $options: 'i' } },
+          { workPlace: { $regex: searchQuery, $options: 'i' } }
+        );
+      }
+
+      if (searchConditions.length > 0) {
+        mongoQuery.$or = searchConditions;
+      }
     }
 
     const users = await User.find(mongoQuery)
@@ -81,8 +122,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ 
       users,
-      count: users.length,
-      query: searchQuery
+      count: users.length
     });
 
   } catch (error) {

@@ -118,14 +118,22 @@ function SearchPageContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header with Search */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-            <SearchIcon className="h-8 w-8 mr-3 text-[#E63946]" />
-            Search Community Members
-          </h1>
-          <p className="text-gray-600 mb-6">Find members by name, gothiram, or location</p>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
+                <SearchIcon className="h-8 w-8 mr-3 text-[#E63946]" />
+                Search Community Members
+              </h1>
+              <p className="text-gray-600">
+                Use quick search for simple queries or advanced search to combine multiple criteria
+              </p>
+            </div>
+          </div>
           
           {/* Search Bar */}
-          <SearchBar isAdmin={isAdmin} onSelectUser={handleSelectUser} />
+          <div className="flex justify-center">
+            <SearchBar isAdmin={isAdmin} onSelectUser={handleSelectUser} />
+          </div>
         </div>
 
         {/* Selected User Details */}
@@ -249,31 +257,6 @@ function SearchPageContent() {
           </Card>
         )}
 
-        {/* Help Text */}
-        {!selectedUser && (
-          <Card className="avs-card border-0 shadow-lg">
-            <CardContent className="p-8 text-center">
-              <SearchIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Search for Community Members</h3>
-              <p className="text-gray-600 mb-4">
-                Use the search bar above to find members by:
-              </p>
-              <div className="flex flex-wrap justify-center gap-2">
-                <Badge variant="outline">Name</Badge>
-                <Badge variant="outline">Gothiram</Badge>
-                <Badge variant="outline">Native Place</Badge>
-                <Badge variant="outline">City</Badge>
-                <Badge variant="outline">Work Place</Badge>
-                {isAdmin && (
-                  <>
-                    <Badge variant="outline">Email</Badge>
-                    <Badge variant="outline">Mobile</Badge>
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
