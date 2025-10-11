@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
+import AppHeader from "@/components/AppHeader";
+import { MATRIMONIAL_ENABLED, EVENT_ENABLED } from "@/lib/features";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -62,50 +64,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA]">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 avs-gradient rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AVS</span>
-              </div>
-              <span className="text-xl font-bold avs-text-gradient">AVS Family Tree</span>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                Welcome, {user.firstName}!
-              </span>
-              {user.role === "admin" && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                  <Crown className="w-3 h-3 mr-1" />
-                  Admin
-                </span>
-              )}
-              {user.role === "matchmaker" && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                  <Heart className="w-3 h-3 mr-1" />
-                  Matchmaker
-                </span>
-              )}
-              <Link href="/profile">
-                <Button variant="outline" size="sm">
-                  <User className="h-4 w-4 mr-1" />
-                  Profile
-                </Button>
-              </Link>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => router.push("/api/auth/signout")}
-              >
-                <LogOut className="h-4 w-4 mr-1" />
-                Logout
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <AppHeader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
@@ -162,7 +121,7 @@ export default function DashboardPage() {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${(MATRIMONIAL_ENABLED && EVENT_ENABLED) ? 'xl:grid-cols-5' : (MATRIMONIAL_ENABLED || EVENT_ENABLED) ? 'xl:grid-cols-4' : 'xl:grid-cols-3'} gap-6 mb-8`}>
           <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             <CardHeader className="pb-3">
               <div className="w-12 h-12 avs-gradient rounded-lg flex items-center justify-center mb-2">
@@ -220,43 +179,47 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <CardHeader className="pb-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-[#F77F00] to-[#E63946] rounded-lg flex items-center justify-center mb-2">
-                <Heart className="h-6 w-6 text-white" />
-              </div>
-              <CardTitle className="text-lg">Matrimony</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="mb-4">
-                Browse profiles and find your perfect match within the AVS community.
-              </CardDescription>
-              <Link href="/matrimony">
-                <Button className="w-full bg-gradient-to-r from-[#F77F00] to-[#E63946] text-white hover:shadow-lg">
-                  Browse Profiles
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          {MATRIMONIAL_ENABLED && (
+            <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <CardHeader className="pb-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-[#F77F00] to-[#E63946] rounded-lg flex items-center justify-center mb-2">
+                  <Heart className="h-6 w-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Matrimony</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="mb-4">
+                  Browse profiles and find your perfect match within the AVS community.
+                </CardDescription>
+                <Link href="/matrimony">
+                  <Button className="w-full bg-gradient-to-r from-[#F77F00] to-[#E63946] text-white hover:shadow-lg">
+                    Browse Profiles
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
 
-          <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <CardHeader className="pb-3">
-              <div className="w-12 h-12 avs-gradient-purple rounded-lg flex items-center justify-center mb-2">
-                <Calendar className="h-6 w-6 text-white" />
-              </div>
-              <CardTitle className="text-lg">Events</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="mb-4">
-                Stay updated with AVS community events and gatherings.
-              </CardDescription>
-              <Link href="/events">
-                <Button className="w-full avs-gradient-purple text-white hover:shadow-lg">
-                  View Events
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          {EVENT_ENABLED && (
+            <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <CardHeader className="pb-3">
+                <div className="w-12 h-12 avs-gradient-purple rounded-lg flex items-center justify-center mb-2">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+                <CardTitle className="text-lg">Events</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="mb-4">
+                  Stay updated with AVS community events and gatherings.
+                </CardDescription>
+                <Link href="/events">
+                  <Button className="w-full avs-gradient-purple text-white hover:shadow-lg">
+                    View Events
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Admin Section */}
@@ -302,24 +265,26 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="avs-card border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Calendar className="h-5 w-5 mr-2 text-[#7209B7]" />
-                    Event Management
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="mb-4">
-                    Create and manage community events.
-                  </CardDescription>
-                  <Link href="/admin/events">
-                    <Button variant="outline" className="w-full">
-                      Manage Events
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+              {EVENT_ENABLED && (
+                <Card className="avs-card border-0 shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Calendar className="h-5 w-5 mr-2 text-[#7209B7]" />
+                      Event Management
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="mb-4">
+                      Create and manage community events.
+                    </CardDescription>
+                    <Link href="/admin/events">
+                      <Button variant="outline" className="w-full">
+                        Manage Events
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         )}

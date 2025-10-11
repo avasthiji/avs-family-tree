@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import AppHeader from "@/components/AppHeader";
+import { MATRIMONIAL_ENABLED } from "@/lib/features";
 import { 
   Users, 
   UserCheck, 
@@ -143,47 +145,26 @@ Female,${stats.femaleUsers}
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA]">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/dashboard" className="flex items-center space-x-2">
-              <div className="w-10 h-10 avs-gradient rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AVS</span>
-              </div>
-              <span className="text-xl font-bold avs-text-gradient">AVS Family Tree</span>
-            </Link>
-            
-            <div className="flex items-center space-x-4">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                <Crown className="w-3 h-3 mr-1" />
-                Admin
-              </span>
-              <Button onClick={exportToCSV} variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
-              <Link href="/admin/dashboard">
-                <Button variant="outline" size="sm">
-                  Back to Admin
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <AppHeader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-            <BarChart3 className="h-8 w-8 mr-3 text-[#E63946]" />
-            Analytics & Reports
-          </h1>
-          <p className="text-gray-600">Comprehensive insights into your AVS community</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
+              <BarChart3 className="h-8 w-8 mr-3 text-[#E63946]" />
+              Analytics & Reports
+            </h1>
+            <p className="text-gray-600">Comprehensive insights into your AVS community</p>
+          </div>
+          <Button onClick={exportToCSV} className="avs-button-primary">
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
         </div>
 
         {/* Key Metrics */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className={`grid md:grid-cols-2 ${MATRIMONIAL_ENABLED ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6 mb-8`}>
           <Card className="avs-card border-0 shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
@@ -212,19 +193,21 @@ Female,${stats.femaleUsers}
             </CardContent>
           </Card>
 
-          <Card className="avs-card border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 avs-gradient-purple rounded-lg flex items-center justify-center">
-                  <Heart className="h-6 w-6 text-white" />
+          {MATRIMONIAL_ENABLED && (
+            <Card className="avs-card border-0 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 avs-gradient-purple rounded-lg flex items-center justify-center">
+                    <Heart className="h-6 w-6 text-white" />
+                  </div>
+                  <Badge className="bg-pink-100 text-pink-800">{matrimonyRate}%</Badge>
                 </div>
-                <Badge className="bg-pink-100 text-pink-800">{matrimonyRate}%</Badge>
-              </div>
-              <p className="text-sm text-gray-600 mb-1">Matrimony Active</p>
-              <p className="text-3xl font-bold text-[#7209B7]">{stats.activeMatrimony}</p>
-              <p className="text-xs text-gray-500 mt-2">Seeking matches</p>
-            </CardContent>
-          </Card>
+                <p className="text-sm text-gray-600 mb-1">Matrimony Active</p>
+                <p className="text-3xl font-bold text-[#7209B7]">{stats.activeMatrimony}</p>
+                <p className="text-xs text-gray-500 mt-2">Seeking matches</p>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="avs-card border-0 shadow-lg">
             <CardContent className="p-6">
@@ -252,10 +235,12 @@ Female,${stats.femaleUsers}
               <MapPin className="h-4 w-4 mr-2" />
               Demographics
             </TabsTrigger>
-            <TabsTrigger value="matrimony">
-              <Heart className="h-4 w-4 mr-2" />
-              Matrimony
-            </TabsTrigger>
+            {MATRIMONIAL_ENABLED && (
+              <TabsTrigger value="matrimony">
+                <Heart className="h-4 w-4 mr-2" />
+                Matrimony
+              </TabsTrigger>
+            )}
             <TabsTrigger value="activity">
               <Activity className="h-4 w-4 mr-2" />
               Activity
@@ -357,7 +342,8 @@ Female,${stats.femaleUsers}
           </TabsContent>
 
           {/* Matrimony Tab */}
-          <TabsContent value="matrimony">
+          {MATRIMONIAL_ENABLED && (
+            <TabsContent value="matrimony">
             <div className="grid md:grid-cols-3 gap-6 mb-6">
               <Card className="avs-card border-0 shadow-lg">
                 <CardContent className="p-6">
@@ -422,6 +408,7 @@ Female,${stats.femaleUsers}
               </CardContent>
             </Card>
           </TabsContent>
+          )}
 
           {/* Activity Tab */}
           <TabsContent value="activity">

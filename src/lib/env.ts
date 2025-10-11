@@ -15,8 +15,16 @@ export const env = {
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   
   // Upload
-  UPLOADTHING_SECRET: process.env.UPLOADTHING_SECRET || 'your-uploadthing-secret'
+  UPLOADTHING_SECRET: process.env.UPLOADTHING_SECRET || 'your-uploadthing-secret',
+  
+  // Feature Flags
+  MATRIMONIAL_FEATURE: process.env.MATRIMONIAL_FEATURE === 'true',
+  EVENT_FEATURE: process.env.EVENT_FEATURE === 'true'
 };
+
+// Helper functions to check if features are enabled
+export const isMatrimonialEnabled = () => env.MATRIMONIAL_FEATURE;
+export const isEventEnabled = () => env.EVENT_FEATURE;
 
 // Validation
 const requiredEnvVars = [

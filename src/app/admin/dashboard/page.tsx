@@ -9,6 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
+import AppHeader from "@/components/AppHeader";
+import { MATRIMONIAL_ENABLED, EVENT_ENABLED } from "@/lib/features";
 import { 
   Users, 
   UserCheck, 
@@ -206,30 +208,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA]">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/dashboard" className="flex items-center space-x-2">
-              <div className="w-10 h-10 avs-gradient rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AVS</span>
-              </div>
-              <span className="text-xl font-bold avs-text-gradient">AVS Family Tree</span>
-            </Link>
-            
-            <div className="flex items-center space-x-4">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                <Crown className="w-3 h-3 mr-1" />
-                Admin
-              </span>
-              <Link href="/dashboard">
-                <Button variant="outline" size="sm">
-                  Back to Dashboard
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <AppHeader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -262,7 +241,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className={`grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8`}>
           <Card className="avs-card border-0 shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -305,19 +284,21 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="avs-card border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Active Matrimony</p>
-                  <p className="text-3xl font-bold text-[#7209B7]">{stats.activeMatrimony}</p>
+          {MATRIMONIAL_ENABLED && (
+            <Card className="avs-card border-0 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Active Matrimony</p>
+                    <p className="text-3xl font-bold text-[#7209B7]">{stats.activeMatrimony}</p>
+                  </div>
+                  <div className="w-12 h-12 avs-gradient-purple rounded-lg flex items-center justify-center">
+                    <Heart className="h-6 w-6 text-white" />
+                  </div>
                 </div>
-                <div className="w-12 h-12 avs-gradient-purple rounded-lg flex items-center justify-center">
-                  <Heart className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="avs-card border-0 shadow-lg">
             <CardContent className="p-6">
@@ -333,19 +314,21 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="avs-card border-0 shadow-lg">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Events</p>
-                  <p className="text-3xl font-bold text-[#E63946]">{stats.totalEvents}</p>
+          {EVENT_ENABLED && (
+            <Card className="avs-card border-0 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">Events</p>
+                    <p className="text-3xl font-bold text-[#E63946]">{stats.totalEvents}</p>
+                  </div>
+                  <div className="w-12 h-12 avs-gradient rounded-lg flex items-center justify-center">
+                    <Calendar className="h-6 w-6 text-white" />
+                  </div>
                 </div>
-                <div className="w-12 h-12 avs-gradient rounded-lg flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Pending Approvals Table */}
@@ -523,24 +506,26 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center text-lg">
-                <Calendar className="h-5 w-5 mr-2 text-[#7209B7]" />
-                Events
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Create and manage community events
-              </p>
-              <Link href="/admin/events">
-                <Button className="w-full" variant="outline">
-                  Manage Events
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          {EVENT_ENABLED && (
+            <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="flex items-center text-lg">
+                  <Calendar className="h-5 w-5 mr-2 text-[#7209B7]" />
+                  Events
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">
+                  Create and manage community events
+                </p>
+                <Link href="/admin/events">
+                  <Button className="w-full" variant="outline">
+                    Manage Events
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader>

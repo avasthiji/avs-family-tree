@@ -29,6 +29,8 @@ import {
   CheckCircle
 } from "lucide-react";
 import Link from "next/link";
+import AppHeader from "@/components/AppHeader";
+import { MATRIMONIAL_ENABLED } from "@/lib/features";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
@@ -122,26 +124,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA]">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/dashboard" className="flex items-center space-x-2">
-              <div className="w-10 h-10 avs-gradient rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AVS</span>
-              </div>
-              <span className="text-xl font-bold avs-text-gradient">AVS Family Tree</span>
-            </Link>
-            
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard">
-                <Button variant="outline" size="sm">
-                  Back to Dashboard
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <AppHeader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Profile Header */}
@@ -180,7 +163,7 @@ export default function ProfilePage() {
                       Admin Approved
                     </span>
                   )}
-                  {userData?.enableMarriageFlag && (
+                  {MATRIMONIAL_ENABLED && userData?.enableMarriageFlag && (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
                       <Heart className="w-3 h-3 mr-1" />
                       Matrimony Active
@@ -559,34 +542,38 @@ export default function ProfilePage() {
                     {(userData?.bioDesc || "").length}/500 characters
                   </p>
                 </div>
-                <div>
-                  <Label>Partner Description</Label>
-                  <Textarea 
-                    value={userData?.partnerDesc || ""} 
-                    disabled={!editing}
-                    onChange={(e) => setUserData({...userData, partnerDesc: e.target.value})}
-                    className="mt-1"
-                    placeholder="Describe your ideal partner..."
-                    rows={5}
-                    maxLength={500}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {(userData?.partnerDesc || "").length}/500 characters
-                  </p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="enableMarriageFlag"
-                    checked={userData?.enableMarriageFlag || false}
-                    disabled={!editing}
-                    onChange={(e) => setUserData({...userData, enableMarriageFlag: e.target.checked})}
-                    className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-                  />
-                  <Label htmlFor="enableMarriageFlag" className="cursor-pointer">
-                    Enable Matrimony Profile (Make my profile visible for matrimony matches)
-                  </Label>
-                </div>
+                {MATRIMONIAL_ENABLED && (
+                  <>
+                    <div>
+                      <Label>Partner Description</Label>
+                      <Textarea 
+                        value={userData?.partnerDesc || ""} 
+                        disabled={!editing}
+                        onChange={(e) => setUserData({...userData, partnerDesc: e.target.value})}
+                        className="mt-1"
+                        placeholder="Describe your ideal partner..."
+                        rows={5}
+                        maxLength={500}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        {(userData?.partnerDesc || "").length}/500 characters
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="enableMarriageFlag"
+                        checked={userData?.enableMarriageFlag || false}
+                        disabled={!editing}
+                        onChange={(e) => setUserData({...userData, enableMarriageFlag: e.target.checked})}
+                        className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+                      />
+                      <Label htmlFor="enableMarriageFlag" className="cursor-pointer">
+                        Enable Matrimony Profile (Make my profile visible for matrimony matches)
+                      </Label>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthSessionProvider from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
+import AdminEnvironmentIndicator from "@/components/AdminEnvironmentIndicator";
+import { MATRIMONIAL_ENABLED } from "@/lib/features";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,10 +16,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const keywords = MATRIMONIAL_ENABLED 
+  ? ["AVS", "Family Tree", "Genealogy", "Tamil", "Vellalar", "Matrimony", "Heritage"]
+  : ["AVS", "Family Tree", "Genealogy", "Tamil", "Vellalar", "Heritage"];
+
 export const metadata: Metadata = {
   title: "AVS Family Tree - அகில இந்திய வேளாளர் சங்கம்",
   description: "Connect with your roots, discover your heritage, and build lasting relationships within the AVS community. Preserve your family legacy for future generations.",
-  keywords: ["AVS", "Family Tree", "Genealogy", "Tamil", "Vellalar", "Matrimony", "Heritage"],
+  keywords,
   authors: [{ name: "AVS Family Tree Team" }],
   openGraph: {
     title: "AVS Family Tree - அகில இந்திய வேளாளர் சங்கம்",
@@ -39,6 +45,7 @@ export default function RootLayout({
       >
         <AuthSessionProvider>
           {children}
+          <AdminEnvironmentIndicator />
         </AuthSessionProvider>
         <Toaster />
       </body>

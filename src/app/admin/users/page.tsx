@@ -1,0 +1,716 @@
+"use client";
+
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AppHeader from "@/components/AppHeader";
+import { MATRIMONIAL_ENABLED } from "@/lib/features";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { 
+  Users, 
+  UserCheck, 
+  UserX,
+  Search,
+  CheckCircle,
+  XCircle,
+  Crown,
+  Heart,
+  Mail,
+  Phone,
+  MapPin,
+  Building2,
+  Calendar,
+  Filter,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+  Shield,
+  User as UserIcon,
+  ChevronDown
+} from "lucide-react";
+
+interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  mobile?: string;
+  role: string;
+  isEmailVerified: boolean;
+  isMobileVerified: boolean;
+  isApprovedByAdmin: boolean;
+  enableMarriageFlag: boolean;
+  createdAt: string;
+  gothiram?: string;
+  nativePlace?: string;
+  city?: string;
+}
+
+interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalUsers: number;
+  limit: number;
+}
+
+export default function AdminUsersPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pagination, setPagination] = useState<Pagination>({
+    currentPage: 1,
+    totalPages: 1,
+    totalUsers: 0,
+    limit: 50
+  });
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [bulkActionLoading, setBulkActionLoading] = useState(false);
+
+  useEffect(() => {
+    if (status === "loading") return;
+    
+    if (!session) {
+      router.push("/auth/login");
+      return;
+    }
+
+    if (session.user.role !== "admin") {
+      router.push("/dashboard");
+      return;
+    }
+
+    fetchUsers();
+  }, [session, status, router, statusFilter, pagination.currentPage]);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        status: statusFilter,
+        page: pagination.currentPage.toString(),
+        limit: pagination.limit.toString(),
+      });
+
+      if (searchQuery) {
+        params.append('search', searchQuery);
+      }
+
+      const response = await fetch(`/api/admin/users?${params}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data.users);
+        setPagination(data.pagination);
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = () => {
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
+    fetchUsers();
+  };
+
+  const handleApproveUser = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/admin/users/${userId}/approve`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        fetchUsers();
+      }
+    } catch (error) {
+      console.error("Error approving user:", error);
+    }
+  };
+
+  const handleRejectUser = async (userId: string) => {
+    if (!confirm("Are you sure you want to reject and delete this user?")) return;
+    
+    try {
+      const response = await fetch(`/api/admin/users/${userId}/reject`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        fetchUsers();
+      }
+    } catch (error) {
+      console.error("Error rejecting user:", error);
+    }
+  };
+
+  const handleSelectAll = () => {
+    if (selectedUsers.length === users.length) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(users.map(user => user._id));
+    }
+  };
+
+  const handleSelectUser = (userId: string) => {
+    setSelectedUsers(prev => 
+      prev.includes(userId) 
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  const handleBulkApprove = async () => {
+    if (selectedUsers.length === 0) return;
+    
+    if (!confirm(`Are you sure you want to approve ${selectedUsers.length} user(s)?`)) return;
+
+    setBulkActionLoading(true);
+    try {
+      await Promise.all(
+        selectedUsers.map(userId =>
+          fetch(`/api/admin/users/${userId}/approve`, {
+            method: "POST",
+          })
+        )
+      );
+      setSelectedUsers([]);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error approving users:", error);
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedUsers.length === 0) return;
+    
+    if (!confirm(`Are you sure you want to reject ${selectedUsers.length} user(s)? This action cannot be undone.`)) return;
+
+    setBulkActionLoading(true);
+    try {
+      await Promise.all(
+        selectedUsers.map(userId =>
+          fetch(`/api/admin/users/${userId}/reject`, {
+            method: "POST",
+          })
+        )
+      );
+      setSelectedUsers([]);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error rejecting users:", error);
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPagination(prev => ({ ...prev, currentPage: newPage }));
+  };
+
+  const handleChangeRole = async (userId: string, newRole: string) => {
+    try {
+      const response = await fetch(`/api/admin/users/${userId}/role`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ role: newRole }),
+      });
+
+      if (response.ok) {
+        fetchUsers();
+      } else {
+        const data = await response.json();
+        alert(data.error || "Failed to update role");
+      }
+    } catch (error) {
+      console.error("Error changing user role:", error);
+      alert("Failed to update role");
+    }
+  };
+
+  const handleBulkMakeAdmin = async () => {
+    if (selectedUsers.length === 0) return;
+    
+    if (!confirm(`Are you sure you want to make ${selectedUsers.length} user(s) admin?`)) return;
+
+    setBulkActionLoading(true);
+    try {
+      await Promise.all(
+        selectedUsers.map(userId =>
+          fetch(`/api/admin/users/${userId}/role`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ role: "admin" }),
+          })
+        )
+      );
+      setSelectedUsers([]);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error promoting users:", error);
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  const handleBulkMakeUser = async () => {
+    if (selectedUsers.length === 0) return;
+    
+    if (!confirm(`Are you sure you want to change ${selectedUsers.length} user(s) to regular user role?`)) return;
+
+    setBulkActionLoading(true);
+    try {
+      await Promise.all(
+        selectedUsers.map(userId =>
+          fetch(`/api/admin/users/${userId}/role`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ role: "user" }),
+          })
+        )
+      );
+      setSelectedUsers([]);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error changing users:", error);
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  if (status === "loading" || loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto avs-gradient rounded-full flex items-center justify-center mb-4 animate-pulse">
+            <span className="text-white font-bold text-xl">AVS</span>
+          </div>
+          <p className="text-gray-600">Loading users...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA]">
+      <AppHeader />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
+            <Users className="h-8 w-8 mr-3 text-[#E63946]" />
+            User Management
+          </h1>
+          <p className="text-gray-600">Manage all registered users and their permissions</p>
+        </div>
+
+        {/* Search and Filters */}
+        <Card className="avs-card border-0 shadow-lg mb-8">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Input
+                    type="text"
+                    placeholder="Search by name, email, or mobile..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <Button onClick={handleSearch} className="avs-button-primary">
+                <Search className="h-4 w-4 mr-2" />
+                Search
+              </Button>
+              <Button onClick={fetchUsers} variant="outline">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Status Tabs */}
+        <Tabs value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)} className="mb-8">
+          <TabsList className="grid w-full md:w-auto grid-cols-3 gap-2">
+            <TabsTrigger value="all" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              All Users ({pagination.totalUsers})
+            </TabsTrigger>
+            <TabsTrigger value="approved" className="flex items-center gap-2">
+              <UserCheck className="h-4 w-4" />
+              Approved
+            </TabsTrigger>
+            <TabsTrigger value="pending" className="flex items-center gap-2">
+              <UserX className="h-4 w-4" />
+              Pending
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value={statusFilter} className="mt-6">
+            <Card className="avs-card border-0 shadow-lg">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>
+                      {statusFilter === 'all' && 'All Users'}
+                      {statusFilter === 'approved' && 'Approved Users'}
+                      {statusFilter === 'pending' && 'Pending Approvals'}
+                    </CardTitle>
+                    <CardDescription>
+                      {statusFilter === 'all' && 'Complete list of all registered users'}
+                      {statusFilter === 'approved' && 'Users approved by admin'}
+                      {statusFilter === 'pending' && 'Users awaiting admin approval'}
+                    </CardDescription>
+                  </div>
+                  
+                  {selectedUsers.length > 0 && (
+                    <div className="flex gap-2">
+                      <Badge variant="outline" className="text-blue-700 border-blue-300">
+                        {selectedUsers.length} selected
+                      </Badge>
+                      {statusFilter === 'pending' && (
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={handleBulkApprove}
+                            disabled={bulkActionLoading}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Approve Selected
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleBulkReject}
+                            disabled={bulkActionLoading}
+                            className="border-red-300 text-red-700 hover:bg-red-50"
+                          >
+                            <XCircle className="h-4 w-4 mr-1" />
+                            Reject Selected
+                          </Button>
+                        </>
+                      )}
+                      <Button
+                        size="sm"
+                        onClick={handleBulkMakeAdmin}
+                        disabled={bulkActionLoading}
+                        className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white"
+                      >
+                        <Crown className="h-4 w-4 mr-1" />
+                        Make Admin
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleBulkMakeUser}
+                        disabled={bulkActionLoading}
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                      >
+                        <UserIcon className="h-4 w-4 mr-1" />
+                        Make User
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {users.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <Users className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg font-medium">No users found</p>
+                    <p className="text-sm">Try adjusting your filters or search query</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-12">
+                              <input
+                                type="checkbox"
+                                checked={selectedUsers.length === users.length && users.length > 0}
+                                onChange={handleSelectAll}
+                                className="h-4 w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
+                              />
+                            </TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Contact</TableHead>
+                            <TableHead>Role</TableHead>
+                            <TableHead>Verification</TableHead>
+                            <TableHead>Location</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Joined</TableHead>
+                            <TableHead>Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {users.map((user) => (
+                            <TableRow key={user._id} className={selectedUsers.includes(user._id) ? "bg-blue-50" : ""}>
+                              <TableCell>
+                                <input
+                                  type="checkbox"
+                                  checked={selectedUsers.includes(user._id)}
+                                  onChange={() => handleSelectUser(user._id)}
+                                  className="h-4 w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <div>
+                                  <p className="font-medium text-gray-900">
+                                    {user.firstName} {user.lastName}
+                                  </p>
+                                  {user.gothiram && (
+                                    <p className="text-xs text-gray-500">{user.gothiram}</p>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="text-sm">
+                                  {user.email && (
+                                    <div className="flex items-center gap-1 mb-1">
+                                      <Mail className="h-3 w-3 text-gray-400" />
+                                      <span className="text-xs">{user.email}</span>
+                                    </div>
+                                  )}
+                                  {user.mobile && (
+                                    <div className="flex items-center gap-1">
+                                      <Phone className="h-3 w-3 text-gray-400" />
+                                      <span className="text-xs">{user.mobile}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                {user.role === 'admin' && (
+                                  <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0">
+                                    <Crown className="w-3 h-3 mr-1" />
+                                    Admin
+                                  </Badge>
+                                )}
+                                {user.role === 'matchmaker' && MATRIMONIAL_ENABLED && (
+                                  <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
+                                    <Heart className="w-3 h-3 mr-1" />
+                                    Matchmaker
+                                  </Badge>
+                                )}
+                                {(user.role === 'user' || (user.role === 'matchmaker' && !MATRIMONIAL_ENABLED)) && (
+                                  <Badge variant="outline">User</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex gap-1 flex-wrap">
+                                  {user.isEmailVerified && (
+                                    <Badge variant="outline" className="text-xs text-green-700 border-green-300">
+                                      Email ✓
+                                    </Badge>
+                                  )}
+                                  {user.isMobileVerified && (
+                                    <Badge variant="outline" className="text-xs text-green-700 border-green-300">
+                                      Mobile ✓
+                                    </Badge>
+                                  )}
+                                  {MATRIMONIAL_ENABLED && user.enableMarriageFlag && (
+                                    <Badge variant="outline" className="text-xs text-purple-700 border-purple-300">
+                                      Matrimony
+                                    </Badge>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="text-xs text-gray-600">
+                                  {user.city && (
+                                    <div className="flex items-center gap-1">
+                                      <Building2 className="h-3 w-3" />
+                                      {user.city}
+                                    </div>
+                                  )}
+                                  {user.nativePlace && (
+                                    <div className="flex items-center gap-1">
+                                      <MapPin className="h-3 w-3" />
+                                      {user.nativePlace}
+                                    </div>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                {user.isApprovedByAdmin ? (
+                                  <Badge className="bg-green-100 text-green-800 border-green-300">
+                                    <CheckCircle className="w-3 h-3 mr-1" />
+                                    Approved
+                                  </Badge>
+                                ) : (
+                                  <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                                    <UserX className="w-3 h-3 mr-1" />
+                                    Pending
+                                  </Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-1 text-xs text-gray-600">
+                                  <Calendar className="h-3 w-3" />
+                                  {new Date(user.createdAt).toLocaleDateString()}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex gap-2">
+                                  {!user.isApprovedByAdmin && (
+                                    <>
+                                      <Button
+                                        size="sm"
+                                        onClick={() => handleApproveUser(user._id)}
+                                        className="bg-green-600 hover:bg-green-700 text-white"
+                                      >
+                                        <CheckCircle className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleRejectUser(user._id)}
+                                        className="border-red-300 text-red-700 hover:bg-red-50"
+                                      >
+                                        <XCircle className="h-4 w-4" />
+                                      </Button>
+                                    </>
+                                  )}
+                                  {user._id !== session?.user.id && (
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="border-gray-300"
+                                        >
+                                          <Shield className="h-4 w-4 mr-1" />
+                                          Role
+                                          <ChevronDown className="h-3 w-3 ml-1" />
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="end">
+                                        <DropdownMenuItem
+                                          onClick={() => handleChangeRole(user._id, 'admin')}
+                                          disabled={user.role === 'admin'}
+                                        >
+                                          <Crown className="h-4 w-4 mr-2 text-orange-500" />
+                                          Make Admin
+                                        </DropdownMenuItem>
+                                        {MATRIMONIAL_ENABLED && (
+                                          <DropdownMenuItem
+                                            onClick={() => handleChangeRole(user._id, 'matchmaker')}
+                                            disabled={user.role === 'matchmaker'}
+                                          >
+                                            <Heart className="h-4 w-4 mr-2 text-purple-500" />
+                                            Make Matchmaker
+                                          </DropdownMenuItem>
+                                        )}
+                                        <DropdownMenuItem
+                                          onClick={() => handleChangeRole(user._id, 'user')}
+                                          disabled={user.role === 'user'}
+                                        >
+                                          <UserIcon className="h-4 w-4 mr-2 text-gray-500" />
+                                          Make User
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+
+                    {/* Pagination */}
+                    {pagination.totalPages > 1 && (
+                      <div className="mt-6 flex items-center justify-between">
+                        <div className="text-sm text-gray-600">
+                          Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to {Math.min(pagination.currentPage * pagination.limit, pagination.totalUsers)} of {pagination.totalUsers} users
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(pagination.currentPage - 1)}
+                            disabled={pagination.currentPage === 1}
+                          >
+                            <ChevronLeft className="h-4 w-4 mr-1" />
+                            Previous
+                          </Button>
+                          <div className="flex items-center gap-2">
+                            {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                              let pageNum;
+                              if (pagination.totalPages <= 5) {
+                                pageNum = i + 1;
+                              } else if (pagination.currentPage <= 3) {
+                                pageNum = i + 1;
+                              } else if (pagination.currentPage >= pagination.totalPages - 2) {
+                                pageNum = pagination.totalPages - 4 + i;
+                              } else {
+                                pageNum = pagination.currentPage - 2 + i;
+                              }
+                              
+                              return (
+                                <Button
+                                  key={pageNum}
+                                  variant={pagination.currentPage === pageNum ? "default" : "outline"}
+                                  size="sm"
+                                  onClick={() => handlePageChange(pageNum)}
+                                  className={pagination.currentPage === pageNum ? "avs-button-primary" : ""}
+                                >
+                                  {pageNum}
+                                </Button>
+                              );
+                            })}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(pagination.currentPage + 1)}
+                            disabled={pagination.currentPage === pagination.totalPages}
+                          >
+                            Next
+                            <ChevronRight className="h-4 w-4 ml-1" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+}
+

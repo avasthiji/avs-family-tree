@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Link from "next/link";
+import AppHeader from "@/components/AppHeader";
 import { 
   Crown,
   Plus,
@@ -203,30 +204,7 @@ export default function GothiramManagementPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA]">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/dashboard" className="flex items-center space-x-2">
-              <div className="w-10 h-10 avs-gradient rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AVS</span>
-              </div>
-              <span className="text-xl font-bold avs-text-gradient">AVS Family Tree</span>
-            </Link>
-            
-            <div className="flex items-center space-x-4">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                <Crown className="w-3 h-3 mr-1" />
-                Admin
-              </span>
-              <Link href="/admin/dashboard">
-                <Button variant="outline" size="sm">
-                  Back to Admin
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <AppHeader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}

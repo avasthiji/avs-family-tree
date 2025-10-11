@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import Logo from "@/components/Logo";
+import { MATRIMONIAL_ENABLED, EVENT_ENABLED } from "@/lib/features";
 import { 
   Users, 
   Heart, 
@@ -19,12 +21,10 @@ export default function Home() {
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 avs-gradient rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AVS</span>
-              </div>
+            <Link href="/" className="flex items-center space-x-3">
+              <Logo size="md" className="rounded-xl" />
               <span className="text-xl font-bold avs-text-gradient">AVS Family Tree</span>
-            </div>
+            </Link>
             <div className="hidden md:flex items-center space-x-8">
               <Link href="/about/history" className="text-gray-600 hover:text-[#E63946] transition-colors">
                 AVS History
@@ -35,9 +35,11 @@ export default function Home() {
               <Link href="/contact" className="text-gray-600 hover:text-[#E63946] transition-colors">
                 Contact
               </Link>
-              <Link href="/events" className="text-gray-600 hover:text-[#E63946] transition-colors">
-                Events
-              </Link>
+              {EVENT_ENABLED && (
+                <Link href="/events" className="text-gray-600 hover:text-[#E63946] transition-colors">
+                  Events
+                </Link>
+              )}
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/auth/login">
@@ -60,8 +62,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <div className="mb-8">
-              <div className="w-32 h-32 mx-auto avs-gradient rounded-full flex items-center justify-center mb-6 avs-animation-float">
-                <span className="text-white font-bold text-4xl">AVS</span>
+              <div className="mx-auto mb-6">
+                <Logo size="xl" className="rounded-full mx-auto" showAnimation={true} />
               </div>
               <h1 className="text-5xl md:text-7xl font-bold mb-6">
                 <span className="avs-text-gradient">AVS Family Tree</span>
@@ -101,10 +103,12 @@ export default function Home() {
                 <div className="text-3xl font-bold text-[#F77F00] mb-2">150+</div>
                 <div className="text-gray-600">Matches Made</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-[#7209B7] mb-2">50+</div>
-                <div className="text-gray-600">Events Hosted</div>
-              </div>
+              {EVENT_ENABLED && (
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-[#7209B7] mb-2">50+</div>
+                  <div className="text-gray-600">Events Hosted</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -133,17 +137,19 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="avs-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 avs-gradient-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Heart className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-4 text-gray-900">Matrimony Services</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Connect with compatible matches within the AVS community. Find your life partner with our trusted platform.
-                </p>
-              </CardContent>
-            </Card>
+            {MATRIMONIAL_ENABLED && (
+              <Card className="avs-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 avs-gradient-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Heart className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-4 text-gray-900">Matrimony Services</h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Connect with compatible matches within the AVS community. Find your life partner with our trusted platform.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
 
             <Card className="avs-card border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
               <CardContent className="p-8 text-center">
@@ -246,8 +252,8 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 avs-gradient rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">AVS</span>
+                <div className="bg-white/10 p-1 rounded-lg">
+                  <Logo size="md" className="rounded-lg" />
                 </div>
                 <span className="text-lg font-bold">AVS Family Tree</span>
               </div>
@@ -261,7 +267,9 @@ export default function Home() {
               <ul className="space-y-2">
                 <li><Link href="/about/history" className="text-gray-400 hover:text-white transition-colors">AVS History</Link></li>
                 <li><Link href="/about/roles" className="text-gray-400 hover:text-white transition-colors">Roles & Responsibilities</Link></li>
-                <li><Link href="/events" className="text-gray-400 hover:text-white transition-colors">Upcoming Events</Link></li>
+                {EVENT_ENABLED && (
+                  <li><Link href="/events" className="text-gray-400 hover:text-white transition-colors">Upcoming Events</Link></li>
+                )}
                 <li><Link href="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
               </ul>
             </div>
@@ -270,9 +278,14 @@ export default function Home() {
               <h3 className="text-lg font-semibold mb-4">Community</h3>
               <ul className="space-y-2">
                 <li><Link href="/auth/register" className="text-gray-400 hover:text-white transition-colors">Join Us</Link></li>
-                <li><Link href="/matrimony" className="text-gray-400 hover:text-white transition-colors">Matrimony</Link></li>
+                {MATRIMONIAL_ENABLED && (
+                  <li><Link href="/matrimony" className="text-gray-400 hover:text-white transition-colors">Matrimony</Link></li>
+                )}
                 <li><Link href="/search" className="text-gray-400 hover:text-white transition-colors">Find Relatives</Link></li>
                 <li><Link href="/family-tree" className="text-gray-400 hover:text-white transition-colors">Family Tree</Link></li>
+                {EVENT_ENABLED && (
+                  <li><Link href="/events" className="text-gray-400 hover:text-white transition-colors">Events</Link></li>
+                )}
               </ul>
             </div>
             
