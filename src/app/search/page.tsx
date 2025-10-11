@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,8 +63,14 @@ function SearchPageContent() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto avs-gradient rounded-full flex items-center justify-center mb-4 animate-pulse">
-            <span className="text-white font-bold text-xl">AVS</span>
+          <div className="w-16 h-16 mx-auto mb-4 animate-pulse">
+            <Image
+              src="/avs-logo.png"
+              alt="AVS Logo"
+              width={64}
+              height={64}
+              className="object-contain"
+            />
           </div>
           <p className="text-gray-600">Loading...</p>
         </div>
@@ -84,8 +91,14 @@ function SearchPageContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/dashboard" className="flex items-center space-x-2">
-              <div className="w-10 h-10 avs-gradient rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AVS</span>
+              <div className="w-10 h-10">
+                <Image
+                  src="/avs-logo.png"
+                  alt="AVS Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
               </div>
               <span className="text-xl font-bold avs-text-gradient">AVS Family Tree</span>
             </Link>
@@ -136,7 +149,7 @@ function SearchPageContent() {
                 <div className="flex-shrink-0">
                   <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
                     <AvatarImage src={selectedUser.profilePicture} />
-                    <AvatarFallback className="text-2xl avs-gradient text-white">
+                    <AvatarFallback className="text-2xl bg-gradient-to-br from-purple-500 to-pink-600 text-white">
                       {selectedUser.firstName?.[0]}{selectedUser.lastName?.[0]}
                     </AvatarFallback>
                   </Avatar>
@@ -271,8 +284,14 @@ export default function SearchPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto avs-gradient rounded-full flex items-center justify-center mb-4 animate-pulse">
-            <span className="text-white font-bold text-xl">AVS</span>
+          <div className="w-16 h-16 mx-auto mb-4 animate-pulse">
+            <Image
+              src="/avs-logo.png"
+              alt="AVS Logo"
+              width={64}
+              height={64}
+              className="object-contain"
+            />
           </div>
           <p className="text-gray-600">Loading search...</p>
         </div>

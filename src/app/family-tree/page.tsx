@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FamilyTreeView from "@/components/FamilyTreeView";
 import Link from "next/link";
+import Image from "next/image";
 import { TreePine, Search, Users, Plus, Network, List } from "lucide-react";
 
 interface Relationship {
@@ -54,8 +55,14 @@ export default function FamilyTreePage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto avs-gradient rounded-full flex items-center justify-center mb-4 animate-pulse">
-            <span className="text-white font-bold text-xl">AVS</span>
+          <div className="w-16 h-16 mx-auto mb-4 animate-pulse">
+            <Image
+              src="/avs-logo.png"
+              alt="AVS Logo"
+              width={64}
+              height={64}
+              className="object-contain"
+            />
           </div>
           <p className="text-gray-600">Loading family tree...</p>
         </div>
@@ -70,8 +77,14 @@ export default function FamilyTreePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/dashboard" className="flex items-center space-x-2">
-              <div className="w-10 h-10 avs-gradient rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AVS</span>
+              <div className="w-10 h-10">
+                <Image
+                  src="/avs-logo.png"
+                  alt="AVS Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
               </div>
               <span className="text-xl font-bold avs-text-gradient">AVS Family Tree</span>
             </Link>
@@ -175,10 +188,10 @@ export default function FamilyTreePage() {
               <TabsContent value="visual" className="p-6">
                 {session && (
                   <FamilyTreeView
-                    relationships={relationships}
-                    currentUserId={session.user.id}
-                    currentUserName={`${session.user.firstName} ${session.user.lastName}`}
-                  />
+                      relationships={relationships}
+                      currentUserId={session.user.id}
+                      currentUserName={`${session.user.firstName} ${session.user.lastName}`}
+                    />
                 )}
               </TabsContent>
 

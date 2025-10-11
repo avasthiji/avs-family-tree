@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "seed": "tsx src/lib/seed-data.ts"
+    "seed": "dotenv -e .env.local -- tsx src/lib/seed-data.ts"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.11.0",
