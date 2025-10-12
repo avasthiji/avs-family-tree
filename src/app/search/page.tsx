@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import SearchBar from "@/components/SearchBar";
+import UserProfileModal from "@/components/UserProfileModal";
 import Link from "next/link";
 import { 
   User, 
@@ -19,7 +20,8 @@ import {
   Mail,
   Phone,
   ArrowLeft,
-  Search as SearchIcon
+  Search as SearchIcon,
+  Eye
 } from "lucide-react";
 
 interface SearchResult {
@@ -45,6 +47,8 @@ function SearchPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedUser, setSelectedUser] = useState<SearchResult | null>(null);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -57,6 +61,11 @@ function SearchPageContent() {
 
   const handleSelectUser = (user: SearchResult) => {
     setSelectedUser(user);
+  };
+
+  const handleViewProfile = (userId: string) => {
+    setProfileUserId(userId);
+    setProfileModalOpen(true);
   };
 
   if (status === "loading") {
@@ -132,7 +141,11 @@ function SearchPageContent() {
           
           {/* Search Bar */}
           <div className="flex justify-center">
-            <SearchBar isAdmin={isAdmin} onSelectUser={handleSelectUser} />
+            <SearchBar 
+              isAdmin={isAdmin} 
+              onSelectUser={handleSelectUser} 
+              onViewProfile={handleViewProfile}
+            />
           </div>
         </div>
 
@@ -142,13 +155,24 @@ function SearchPageContent() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>User Details</CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSelectedUser(null)}
-                >
-                  Clear
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => handleViewProfile(selectedUser._id)}
+                    className="avs-button-primary"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Full Profile
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedUser(null)}
+                  >
+                    Clear
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -256,6 +280,13 @@ function SearchPageContent() {
             </CardContent>
           </Card>
         )}
+
+        {/* User Profile Modal */}
+        <UserProfileModal
+          userId={profileUserId}
+          open={profileModalOpen}
+          onOpenChange={setProfileModalOpen}
+        />
 
       </div>
     </div>

@@ -19,26 +19,18 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    // Get all approved relationships where current user is involved
-    const directRelationships = await Relationship.find({
-      $or: [
-        { personId1: session.user.id },
-        { personId2: session.user.id }
-      ],
-      isApproved: true
-    })
-    .populate('personId1', 'firstName lastName profilePicture gothiram nativePlace')
-    .populate('personId2', 'firstName lastName profilePicture gothiram nativePlace')
-    .populate('createdBy', 'firstName lastName');
+    // Get userId from query params - if provided, fetch relationships for that user
+    const { searchParams } = new URL(request.url);
+    const targetUserId = searchParams.get('userId') || session.user.id;
 
     // Build a set of all connected family members
     const connectedPeople = new Set<string>();
-    connectedPeople.add(session.user.id);
+    connectedPeople.add(targetUserId);
 
     // BFS to find all connected family members
-    const queue: string[] = [session.user.id];
+    const queue: string[] = [targetUserId];
     const visited = new Set<string>();
-    visited.add(session.user.id);
+    visited.add(targetUserId);
 
     while (queue.length > 0) {
       const currentPerson = queue.shift()!;
@@ -78,7 +70,7 @@ export async function GET(request: NextRequest) {
     .sort({ createdAt: -1 });
 
     console.log('🔍 Family Network Debug:');
-    console.log('👤 Current User:', session.user.id);
+    console.log('👤 Target User:', targetUserId);
     console.log('👥 Connected People:', connectedPeople.size);
     console.log('🔗 Total Family Relationships:', allFamilyRelationships.length);
 

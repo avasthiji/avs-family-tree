@@ -18,7 +18,21 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    const user = await User.findById(session.user.id).select('-password');
+    // Get userId from query params - if not provided, use current user's ID
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId') || session.user.id;
+
+    // Determine what fields to select based on user role and requested user
+    let selectFields = '-password';
+    const isAdmin = session.user.role === 'admin';
+    const isOwnProfile = userId === session.user.id;
+
+    // Non-admin users viewing other profiles get limited info (no sensitive contact details)
+    if (!isAdmin && !isOwnProfile) {
+      selectFields = 'firstName lastName profilePicture gothiram nativePlace city state country workPlace jobDesc qualification gender dob height rasi natchathiram kuladeivam bioDesc partnerDesc enableMarriageFlag role isApprovedByAdmin isEmailVerified isMobileVerified';
+    }
+
+    const user = await User.findById(userId).select(selectFields);
     
     if (!user) {
       return NextResponse.json(

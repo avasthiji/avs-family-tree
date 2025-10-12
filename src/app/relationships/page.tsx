@@ -28,10 +28,11 @@ import {
   Label 
 } from "@/components/ui/label";
 import SearchBar from "@/components/SearchBar";
+import UserProfileModal from "@/components/UserProfileModal";
 import Link from "next/link";
 import { toast } from "sonner";
 import { 
-  Users, Plus, Trash2, Edit, ArrowLeft, MapPin, User, CheckCircle, Clock 
+  Users, Plus, Trash2, Edit, ArrowLeft, MapPin, User, CheckCircle, Clock, Eye 
 } from "lucide-react";
 
 interface RelationshipData {
@@ -77,6 +78,8 @@ export default function RelationshipsPage() {
   const [relationType, setRelationType] = useState("");
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -180,6 +183,11 @@ export default function RelationshipsPage() {
   const getOtherPerson = (r: RelationshipData) =>
     r.personId1._id === session?.user.id ? r.personId2 : r.personId1;
 
+  const handleViewProfile = (userId: string) => {
+    setProfileUserId(userId);
+    setProfileModalOpen(true);
+  };
+
   if (status === "loading" || loading)
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
@@ -251,6 +259,7 @@ export default function RelationshipsPage() {
                       <SearchBar
                         isAdmin={session.user.role === "admin"}
                         onSelectUser={setSelectedUser}
+                        onViewProfile={handleViewProfile}
                       />
                     </div>
                   </div>
@@ -376,6 +385,14 @@ export default function RelationshipsPage() {
                         </div>
                       </div>
                       <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleViewProfile(person._id)}
+                          title="View Profile"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                         <Button variant="outline" size="sm" onClick={() => openEditDialog(rel)}>
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -430,6 +447,13 @@ export default function RelationshipsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* User Profile Modal */}
+        <UserProfileModal
+          userId={profileUserId}
+          open={profileModalOpen}
+          onOpenChange={setProfileModalOpen}
+        />
       </main>
     </div>
   );

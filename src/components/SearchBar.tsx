@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
-import { Search, X, User, MapPin, Filter, Loader2, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { Search, X, User, MapPin, Filter, Loader2, ChevronDown, ChevronUp, Sparkles, Eye } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface SearchResult {
@@ -31,6 +31,7 @@ interface SearchResult {
 interface SearchBarProps {
   isAdmin?: boolean;
   onSelectUser?: (user: SearchResult) => void;
+  onViewProfile?: (userId: string) => void;
 }
 
 interface GothiramOption {
@@ -38,7 +39,7 @@ interface GothiramOption {
   name: string;
 }
 
-export default function SearchBar({ isAdmin = false, onSelectUser }: SearchBarProps) {
+export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
   const [status, setStatus] = useState("approved");
@@ -427,8 +428,7 @@ export default function SearchBar({ isAdmin = false, onSelectUser }: SearchBarPr
               {results.map((user) => (
                 <div
                   key={user._id}
-                  onClick={() => handleSelectUser(user)}
-                  className="p-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="p-3 hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
@@ -438,7 +438,10 @@ export default function SearchBar({ isAdmin = false, onSelectUser }: SearchBarPr
                       </AvatarFallback>
                     </Avatar>
 
-                    <div className="flex-1 min-w-0">
+                    <div 
+                      className="flex-1 min-w-0 cursor-pointer"
+                      onClick={() => handleSelectUser(user)}
+                    >
                       <div className="flex items-center gap-2 mb-1">
                         <p className="font-semibold text-gray-900">
                           {user.firstName} {user.lastName}
@@ -475,11 +478,28 @@ export default function SearchBar({ isAdmin = false, onSelectUser }: SearchBarPr
                       </div>
                     </div>
 
-                    {user.gender && (
-                      <Badge variant="outline" className="text-xs">
-                        {user.gender}
-                      </Badge>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {user.gender && (
+                        <Badge variant="outline" className="text-xs">
+                          {user.gender}
+                        </Badge>
+                      )}
+                      {onViewProfile && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onViewProfile(user._id);
+                            setShowResults(false);
+                          }}
+                          className="h-7 px-2"
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
+                          View
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
