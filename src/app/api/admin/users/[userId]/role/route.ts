@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await auth();
@@ -31,7 +31,8 @@ export async function POST(
       );
     }
 
-    const userId = params.userId;
+    const resolvedParams = await params;
+    const userId = resolvedParams.userId;
 
     // Prevent admin from changing their own role
     if (userId === session.user.id) {
