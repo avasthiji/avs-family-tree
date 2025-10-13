@@ -18,6 +18,7 @@ interface FamilyTreeViewProps {
   relationships: RelationshipData[];
   currentUserId: string;
   currentUserName: string;
+  onNodeClick?: (userId: string) => void;
 }
 
 interface TreeNode {
@@ -37,7 +38,7 @@ interface TreeNode {
   y?: number;
 }
 
-export default function D3FamilyTree({ relationships, currentUserId, currentUserName }: FamilyTreeViewProps) {
+export default function D3FamilyTree({ relationships, currentUserId, currentUserName, onNodeClick }: FamilyTreeViewProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
@@ -47,6 +48,7 @@ export default function D3FamilyTree({ relationships, currentUserId, currentUser
   useEffect(() => {
     console.log('🎯 D3FamilyTree received data:');
     console.log('📊 Relationships count:', relationships?.length || 0);
+    console.log('📊 Relationships data:', relationships);
     console.log('👤 Current User ID:', currentUserId);
     console.log('👤 Current User Name:', currentUserName);
 
@@ -101,7 +103,8 @@ export default function D3FamilyTree({ relationships, currentUserId, currentUser
   const createNode = (container: d3.Selection<SVGGElement, unknown, null, undefined>, x: number, y: number, nodeData: TreeNode) => {
     const nodeGroup = container.append("g")
       .attr("class", "node")
-      .attr("transform", `translate(${x}, ${y})`);
+      .attr("transform", `translate(${x}, ${y})`)
+      .style("cursor", "pointer");
 
     // Node background (matching FamilyTreeView style)
     nodeGroup.append("rect")
@@ -211,54 +214,123 @@ export default function D3FamilyTree({ relationships, currentUserId, currentUser
         .text(nodeData.relationshipType);
     }
 
+    // Add click event handler
+    nodeGroup.on("click", () => {
+      if (onNodeClick) {
+        onNodeClick(nodeData.id);
+      }
+    });
+
+    // Add hover effects
+    nodeGroup.on("mouseenter", function() {
+      d3.select(this).select("rect")
+        .attr("stroke", "#3b82f6")
+        .attr("stroke-width", 3);
+    });
+
+    nodeGroup.on("mouseleave", function() {
+      d3.select(this).select("rect")
+        .attr("stroke", nodeData.isCurrentUser ? "#3b82f6" : "#e5e7eb")
+        .attr("stroke-width", nodeData.isCurrentUser ? 3 : 2);
+    });
+
     return nodeGroup;
   };
 
-  const createLink = (container: d3.Selection<SVGGElement, unknown, null, undefined>, 
+  const createOrthogonalLink = (container: d3.Selection<SVGGElement, unknown, null, undefined>, 
                      source: {x: number, y: number}, 
                      target: {x: number, y: number}, 
                      relationshipType: string, 
                      isApproved: boolean) => {
     
     const linkGroup = container.append("g")
-      .attr("class", "link");
+      .attr("class", "orthogonal-link");
 
-    // Draw the line (matching FamilyTreeView style)
-    linkGroup.append("line")
-      .attr("x1", source.x)
-      .attr("y1", source.y)
-      .attr("x2", target.x)
-      .attr("y2", target.y)
-      .attr("stroke", isApproved ? "#10b981" : "#f59e0b")
-      .attr("stroke-width", isApproved ? 6 : 4)
-      .attr("stroke-dasharray", isApproved ? "0" : "8,4")
-      .attr("stroke-linecap", "round")
-      .attr("opacity", 0.9);
-
-    // Add arrowhead for parent-to-child direction (matching FamilyTreeView style)
+    // Calculate orthogonal path points
     const dx = target.x - source.x;
     const dy = target.y - source.y;
-    const length = Math.sqrt(dx * dx + dy * dy);
-    const unitX = dx / length;
-    const unitY = dy / length;
+    const isVertical = Math.abs(dy) > Math.abs(dx);
     
-    const arrowSize = 15; // Larger arrow to match FamilyTreeView
-    const arrowX = target.x - unitX * 30; // Position arrow 30px from target
-    const arrowY = target.y - unitY * 30;
+    let pathPoints: { x: number; y: number }[] = [];
+    
+    if (isVertical) {
+      // Vertical relationship (parent-child)
+      const midY = source.y + (dy > 0 ? 80 : -80); // 80px spacing from node edges
+      
+      if (Math.abs(dx) < 50) {
+        // Direct vertical line with small horizontal adjustment
+        pathPoints = [
+          { x: source.x, y: source.y + (dy > 0 ? 80 : -80) },
+          { x: source.x, y: midY },
+          { x: target.x, y: midY },
+          { x: target.x, y: target.y + (dy > 0 ? -80 : 80) }
+        ];
+      } else {
+        // L-shaped path for better visual separation
+        const horizontalOffset = dx > 0 ? 80 : -80;
+        pathPoints = [
+          { x: source.x, y: source.y + (dy > 0 ? 80 : -80) },
+          { x: source.x, y: midY },
+          { x: source.x + horizontalOffset, y: midY },
+          { x: source.x + horizontalOffset, y: target.y + (dy > 0 ? -80 : 80) },
+          { x: target.x, y: target.y + (dy > 0 ? -80 : 80) }
+        ];
+      }
+    } else {
+      // Horizontal relationship (spouse, sibling)
+      const midX = source.x + dx / 2;
+      const verticalOffset = dy > 0 ? 40 : -40;
+      
+      pathPoints = [
+        { x: source.x + (dx > 0 ? 80 : -80), y: source.y },
+        { x: midX, y: source.y },
+        { x: midX, y: source.y + verticalOffset },
+        { x: target.x + (dx > 0 ? -80 : 80), y: source.y + verticalOffset },
+        { x: target.x + (dx > 0 ? -80 : 80), y: target.y }
+      ];
+    }
+
+    // Create the orthogonal path
+    let pathData = `M ${pathPoints[0].x} ${pathPoints[0].y}`;
+    for (let i = 1; i < pathPoints.length; i++) {
+      pathData += ` L ${pathPoints[i].x} ${pathPoints[i].y}`;
+    }
 
     linkGroup.append("path")
-      .attr("d", `M ${arrowX - arrowSize} ${arrowY - arrowSize} L ${arrowX} ${arrowY} L ${arrowX - arrowSize} ${arrowY + arrowSize}`)
+      .attr("d", pathData)
+      .attr("stroke", isApproved ? "#10b981" : "#f59e0b")
+      .attr("stroke-width", isApproved ? 3 : 2)
+      .attr("stroke-dasharray", isApproved ? "0" : "8,4")
+      .attr("stroke-linecap", "round")
+      .attr("stroke-linejoin", "round")
+      .attr("fill", "none")
+      .attr("opacity", 0.9);
+
+    // Add arrowhead at the end
+    const lastPoint = pathPoints[pathPoints.length - 1];
+    const secondLastPoint = pathPoints[pathPoints.length - 2];
+    const arrowDx = lastPoint.x - secondLastPoint.x;
+    const arrowDy = lastPoint.y - secondLastPoint.y;
+    const arrowLength = Math.sqrt(arrowDx * arrowDx + arrowDy * arrowDy);
+    const arrowUnitX = arrowDx / arrowLength;
+    const arrowUnitY = arrowDy / arrowLength;
+    
+    const arrowSize = 12;
+    const arrowX = lastPoint.x - arrowUnitX * 15;
+    const arrowY = lastPoint.y - arrowUnitY * 15;
+
+    linkGroup.append("path")
+      .attr("d", `M ${arrowX - arrowSize * arrowUnitX} ${arrowY - arrowSize * arrowUnitY} L ${arrowX} ${arrowY} L ${arrowX + arrowSize * arrowUnitY} ${arrowY - arrowSize * arrowUnitX}`)
       .attr("fill", isApproved ? "#10b981" : "#f59e0b")
       .attr("stroke", "none");
 
-    // Add relationship type label (matching FamilyTreeView style)
-    const midX = (source.x + target.x) / 2;
-    const midY = (source.y + target.y) / 2;
+    // Add relationship type label at a good position
+    const labelPoint = pathPoints[Math.floor(pathPoints.length / 2)];
     
     // Background for label
     linkGroup.append("rect")
-      .attr("x", midX - 30)
-      .attr("y", midY - 15)
+      .attr("x", labelPoint.x - 30)
+      .attr("y", labelPoint.y - 10)
       .attr("width", 60)
       .attr("height", 20)
       .attr("rx", 4)
@@ -268,12 +340,12 @@ export default function D3FamilyTree({ relationships, currentUserId, currentUser
       .attr("stroke-width", 1);
     
     linkGroup.append("text")
-      .attr("x", midX)
-      .attr("y", midY - 5)
+      .attr("x", labelPoint.x)
+      .attr("y", labelPoint.y + 5)
       .attr("text-anchor", "middle")
       .attr("fill", "#000000")
-      .attr("font-size", "14")
-      .attr("font-weight", "800")
+      .attr("font-size", "12")
+      .attr("font-weight", "600")
       .text(relationshipType);
 
     return linkGroup;
@@ -285,7 +357,7 @@ export default function D3FamilyTree({ relationships, currentUserId, currentUser
 
     const width = dimensions.width;
     const height = dimensions.height;
-    const margin = { top: 60, right: 60, bottom: 60, left: 60 };
+    const margin = { top: 80, right: 80, bottom: 80, left: 80 };
 
     svg.attr("width", width).attr("height", height);
 
@@ -326,81 +398,143 @@ export default function D3FamilyTree({ relationships, currentUserId, currentUser
 
     console.log('👥 People in tree:', Array.from(personMap.values()).map(p => ({ name: `${p.firstName} ${p.lastName}`, id: p._id })));
 
-    // Create nodes and links
+    // Build relationship graph
+    const relationshipGraph = new Map<string, Array<{person: any, type: string, relId: string, approved: boolean}>>();
+    
+    relationships.forEach(rel => {
+      if (!rel.personId1 || !rel.personId2) return;
+      const a = rel.personId1._id;
+      const b = rel.personId2._id;
+
+      if (!relationshipGraph.has(a)) relationshipGraph.set(a, []);
+      if (!relationshipGraph.has(b)) relationshipGraph.set(b, []);
+
+      relationshipGraph.get(a)!.push({ person: rel.personId2, type: rel.relationType, relId: rel._id, approved: rel.isApproved });
+      relationshipGraph.get(b)!.push({ person: rel.personId1, type: rel.relationType, relId: rel._id, approved: rel.isApproved });
+    });
+
+    // Compute generations using BFS
+    const generations = new Map<string, number>();
+    const queue: string[] = [currentUserId];
+    const visited = new Set<string>([currentUserId]);
+    generations.set(currentUserId, 0);
+
+    while (queue.length > 0) {
+      const pid = queue.shift()!;
+      const curGen = generations.get(pid) || 0;
+      const neighbors = relationshipGraph.get(pid) || [];
+
+      neighbors.forEach(({ person, type }) => {
+        if (!person || !person._id) return;
+        const nid = person._id;
+        if (visited.has(nid)) return;
+
+        let targetGen = curGen;
+
+        // Determine generation based on relationship type
+        if (['Father', 'Mother', 'Grand Father', 'Grand Mother', 'Uncle', 'Aunt'].includes(type)) {
+          targetGen = curGen - 1;
+        } else if (['Son', 'Daughter', 'Nephew', 'Niece'].includes(type)) {
+          targetGen = curGen + 1;
+        } else if (['Spouse', 'Brother', 'Sister', 'Sibling', 'Older Sibling', 'Younger Sibling', 'Cousin'].includes(type)) {
+          targetGen = curGen;
+        }
+
+        generations.set(nid, targetGen);
+        visited.add(nid);
+        queue.push(nid);
+      });
+    }
+
+    // Ensure everyone gets a generation
+    Array.from(personMap.keys()).forEach((pid) => {
+      if (!generations.has(pid)) {
+        generations.set(pid, 1);
+      }
+    });
+
+    console.log('🏗️ Generation mapping:', Object.fromEntries(generations));
+
+    // Create nodes and position them by generation
     const nodes: TreeNode[] = [];
     const links: Array<{source: TreeNode, target: TreeNode, relationshipType: string, isApproved: boolean}> = [];
 
-    // Position current user in center top
-    const centerX = contentWidth / 2;
-    const currentUserNode: TreeNode = {
-      id: currentUserId,
-      name: currentUserName,
-      firstName: currentUserName.split(' ')[0],
-      lastName: currentUserName.split(' ').slice(1).join(' ') || '',
-      initials: currentUserName.split(' ').map(n => n[0]).join(''),
-      isCurrentUser: true,
-      x: centerX,
-      y: 100
-    };
-    nodes.push(currentUserNode);
+    // Group people by generation
+    const generationGroups = new Map<number, string[]>();
+    generations.forEach((gen, personId) => {
+      if (!generationGroups.has(gen)) {
+        generationGroups.set(gen, []);
+      }
+      generationGroups.get(gen)!.push(personId);
+    });
 
-    // Process relationships to find children
-    const children: TreeNode[] = [];
+    // Position nodes by generation
+    const generationSpacing = 300; // Increased for better orthogonal line spacing
+    const nodeSpacing = 350; // Increased for better horizontal separation
+    const centerX = contentWidth / 2;
+
+    generationGroups.forEach((personIds, gen) => {
+      const startX = centerX - ((personIds.length - 1) * nodeSpacing) / 2;
+      
+      personIds.forEach((personId, index) => {
+        const person = personMap.get(personId);
+        if (!person) return;
+
+        const node: TreeNode = {
+          id: personId,
+          name: `${person.firstName} ${person.lastName}`,
+          firstName: person.firstName,
+          lastName: person.lastName,
+          initials: `${person.firstName?.[0] || ''}${person.lastName?.[0] || ''}`,
+          profilePicture: person.profilePicture,
+          gothiram: person.gothiram,
+          nativePlace: person.nativePlace,
+          isCurrentUser: personId === currentUserId,
+          x: startX + index * nodeSpacing,
+          y: 100 + gen * generationSpacing
+        };
+
+        nodes.push(node);
+      });
+    });
+
+    // Create links from relationships
+    const linkSet = new Set<string>();
     
     relationships.forEach(rel => {
-      console.log('🔍 Processing relationship:', rel);
+      if (!rel.personId1 || !rel.personId2) return;
       
-      let childPerson = null;
-      let relationshipFromPerspective = rel.relationType;
-
-      // Determine if this is a parent-child relationship from current user's perspective
-      if (rel.personId1?._id === currentUserId) {
-        childPerson = rel.personId2;
-        // Current user is parent, other is child (Son/Daughter)
-        relationshipFromPerspective = rel.relationType;
-      } else if (rel.personId2?._id === currentUserId) {
-        childPerson = rel.personId1;
-        // Current user is child, other is parent - reverse the relationship
-        relationshipFromPerspective = getReverseRelationship(rel.relationType);
-      }
-
-      if (childPerson && isChildRelationship(relationshipFromPerspective)) {
-        console.log(`✅ Found child: ${childPerson.firstName} ${childPerson.lastName}`);
+      const sourceNode = nodes.find(n => n.id === rel.personId1._id);
+      const targetNode = nodes.find(n => n.id === rel.personId2._id);
+      
+      if (sourceNode && targetNode) {
+        const gen1 = generations.get(rel.personId1._id) || 0;
+        const gen2 = generations.get(rel.personId2._id) || 0;
         
-        const childNode: TreeNode = {
-          id: childPerson._id,
-          name: `${childPerson.firstName} ${childPerson.lastName}`,
-          firstName: childPerson.firstName,
-          lastName: childPerson.lastName,
-          initials: `${childPerson.firstName?.[0] || ''}${childPerson.lastName?.[0] || ''}`,
-          profilePicture: childPerson.profilePicture,
-          gothiram: childPerson.gothiram,
-          nativePlace: childPerson.nativePlace,
-          isCurrentUser: false,
-          relationshipType: rel.relationType,
-          isApproved: rel.isApproved
-        };
+        // Determine source and target based on generation (parent to child)
+        let source = sourceNode;
+        let target = targetNode;
         
-        children.push(childNode);
+        if (gen1 > gen2) {
+          source = targetNode;
+          target = sourceNode;
+        }
         
-        // Create link from current user to child
+        // Check for duplicates
+        const linkKey = `${source.id}-${target.id}`;
+        const reverseKey = `${target.id}-${source.id}`;
+        
+        if (!linkSet.has(linkKey) && !linkSet.has(reverseKey)) {
+          linkSet.add(linkKey);
+          
         links.push({
-          source: currentUserNode,
-          target: childNode,
+            source,
+            target,
           relationshipType: rel.relationType,
           isApproved: rel.isApproved
         });
       }
-    });
-
-    // Position children horizontally below current user (matching FamilyTreeView spacing)
-    const childSpacing = Math.min(280, contentWidth / Math.max(1, children.length));
-    const startX = centerX - ((children.length - 1) * childSpacing) / 2;
-
-    children.forEach((child, index) => {
-      child.x = startX + index * childSpacing;
-      child.y = 350; // Position below current user with proper spacing
-      nodes.push(child);
+      }
     });
 
     console.log('📊 Final nodes:', nodes.length);
@@ -409,13 +543,13 @@ export default function D3FamilyTree({ relationships, currentUserId, currentUser
     setNodeCount(nodes.length);
     setEdgeCount(links.length);
 
-    // Draw links first (behind nodes)
+    // Draw orthogonal links first (behind nodes) - Microsoft Teams style
     links.forEach(link => {
       if (link.source.x !== undefined && link.source.y !== undefined && 
           link.target.x !== undefined && link.target.y !== undefined) {
-        createLink(g, 
-          { x: link.source.x, y: link.source.y + 80 }, // Start from bottom of parent node
-          { x: link.target.x, y: link.target.y - 80 }, // End at top of child node
+        createOrthogonalLink(g, 
+          { x: link.source.x, y: link.source.y }, // Start from center of source node
+          { x: link.target.x, y: link.target.y }, // End at center of target node
           link.relationshipType, 
           link.isApproved
         );
@@ -439,16 +573,22 @@ export default function D3FamilyTree({ relationships, currentUserId, currentUser
     svg.call(zoom as any);
 
     // Fit view to show all nodes
-    const bounds = { 
+    const nodePositions = nodes.filter(n => n.x !== undefined && n.y !== undefined);
+    const bounds = nodePositions.length > 0 ? {
+      x: Math.min(...nodePositions.map(n => n.x!)) - 100, 
+      y: Math.min(...nodePositions.map(n => n.y!)) - 100, 
+      width: Math.max(...nodePositions.map(n => n.x!)) - Math.min(...nodePositions.map(n => n.x!)) + 200,
+      height: Math.max(...nodePositions.map(n => n.y!)) - Math.min(...nodePositions.map(n => n.y!)) + 200
+    } : {
       x: 0, 
       y: 0, 
       width: contentWidth, 
-      height: Math.max(contentHeight, 400) 
+      height: contentHeight
     };
     
     const fullWidth = width - margin.left - margin.right;
     const fullHeight = height - margin.top - margin.bottom;
-    const scale = Math.min(fullWidth / bounds.width, fullHeight / bounds.height) * 0.9;
+    const scale = Math.min(fullWidth / bounds.width, fullHeight / bounds.height) * 0.8;
     const translate = [
       fullWidth / 2 - scale * (bounds.x + bounds.width / 2),
       fullHeight / 2 - scale * (bounds.y + bounds.height / 2)
@@ -460,23 +600,6 @@ export default function D3FamilyTree({ relationships, currentUserId, currentUser
     );
   };
 
-  // Helper function to reverse relationship perspective
-  const getReverseRelationship = (relationType: string): string => {
-    const reverseMap: { [key: string]: string } = {
-      'Father': 'Son',
-      'Mother': 'Daughter',
-      'Son': 'Father',
-      'Daughter': 'Mother',
-      'Grand Father': 'Grand Son',
-      'Grand Mother': 'Grand Daughter',
-    };
-    return reverseMap[relationType] || relationType;
-  };
-
-  // Helper function to check if relationship is child relationship
-  const isChildRelationship = (relationType: string): boolean => {
-    return ['Son', 'Daughter', 'Grand Son', 'Grand Daughter'].includes(relationType);
-  };
 
   return (
     <div className="w-full h-[750px] bg-gradient-to-br from-indigo-50 via-white to-emerald-50 rounded-2xl border-4 border-indigo-200 shadow-2xl overflow-hidden">
@@ -499,23 +622,6 @@ export default function D3FamilyTree({ relationships, currentUserId, currentUser
           </div>
         </div>
 
-        {/* Connection Status Panel */}
-        <div className="absolute top-4 right-4 z-10 bg-white backdrop-blur-md p-4 rounded-2xl shadow-2xl border-2 border-gray-200">
-          <div className="space-y-3">
-            <h3 className="font-bold text-sm text-gray-900 mb-2 flex items-center gap-2">
-              <span className="text-sm">📊</span>
-              Connection Status
-            </h3>
-            <div className="flex items-center gap-3 text-sm">
-              <div className="w-8 h-1.5 bg-green-500 rounded-full shadow-md"></div>
-              <span className="text-gray-800 font-semibold">Approved</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <div className="w-8 h-1.5 bg-amber-500 rounded-full shadow-md dash-animated"></div>
-              <span className="text-gray-800 font-semibold">Pending</span>
-            </div>
-          </div>
-        </div>
 
         {/* Empty State */}
         {(!relationships || relationships.length === 0) && (

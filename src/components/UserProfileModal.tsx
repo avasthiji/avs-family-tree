@@ -191,7 +191,7 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent  className="!max-w-7xl w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <Avatar className="h-12 w-12">

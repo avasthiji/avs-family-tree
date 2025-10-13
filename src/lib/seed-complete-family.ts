@@ -440,9 +440,9 @@ export async function seedCompleteFamily() {
     const kumar = findUser('Kumar');
     const rohan = findUser('Rohan');
 
-    // Create comprehensive relationships
+    // Create clean, linear relationships - NO DUPLICATES OR CONTRADICTIONS
     const relationships = [
-      // === GENERATION 1: GRANDPARENTS ===
+      // === GENERATION 1: GRANDPARENTS (Spouse relationship only) ===
       {
         personId1: venkat?._id,
         personId2: lakshmi?._id,
@@ -453,12 +453,13 @@ export async function seedCompleteFamily() {
         createdBy: arun?._id
       },
 
-      // === GENERATION 2: VENKAT'S CHILDREN ===
+      // === GENERATION 2: PARENTS (Only direct parent-child relationships) ===
+      // Venkataraman & Lakshmi → Ramesh (Father & Mother)
       {
         personId1: venkat?._id,
         personId2: ramesh?._id,
-        relationType: 'Son',
-        description: 'Eldest son',
+        relationType: 'Father',
+        description: 'Father',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
@@ -466,17 +467,19 @@ export async function seedCompleteFamily() {
       {
         personId1: lakshmi?._id,
         personId2: ramesh?._id,
-        relationType: 'Son',
-        description: 'Eldest son',
+        relationType: 'Mother',
+        description: 'Mother',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
       },
+      
+      // Venkataraman & Lakshmi → Murali (Father & Mother)
       {
         personId1: venkat?._id,
         personId2: murali?._id,
-        relationType: 'Son',
-        description: 'Younger son',
+        relationType: 'Father',
+        description: 'Father',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
@@ -484,14 +487,14 @@ export async function seedCompleteFamily() {
       {
         personId1: lakshmi?._id,
         personId2: murali?._id,
-        relationType: 'Son',
-        description: 'Younger son',
+        relationType: 'Mother',
+        description: 'Mother',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
       },
 
-      // === SIBLINGS: RAMESH AND MURALI ===
+      // === GENERATION 2: SIBLINGS ===
       {
         personId1: ramesh?._id,
         personId2: murali?._id,
@@ -502,7 +505,7 @@ export async function seedCompleteFamily() {
         createdBy: arun?._id
       },
 
-      // === RAMESH AND SAROJA (PARENTS) ===
+      // === GENERATION 2: SPOUSE ===
       {
         personId1: ramesh?._id,
         personId2: saroja?._id,
@@ -513,12 +516,13 @@ export async function seedCompleteFamily() {
         createdBy: arun?._id
       },
 
-      // === GENERATION 3: RAMESH & SAROJA'S CHILDREN ===
+      // === GENERATION 3: PARENTS TO CHILDREN (Only direct relationships) ===
+      // Ramesh & Saroja → Arun (Father & Mother)
       {
         personId1: ramesh?._id,
         personId2: arun?._id,
-        relationType: 'Son',
-        description: 'Eldest son',
+        relationType: 'Father',
+        description: 'Father',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
@@ -526,17 +530,19 @@ export async function seedCompleteFamily() {
       {
         personId1: saroja?._id,
         personId2: arun?._id,
-        relationType: 'Son',
-        description: 'Eldest son',
+        relationType: 'Mother',
+        description: 'Mother',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
       },
+      
+      // Ramesh & Saroja → Divya (Father & Mother)
       {
         personId1: ramesh?._id,
         personId2: divya?._id,
-        relationType: 'Daughter',
-        description: 'Daughter',
+        relationType: 'Father',
+        description: 'Father',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
@@ -544,17 +550,19 @@ export async function seedCompleteFamily() {
       {
         personId1: saroja?._id,
         personId2: divya?._id,
-        relationType: 'Daughter',
-        description: 'Daughter',
+        relationType: 'Mother',
+        description: 'Mother',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
       },
+      
+      // Ramesh & Saroja → Kumar (Father & Mother)
       {
         personId1: ramesh?._id,
         personId2: kumar?._id,
-        relationType: 'Son',
-        description: 'Youngest son',
+        relationType: 'Father',
+        description: 'Father',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
@@ -562,19 +570,19 @@ export async function seedCompleteFamily() {
       {
         personId1: saroja?._id,
         personId2: kumar?._id,
-        relationType: 'Son',
-        description: 'Youngest son',
+        relationType: 'Mother',
+        description: 'Mother',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
       },
 
-      // === SIBLINGS: ARUN, DIVYA, KUMAR ===
+      // === GENERATION 3: SIBLINGS (Only between siblings, not parent-child) ===
       {
         personId1: arun?._id,
         personId2: divya?._id,
         relationType: 'Sister',
-        description: 'Younger sister',
+        description: 'Sister',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
@@ -583,7 +591,7 @@ export async function seedCompleteFamily() {
         personId1: arun?._id,
         personId2: kumar?._id,
         relationType: 'Brother',
-        description: 'Younger brother',
+        description: 'Brother',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
@@ -592,13 +600,13 @@ export async function seedCompleteFamily() {
         personId1: divya?._id,
         personId2: kumar?._id,
         relationType: 'Brother',
-        description: 'Younger brother',
+        description: 'Brother',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
       },
 
-      // === ARUN AND PRIYA (SPOUSE) ===
+      // === GENERATION 3: SPOUSE ===
       {
         personId1: arun?._id,
         personId2: priya?._id,
@@ -609,12 +617,12 @@ export async function seedCompleteFamily() {
         createdBy: arun?._id
       },
 
-      // === GENERATION 4: ARUN & PRIYA'S CHILDREN ===
+      // === GENERATION 4: PARENTS TO CHILDREN ===
       {
         personId1: arun?._id,
         personId2: rohan?._id,
-        relationType: 'Son',
-        description: 'Son',
+        relationType: 'Father',
+        description: 'Father',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id
@@ -622,57 +630,8 @@ export async function seedCompleteFamily() {
       {
         personId1: priya?._id,
         personId2: rohan?._id,
-        relationType: 'Son',
-        description: 'Son',
-        isApproved: true,
-        approvedBy: arun?._id,
-        createdBy: arun?._id
-      },
-
-      // === GRANDPARENTS TO GRANDCHILDREN ===
-      {
-        personId1: venkat?._id,
-        personId2: arun?._id,
-        relationType: 'Grand Father',
-        description: 'Grandfather',
-        isApproved: true,
-        approvedBy: arun?._id,
-        createdBy: arun?._id
-      },
-      {
-        personId1: lakshmi?._id,
-        personId2: arun?._id,
-        relationType: 'Grand Mother',
-        description: 'Grandmother',
-        isApproved: true,
-        approvedBy: arun?._id,
-        createdBy: arun?._id
-      },
-      {
-        personId1: venkat?._id,
-        personId2: rohan?._id,
-        relationType: 'Grand Father',
-        description: 'Great-grandson relationship',
-        isApproved: true,
-        approvedBy: arun?._id,
-        createdBy: arun?._id
-      },
-      {
-        personId1: lakshmi?._id,
-        personId2: rohan?._id,
-        relationType: 'Grand Mother',
-        description: 'Great-grandson relationship',
-        isApproved: true,
-        approvedBy: arun?._id,
-        createdBy: arun?._id
-      },
-
-      // === UNCLE RELATIONSHIP ===
-      {
-        personId1: murali?._id,
-        personId2: arun?._id,
-        relationType: 'Uncle',
-        description: 'Paternal uncle',
+        relationType: 'Mother',
+        description: 'Mother',
         isApproved: true,
         approvedBy: arun?._id,
         createdBy: arun?._id

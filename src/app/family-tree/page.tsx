@@ -11,6 +11,8 @@ import FamilyTreeView from "@/components/FamilyTreeView";
 import Link from "next/link";
 import Image from "next/image";
 import { TreePine, Search, Users, Plus, Network, List } from "lucide-react";
+import D3FamilyTree from "@/components/D3FamilyTree";
+import UserDetailsModal from "@/components/UserDetailsModal";
 
 interface Relationship {
   _id: string;
@@ -25,6 +27,8 @@ export default function FamilyTreePage() {
   const router = useRouter();
   const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -49,6 +53,16 @@ export default function FamilyTreePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleNodeClick = (userId: string) => {
+    setSelectedUserId(userId);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUserId(null);
   };
 
   if (status === "loading" || loading) {
@@ -187,10 +201,11 @@ export default function FamilyTreePage() {
 
               <TabsContent value="visual" className="p-6">
                 {session && (
-                  <FamilyTreeView
+                  <D3FamilyTree
                       relationships={relationships}
                       currentUserId={session.user.id}
                       currentUserName={`${session.user.firstName} ${session.user.lastName}`}
+                      onNodeClick={handleNodeClick}
                     />
                 )}
               </TabsContent>
@@ -259,6 +274,13 @@ export default function FamilyTreePage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* User Details Modal */}
+      <UserDetailsModal
+        userId={selectedUserId}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }
