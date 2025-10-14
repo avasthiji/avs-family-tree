@@ -1,28 +1,33 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  GraduationCap, 
-  Briefcase, 
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  GraduationCap,
+  Briefcase,
   DollarSign,
   Home,
   Heart,
   Users,
   Star,
   X,
-  Clock
-} from 'lucide-react';
+  Clock,
+} from "lucide-react";
 
 interface UserProfile {
   _id: string;
@@ -69,7 +74,11 @@ interface UserDetailsModalProps {
   onClose: () => void;
 }
 
-export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetailsModalProps) {
+export default function UserDetailsModal({
+  userId,
+  isOpen,
+  onClose,
+}: UserDetailsModalProps) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,21 +91,21 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
 
   const fetchUserProfile = async () => {
     if (!userId) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch(`/api/users/profile?userId=${userId}`);
       if (response.ok) {
         const data = await response.json();
         setUserProfile(data.user);
       } else {
-        setError('Failed to fetch user profile');
+        setError("Failed to fetch user profile");
       }
     } catch (err) {
-      setError('Error loading user profile');
-      console.error('Error fetching user profile:', err);
+      setError("Error loading user profile");
+      console.error("Error fetching user profile:", err);
     } finally {
       setLoading(false);
     }
@@ -104,10 +113,10 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
 
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
     } catch {
       return dateString;
@@ -115,7 +124,7 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
   };
 
   const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
+    return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
   };
 
   const getAge = (dobString: string) => {
@@ -124,12 +133,15 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
       const today = new Date();
       let age = today.getFullYear() - dob.getFullYear();
       const monthDiff = today.getMonth() - dob.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < dob.getDate())
+      ) {
         age--;
       }
       return age;
     } catch {
-      return 'N/A';
+      return "N/A";
     }
   };
 
@@ -139,15 +151,9 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="!max-w-7xl w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader className="flex flex-row items-center justify-between">
-          <DialogTitle className="text-2xl font-bold">User Profile Details</DialogTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="h-8 w-8 p-0"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <DialogTitle className="text-2xl font-bold">
+            User Profile Details
+          </DialogTitle>
         </DialogHeader>
 
         {loading && (
@@ -173,22 +179,31 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
               <CardContent className="pt-6">
                 <div className="flex items-start space-x-6">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src={userProfile.profilePicture} alt={`${userProfile.firstName} ${userProfile.lastName}`} />
+                    <AvatarImage
+                      src={userProfile.profilePicture}
+                      alt={`${userProfile.firstName} ${userProfile.lastName}`}
+                    />
                     <AvatarFallback className="text-2xl">
                       {getInitials(userProfile.firstName, userProfile.lastName)}
                     </AvatarFallback>
                   </Avatar>
-                  
+
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
                       <h1 className="text-3xl font-bold text-gray-900">
                         {userProfile.firstName} {userProfile.lastName}
                       </h1>
-                      <Badge variant={userProfile.isApprovedByAdmin ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          userProfile.isApprovedByAdmin
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
                         {userProfile.isApprovedByAdmin ? "Approved" : "Pending"}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center space-x-4 text-gray-600 mb-4">
                       <span className="flex items-center">
                         <User className="h-4 w-4 mr-1" />
@@ -226,21 +241,17 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
                       <span className="text-sm text-gray-600">Email</span>
                       <div className="flex items-center space-x-2">
                         <span>{userProfile.email}</span>
-                        <Badge variant={userProfile.isEmailVerified ? "default" : "secondary"} className="text-xs">
-                          {userProfile.isEmailVerified ? "Verified" : "Unverified"}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <Phone className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Mobile</span>
-                      <div className="flex items-center space-x-2">
-                        <span>{userProfile.mobile}</span>
-                        <Badge variant={userProfile.isMobileVerified ? "default" : "secondary"} className="text-xs">
-                          {userProfile.isMobileVerified ? "Verified" : "Unverified"}
+                        <Badge
+                          variant={
+                            userProfile.isEmailVerified
+                              ? "default"
+                              : "secondary"
+                          }
+                          className="text-xs"
+                        >
+                          {userProfile.isEmailVerified
+                            ? "Verified"
+                            : "Unverified"}
                         </Badge>
                       </div>
                     </div>
@@ -248,7 +259,31 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
 
                   <div className="flex items-center space-x-3">
                     <Phone className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">Primary Phone: {userProfile.primaryPhone}</span>
+                    <div>
+                      <span className="text-sm text-gray-600">Mobile</span>
+                      <div className="flex items-center space-x-2">
+                        <span>{userProfile.mobile}</span>
+                        <Badge
+                          variant={
+                            userProfile.isMobileVerified
+                              ? "default"
+                              : "secondary"
+                          }
+                          className="text-xs"
+                        >
+                          {userProfile.isMobileVerified
+                            ? "Verified"
+                            : "Unverified"}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <Phone className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm text-gray-600">
+                      Primary Phone: {userProfile.primaryPhone}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -265,15 +300,19 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
                   <div className="flex items-center space-x-3">
                     <Calendar className="h-4 w-4 text-gray-500" />
                     <div>
-                      <span className="text-sm text-gray-600">Date of Birth</span>
+                      <span className="text-sm text-gray-600">
+                        Date of Birth
+                      </span>
                       <div>{formatDate(userProfile.dob)}</div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-3">
                     <MapPin className="h-4 w-4 text-gray-500" />
                     <div>
-                      <span className="text-sm text-gray-600">Place of Birth</span>
+                      <span className="text-sm text-gray-600">
+                        Place of Birth
+                      </span>
                       <div>{userProfile.placeOfBirth}</div>
                     </div>
                   </div>
@@ -281,7 +320,9 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
                   <div className="flex items-center space-x-3">
                     <Clock className="h-4 w-4 text-gray-500" />
                     <div>
-                      <span className="text-sm text-gray-600">Time of Birth</span>
+                      <span className="text-sm text-gray-600">
+                        Time of Birth
+                      </span>
                       <div>{userProfile.timeOfBirth}</div>
                     </div>
                   </div>
@@ -306,20 +347,24 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-600">Rasi (Zodiac):</span>
+                    <span className="text-sm text-gray-600">
+                      Rasi (Zodiac):
+                    </span>
                     <Badge variant="outline">{userProfile.rasi}</Badge>
                   </div>
-                  
+
                   <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-600">Natchathiram (Star):</span>
+                    <span className="text-sm text-gray-600">
+                      Natchathiram (Star):
+                    </span>
                     <Badge variant="outline">{userProfile.natchathiram}</Badge>
                   </div>
-                  
+
                   <div className="flex items-center space-x-3">
                     <span className="text-sm text-gray-600">Gothiram:</span>
                     <Badge variant="outline">{userProfile.gothiram}</Badge>
                   </div>
-                  
+
                   <div className="flex items-center space-x-3">
                     <span className="text-sm text-gray-600">Kuladeivam:</span>
                     <Badge variant="outline">{userProfile.kuladeivam}</Badge>
@@ -339,19 +384,23 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
                   <div className="flex items-center space-x-3">
                     <GraduationCap className="h-4 w-4 text-gray-500" />
                     <div>
-                      <span className="text-sm text-gray-600">Qualification</span>
+                      <span className="text-sm text-gray-600">
+                        Qualification
+                      </span>
                       <div>{userProfile.qualification}</div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-3">
                     <Briefcase className="h-4 w-4 text-gray-500" />
                     <div>
-                      <span className="text-sm text-gray-600">Job Description</span>
+                      <span className="text-sm text-gray-600">
+                        Job Description
+                      </span>
                       <div>{userProfile.jobDesc}</div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-3">
                     <DollarSign className="h-4 w-4 text-gray-500" />
                     <div>
@@ -359,7 +408,7 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
                       <div>{userProfile.salary}</div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-3">
                     <MapPin className="h-4 w-4 text-gray-500" />
                     <div>
@@ -387,15 +436,18 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
                     <div>{userProfile.address1}</div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   <MapPin className="h-4 w-4 text-gray-500" />
                   <div>
                     <span className="text-sm text-gray-600">Location</span>
-                    <div>{userProfile.city}, {userProfile.state} {userProfile.postalCode}</div>
+                    <div>
+                      {userProfile.city}, {userProfile.state}{" "}
+                      {userProfile.postalCode}
+                    </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   <MapPin className="h-4 w-4 text-gray-500" />
                   <div>
@@ -403,12 +455,16 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
                     <div>{userProfile.nativePlace}</div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-3">
                   <MapPin className="h-4 w-4 text-gray-500" />
                   <div>
-                    <span className="text-sm text-gray-600">Country & Citizenship</span>
-                    <div>{userProfile.country} • {userProfile.citizenship}</div>
+                    <span className="text-sm text-gray-600">
+                      Country & Citizenship
+                    </span>
+                    <div>
+                      {userProfile.country} • {userProfile.citizenship}
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -427,11 +483,15 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
                   <Badge variant="default" className="mb-4">
                     Marriage Profile Active
                   </Badge>
-                  
+
                   {userProfile.partnerDesc && (
                     <div>
-                      <span className="text-sm text-gray-600 block mb-2">Partner Description</span>
-                      <p className="text-gray-700 leading-relaxed">{userProfile.partnerDesc}</p>
+                      <span className="text-sm text-gray-600 block mb-2">
+                        Partner Description
+                      </span>
+                      <p className="text-gray-700 leading-relaxed">
+                        {userProfile.partnerDesc}
+                      </p>
                     </div>
                   )}
                 </CardContent>
@@ -451,12 +511,12 @@ export default function UserDetailsModal({ userId, isOpen, onClose }: UserDetail
                   <span className="text-sm text-gray-600">Role</span>
                   <Badge variant="outline">{userProfile.role}</Badge>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Account Created</span>
                   <span>{formatDate(userProfile.createdAt)}</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Last Updated</span>
                   <span>{formatDate(userProfile.updatedAt)}</span>
