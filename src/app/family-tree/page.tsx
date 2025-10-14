@@ -3,7 +3,13 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,7 +38,7 @@ export default function FamilyTreePage() {
 
   useEffect(() => {
     if (status === "loading") return;
-    
+
     if (!session) {
       router.push("/auth/login");
       return;
@@ -63,6 +69,10 @@ export default function FamilyTreePage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedUserId(null);
+
+    // Clear card highlight when modal closes
+    const clickedCards = document.querySelectorAll(".card-clicked");
+    clickedCards.forEach((card) => card.classList.remove("card-clicked"));
   };
 
   if (status === "loading" || loading) {
@@ -100,9 +110,11 @@ export default function FamilyTreePage() {
                   className="object-contain"
                 />
               </div>
-              <span className="text-xl font-bold avs-text-gradient">AVS Family Tree</span>
+              <span className="text-xl font-bold avs-text-gradient">
+                AVS Family Tree
+              </span>
             </Link>
-            
+
             <div className="flex items-center space-x-4">
               <Link href="/dashboard">
                 <Button variant="outline" size="sm">
@@ -121,7 +133,9 @@ export default function FamilyTreePage() {
             <TreePine className="h-8 w-8 mr-3 text-[#E63946]" />
             Family Tree
           </h1>
-          <p className="text-gray-600">Visualize and manage your family relationships</p>
+          <p className="text-gray-600">
+            Visualize and manage your family relationships
+          </p>
         </div>
 
         {/* Quick Actions */}
@@ -202,11 +216,11 @@ export default function FamilyTreePage() {
               <TabsContent value="visual" className="p-6">
                 {session && (
                   <D3FamilyTree
-                      relationships={relationships}
-                      currentUserId={session.user.id}
-                      currentUserName={`${session.user.firstName} ${session.user.lastName}`}
-                      onNodeClick={handleNodeClick}
-                    />
+                    relationships={relationships}
+                    currentUserId={session.user.id}
+                    currentUserName={`${session.user.firstName} ${session.user.lastName}`}
+                    onNodeClick={handleNodeClick}
+                  />
                 )}
               </TabsContent>
 
@@ -219,7 +233,8 @@ export default function FamilyTreePage() {
                         No relationships found
                       </h3>
                       <p className="text-gray-600 mb-4">
-                        Start building your family tree by searching for relatives and adding connections.
+                        Start building your family tree by searching for
+                        relatives and adding connections.
                       </p>
                       <Link href="/relationships">
                         <Button className="avs-button-primary">
@@ -230,11 +245,17 @@ export default function FamilyTreePage() {
                     </div>
                   ) : (
                     relationships.map((rel) => {
-                      const isCurrentUserPerson1 = rel.personId1?._id === session?.user.id;
-                      const otherPerson = isCurrentUserPerson1 ? rel.personId2 : rel.personId1;
-                      
+                      const isCurrentUserPerson1 =
+                        rel.personId1?._id === session?.user.id;
+                      const otherPerson = isCurrentUserPerson1
+                        ? rel.personId2
+                        : rel.personId1;
+
                       return (
-                        <div key={rel._id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow">
+                        <div
+                          key={rel._id}
+                          className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow"
+                        >
                           <div className="flex items-center space-x-4">
                             <div className="w-10 h-10 avs-gradient rounded-full flex items-center justify-center">
                               <Users className="h-5 w-5 text-white" />

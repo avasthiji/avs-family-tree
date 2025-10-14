@@ -244,3 +244,177 @@
     opacity: .5;
   }
 }
+
+/* Family Chart Styles */
+.f3 {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.f3 svg {
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible !important;
+}
+
+/* More specific selectors for links */
+.f3 svg line,
+#FamilyChart svg line {
+  stroke: #10b981 !important;
+  stroke-width: 4px !important;
+  opacity: 1 !important;
+  stroke-linecap: round !important;
+}
+
+.f3 svg path,
+#FamilyChart svg path {
+  stroke: #10b981 !important;
+  stroke-width: 4px !important;
+  fill: none !important;
+  opacity: 1 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+.f3 .link line {
+  stroke: #10b981 !important;
+  stroke-width: 4px !important;
+  opacity: 1 !important;
+}
+
+.f3 .link path {
+  stroke: #10b981 !important;
+  stroke-width: 4px !important;
+  fill: none !important;
+  opacity: 1 !important;
+}
+
+.f3 .card {
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  z-index: 10 !important;
+}
+
+.f3 .card:hover {
+  filter: brightness(1.05) !important;
+  transform: scale(1.02) !important;
+}
+
+#FamilyChart {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 51; /* Above dialog overlay */
+}
+
+#FamilyChart svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 51; /* Above dialog overlay */
+}
+
+/* Override any default link styles */
+#FamilyChart svg g.link line,
+#FamilyChart svg g.link path,
+#FamilyChart svg g[class*="link"] line,
+#FamilyChart svg g[class*="link"] path {
+  stroke: #10b981 !important;
+  stroke-width: 4px !important;
+  opacity: 1 !important;
+  fill: none !important;
+}
+
+/* Make dialog overlay very transparent so tree stays visible */
+[data-radix-dialog-overlay] {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(1px) !important;
+  z-index: 1000 !important;
+}
+
+/* Ensure dialog content is above everything */
+[data-radix-dialog-content] {
+  z-index: 1001 !important;
+}
+
+/* Ensure family tree and all its elements stay visible */
+.f3,
+#FamilyChart,
+#FamilyChart svg,
+.f3 svg {
+  isolation: isolate;
+}
+
+/* Keep all family tree cards visible above overlay */
+.f3 .card,
+.f3 foreignObject,
+#FamilyChart foreignObject,
+#FamilyChart .card-inner {
+  position: relative;
+  z-index: 51 !important; /* Above dialog overlay (50) */
+}
+
+/* Clicked card highlight - stays visible above tree but below modal */
+.card-inner.card-clicked {
+  animation: pulse-highlight 1.5s ease-in-out 3;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.6), 0 8px 16px rgba(0, 0, 0, 0.3) !important;
+  border: 3px solid #3b82f6 !important;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+  z-index: 60 !important;
+}
+
+/* Make the foreignObject parent of clicked card also have high z-index */
+#FamilyChart foreignObject:has(.card-clicked) {
+  z-index: 60 !important;
+  position: relative;
+}
+
+@keyframes pulse-highlight {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.6), 0 8px 16px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.9), 0 12px 24px rgba(0, 0, 0, 0.4);
+    transform: scale(1.08);
+  }
+}
+
+/* ReactFlow Styles */
+.react-flow {
+  background: transparent !important;
+  z-index: 40 !important;
+}
+
+.react-flow__node {
+  z-index: 45 !important;
+}
+
+.react-flow__edge {
+  z-index: 35 !important;
+}
+
+.react-flow__edge-path {
+  stroke: #10b981 !important;
+  stroke-width: 3px !important;
+}
+
+.react-flow__node.selected .card-inner {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* ReactFlow background pattern */
+.react-flow__background {
+  opacity: 0.5;
+  z-index: 30 !important;
+}
+
+.react-flow__controls {
+  z-index: 50 !important;
+}
