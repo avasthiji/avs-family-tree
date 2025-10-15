@@ -12,14 +12,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials) {
-          console.log("❌ [AUTH] No credentials provided");
           return null;
         }
-
-        console.log("🔐 [AUTH] Login attempt:", { 
-          email: credentials.email, 
-          mobile: credentials.mobile 
-        });
 
         // Lazy imports to avoid loading in Edge Runtime (middleware)
         const bcrypt = (await import("bcryptjs")).default;
@@ -28,7 +22,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         try {
           await connectDB();
-          console.log("✅ [AUTH] Database connected");
 
           // Find user by email or mobile (filter out undefined values)
           const searchConditions = [];
@@ -40,7 +33,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
 
           if (searchConditions.length === 0) {
-            console.log("❌ [AUTH] No email or mobile provided");
             return null;
           }
 
@@ -49,16 +41,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
 
           if (!user) {
-            console.log("❌ [AUTH] User not found for:", credentials.email || credentials.mobile);
             return null;
           }
-
-          console.log("✅ [AUTH] User found:", { 
-            id: user._id, 
-            email: user.email,
-            mobile: user.mobile,
-            firstName: user.firstName 
-          });
 
           // Verify password
           const isPasswordValid = await bcrypt.compare(
@@ -67,11 +51,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           );
           
           if (!isPasswordValid) {
-            console.log("❌ [AUTH] Invalid password for user:", user.email || user.mobile);
             return null;
           }
-
-          console.log("✅ [AUTH] Password verified successfully");
 
           // Allow verified users to log in even if not approved by admin
           // They will be shown a pending approval page instead of being blocked from logging in
@@ -88,7 +69,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             isMobileVerified: user.isMobileVerified,
           };
 
-          console.log("✅ [AUTH] Login successful for:", user.email || user.mobile);
           return authUser;
 
         } catch (error) {

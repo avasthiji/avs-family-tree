@@ -50,14 +50,23 @@ const FamilyMemberNode = ({ data }: any) => {
 
         <div className="text-center">
           <p className="font-bold text-gray-900 text-sm">{data.name}</p>
-          {data.gothiram && <p className="text-xs text-gray-600 mt-1">{data.gothiram}</p>}
-          {data.nativePlace && <p className="text-xs text-gray-500">{data.nativePlace}</p>}
+          {data.gothiram && (
+            <p className="text-xs text-gray-600 mt-1">{data.gothiram}</p>
+          )}
+          {data.nativePlace && (
+            <p className="text-xs text-gray-500">{data.nativePlace}</p>
+          )}
         </div>
 
-        {data.isCurrentUser && <Badge className="bg-blue-100 text-blue-800 text-xs">You</Badge>}
+        {data.isCurrentUser && (
+          <Badge className="bg-blue-100 text-blue-800 text-xs">You</Badge>
+        )}
 
         {data.relationshipType && (
-          <Badge variant="outline" className="text-[#E63946] border-[#E63946] text-xs">
+          <Badge
+            variant="outline"
+            className="text-[#E63946] border-[#E63946] text-xs"
+          >
             {data.relationshipType}
           </Badge>
         )}
@@ -132,7 +141,10 @@ export default function FamilyTreeView({
    * Build relationship graph: personId -> list of { person, type, relId, approved }
    */
   const relationshipGraph = useMemo(() => {
-    const g = new Map<string, Array<{ person: any; type: string; relId: string; approved: boolean }>>();
+    const g = new Map<
+      string,
+      Array<{ person: any; type: string; relId: string; approved: boolean }>
+    >();
     (relationships || []).forEach((rel) => {
       if (!rel.personId1 || !rel.personId2) return;
       const a = rel.personId1._id;
@@ -141,8 +153,18 @@ export default function FamilyTreeView({
       if (!g.has(a)) g.set(a, []);
       if (!g.has(b)) g.set(b, []);
 
-      g.get(a)!.push({ person: rel.personId2, type: rel.relationType, relId: rel._id, approved: rel.isApproved });
-      g.get(b)!.push({ person: rel.personId1, type: rel.relationType, relId: rel._id, approved: rel.isApproved });
+      g.get(a)!.push({
+        person: rel.personId2,
+        type: rel.relationType,
+        relId: rel._id,
+        approved: rel.isApproved,
+      });
+      g.get(b)!.push({
+        person: rel.personId1,
+        type: rel.relationType,
+        relId: rel._id,
+        approved: rel.isApproved,
+      });
     });
     return g;
   }, [relationships]);
@@ -151,12 +173,6 @@ export default function FamilyTreeView({
    * Build family tree with proper relationship mapping and edge drawing
    */
   useEffect(() => {
-    console.log('🌳 FamilyTreeView Debug:');
-    console.log('📊 Relationships received:', relationships?.length || 0);
-    console.log('👤 Current User ID:', currentUserId);
-    console.log('👤 Current User Name:', currentUserName);
-    console.log('📋 Relationships data:', relationships);
-
     // short-circuit: no people at all
     if (!personMap || personMap.size === 0) {
       setNodes([]);
@@ -166,14 +182,16 @@ export default function FamilyTreeView({
 
     // if there are no relationships, show only current user as a node
     if (!relationships || relationships.length === 0) {
-      console.log('⚠️ No relationships found - showing only current user');
       const singleNode: Node = {
         id: currentUserId,
         type: "familyMember",
         position: { x: 800, y: 400 },
         data: {
           name: currentUserName,
-          initials: currentUserName.split(" ").map((n) => n[0]).join(""),
+          initials: currentUserName
+            .split(" ")
+            .map((n) => n[0])
+            .join(""),
           isCurrentUser: true,
         },
       };
@@ -227,9 +245,6 @@ export default function FamilyTreeView({
       });
     }
 
-    console.log('🏗️ Generation mapping:', Object.fromEntries(generations));
-
-
     // Ensure everyone gets a generation (if some disconnected nodes exist)
     Array.from(personMap.keys()).forEach((pid) => {
       if (!generations.has(pid)) {
@@ -253,13 +268,17 @@ export default function FamilyTreeView({
       if (pid === currentUserId) return;
       // find neighbors of pid with generation = gen - 1 (parents)
       const neigh = relationshipGraph.get(pid) || [];
-      const parentCandidate = neigh.find((n) => (generations.get(n.person._id) || 0) === gen - 1);
+      const parentCandidate = neigh.find(
+        (n) => (generations.get(n.person._id) || 0) === gen - 1
+      );
 
       if (parentCandidate) {
         parentOf.set(pid, parentCandidate.person._id);
       } else {
         // fallback: pick any neighbor with smaller generation than current
-        const smaller = neigh.find((n) => (generations.get(n.person._id) || 0) < gen);
+        const smaller = neigh.find(
+          (n) => (generations.get(n.person._id) || 0) < gen
+        );
         if (smaller) parentOf.set(pid, smaller.person._id);
         else {
           // ultimate fallback: attach to currentUser
@@ -288,7 +307,11 @@ export default function FamilyTreeView({
     });
 
     // root object (current user)
-    const rootNode = treeNodes.get(currentUserId) || { id: currentUserId, person: personMap.get(currentUserId), children: [] };
+    const rootNode = treeNodes.get(currentUserId) || {
+      id: currentUserId,
+      person: personMap.get(currentUserId),
+      children: [],
+    };
 
     // --- 4. Use d3.hierarchy and d3.tree to compute positions ---
     const d3Root = hierarchy(rootNode, (d: any) => d.children);
@@ -296,15 +319,17 @@ export default function FamilyTreeView({
 
     // Choose node size (this controls spacing). Tune as needed.
     // Using nodeSize gives fine-grained control; alternatively, use .size([...]) for full width/height.
-const NODE_WIDTH = 280;
-const NODE_HEIGHT = 300; // was 220 before — more vertical space to make the line visible
-layout.nodeSize([NODE_WIDTH, NODE_HEIGHT])(d3Root);
-
+    const NODE_WIDTH = 280;
+    const NODE_HEIGHT = 300; // was 220 before — more vertical space to make the line visible
+    layout.nodeSize([NODE_WIDTH, NODE_HEIGHT])(d3Root);
 
     // d3 tree yields x and y values where x is horizontal coordinate and y is vertical coordinate.
     // We'll translate those into ReactFlow positions. Optionally center the layout.
     // Compute bounding box to center the tree in a canvas area.
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    let minX = Infinity,
+      maxX = -Infinity,
+      minY = Infinity,
+      maxY = -Infinity;
     d3Root.each((d: any) => {
       if (d.x < minX) minX = d.x;
       if (d.x > maxX) maxX = d.x;
@@ -326,7 +351,9 @@ layout.nodeSize([NODE_WIDTH, NODE_HEIGHT])(d3Root);
     d3Root.each((d: any) => {
       const tid = d.data.id;
       const p = d.data.person;
-      const name = `${p.firstName || ""}${p.lastName ? " " + p.lastName : ""}`.trim() || "Unknown";
+      const name =
+        `${p.firstName || ""}${p.lastName ? " " + p.lastName : ""}`.trim() ||
+        "Unknown";
       const initials = (p.firstName?.[0] || "") + (p.lastName?.[0] || "");
       const node: Node = {
         id: tid,
@@ -354,23 +381,19 @@ layout.nodeSize([NODE_WIDTH, NODE_HEIGHT])(d3Root);
     const edgeSet = new Set<string>();
     const finalEdges: Edge[] = [];
 
-    console.log('🔗 Creating edges from relationships...');
-
     (relationships || []).forEach((rel) => {
       if (!rel.personId1 || !rel.personId2) {
-        console.log('❌ Skipping relationship - missing person:', rel);
         return;
       }
-      
+
       const a = rel.personId1._id;
       const b = rel.personId2._id;
-      
+
       // Check if both nodes exist in our final nodes
-      const nodeAExists = finalNodes.some(node => node.id === a);
-      const nodeBExists = finalNodes.some(node => node.id === b);
-      
+      const nodeAExists = finalNodes.some((node) => node.id === a);
+      const nodeBExists = finalNodes.some((node) => node.id === b);
+
       if (!nodeAExists || !nodeBExists) {
-        console.log('❌ Skipping relationship - node not found:', { a, b, nodeAExists, nodeBExists });
         return;
       }
 
@@ -393,7 +416,6 @@ layout.nodeSize([NODE_WIDTH, NODE_HEIGHT])(d3Root);
       const key = `${source}-${target}`;
       const reverseKey = `${target}-${source}`;
       if (edgeSet.has(key) || edgeSet.has(reverseKey)) {
-        console.log('⏭️ Skipping duplicate edge:', key);
         return;
       }
       edgeSet.add(key);
@@ -428,22 +450,21 @@ layout.nodeSize([NODE_WIDTH, NODE_HEIGHT])(d3Root);
         zIndex: 1000,
       };
 
-      console.log(`✅ Creating edge: ${source} → ${target} (${rel.relationType})`);
       finalEdges.push(edge);
     });
 
-    console.log('🔗 Total edges created:', finalEdges.length);
-
     // --- 6. Apply nodes & edges to reactflow state ---
-    console.log('🌳 Final Family Tree Debug:');
-    console.log('📊 Nodes created:', finalNodes.length);
-    console.log('🔗 Edges created:', finalEdges.length);
-    console.log('📋 Nodes:', finalNodes.map(n => ({ id: n.id, name: n.data.name })));
-    console.log('📋 Edges:', finalEdges.map(e => ({ id: e.id, source: e.source, target: e.target, label: e.label })));
-    
     setNodes(finalNodes);
     setEdges(finalEdges);
-  }, [relationships, currentUserId, currentUserName, personMap, relationshipGraph, setNodes, setEdges]);
+  }, [
+    relationships,
+    currentUserId,
+    currentUserName,
+    personMap,
+    relationshipGraph,
+    setNodes,
+    setEdges,
+  ]);
 
   return (
     <div className="w-full h-[820px] bg-gradient-to-br from-indigo-50 via-white to-emerald-50 rounded-2xl border-4 border-indigo-200 shadow-2xl overflow-hidden">
@@ -486,10 +507,21 @@ layout.nodeSize([NODE_WIDTH, NODE_HEIGHT])(d3Root);
         elevateEdgesOnSelect={true}
         selectNodesOnDrag={false}
       >
-        <Background color="#cbd5e1" gap={24} size={2} style={{ backgroundColor: "transparent" }} />
-        <Controls showInteractive={false} className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl" />
+        <Background
+          color="#cbd5e1"
+          gap={24}
+          size={2}
+          style={{ backgroundColor: "transparent" }}
+        />
+        <Controls
+          showInteractive={false}
+          className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl"
+        />
 
-        <Panel position="top-right" className="bg-gradient-to-br from-white via-indigo-50 to-white backdrop-blur-md p-5 rounded-2xl shadow-2xl border-3 border-indigo-200">
+        <Panel
+          position="top-right"
+          className="bg-gradient-to-br from-white via-indigo-50 to-white backdrop-blur-md p-5 rounded-2xl shadow-2xl border-3 border-indigo-200"
+        >
           <div className="space-y-3">
             <h3 className="font-bold text-base text-indigo-900 mb-1 flex items-center gap-2">
               <span className="text-lg">📊</span> Connection Status
@@ -505,24 +537,38 @@ layout.nodeSize([NODE_WIDTH, NODE_HEIGHT])(d3Root);
           </div>
         </Panel>
 
-        <Panel position="top-left" className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-4 rounded-2xl shadow-2xl border-3 border-white/30">
+        <Panel
+          position="top-left"
+          className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-4 rounded-2xl shadow-2xl border-3 border-white/30"
+        >
           <div className="text-white">
             <h3 className="font-bold text-base mb-2 flex items-center gap-2">
               <span className="text-xl">🌳</span> Family Tree
             </h3>
             <div className="flex items-center gap-4 text-sm">
-              <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">{nodes.length} Members</span>
-              <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">{edges.length} Lines</span>
+              <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">
+                {nodes.length} Members
+              </span>
+              <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">
+                {edges.length} Lines
+              </span>
             </div>
           </div>
         </Panel>
 
         {nodes.length === 0 && (
-          <Panel position="top-center" className="bg-white/95 p-6 rounded-2xl shadow-2xl border-3 border-indigo-200">
+          <Panel
+            position="top-center"
+            className="bg-white/95 p-6 rounded-2xl shadow-2xl border-3 border-indigo-200"
+          >
             <div className="text-center">
               <div className="text-6xl mb-4">🌳</div>
-              <p className="text-gray-800 font-bold text-lg mb-2">Your Family Tree Awaits</p>
-              <p className="text-sm text-gray-600">Add relationships to see beautiful family connections</p>
+              <p className="text-gray-800 font-bold text-lg mb-2">
+                Your Family Tree Awaits
+              </p>
+              <p className="text-sm text-gray-600">
+                Add relationships to see beautiful family connections
+              </p>
             </div>
           </Panel>
         )}

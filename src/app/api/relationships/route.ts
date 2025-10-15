@@ -69,11 +69,6 @@ export async function GET(request: NextRequest) {
     .populate('createdBy', 'firstName lastName')
     .sort({ createdAt: -1 });
 
-    console.log('🔍 Family Network Debug:');
-    console.log('👤 Target User:', targetUserId);
-    console.log('👥 Connected People:', connectedPeople.size);
-    console.log('🔗 Total Family Relationships:', allFamilyRelationships.length);
-
     return NextResponse.json({ relationships: allFamilyRelationships });
 
   } catch (error) {

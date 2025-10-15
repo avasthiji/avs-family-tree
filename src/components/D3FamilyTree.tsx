@@ -115,9 +115,6 @@ export default function D3FamilyTree({
       people.set(p2._id, p2);
 
       const relType = rel.relationType;
-      console.log(
-        `Processing relationship: ${p1.firstName} ${p1.lastName} (${p1._id}) --[${relType}]--> ${p2.firstName} ${p2.lastName} (${p2._id})`
-      );
 
       // Handle different relationship types based on the semantics:
       // The relationship type describes what personId2 is to personId1
@@ -172,14 +169,6 @@ export default function D3FamilyTree({
         extended.get(p2._id)!.push({ id: p1._id, type: relType });
       }
     });
-
-    console.log("Family Structure Built:");
-    console.log("People:", Array.from(people.keys()));
-    console.log("Parents map:", parents);
-    console.log("Children map:", children);
-    console.log("Spouses map:", spouses);
-    console.log("Siblings map:", siblings);
-    console.log("Extended map:", extended);
 
     return { people, parents, children, spouses, siblings, extended };
   }, [relationships, currentUserId, currentUserName]);
@@ -566,16 +555,9 @@ export default function D3FamilyTree({
 
   useEffect(() => {
     const { nodes: newNodes, edges: newEdges } = generateTreeElements();
-    console.log("Generated nodes:", newNodes.length);
-    console.log("Generated edges:", newEdges.length);
-    console.log("Nodes:", newNodes);
     setNodes(newNodes);
     setEdges(newEdges);
   }, [relationships, direction, generateTreeElements]);
-
-  const onLayout = useCallback((dir: "TB" | "LR") => {
-    setDirection(dir);
-  }, []);
 
   return (
     <div className="w-full h-[750px] bg-gradient-to-br from-indigo-50 via-white to-emerald-50 rounded-2xl border-4 border-indigo-200 shadow-xl overflow-hidden">

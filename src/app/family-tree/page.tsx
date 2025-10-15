@@ -37,8 +37,6 @@ export default function FamilyTreePage() {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log(relationships);
-  console.log("relationships", relationships);
   useEffect(() => {
     if (status === "loading") return;
 

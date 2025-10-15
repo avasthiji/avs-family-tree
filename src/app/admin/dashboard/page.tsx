@@ -3,26 +3,39 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
 import AppHeader from "@/components/AppHeader";
 import { MATRIMONIAL_ENABLED, EVENT_ENABLED } from "@/lib/features";
-import { 
-  Users, 
-  UserCheck, 
-  UserX, 
-  TreePine, 
+import {
+  Users,
+  UserCheck,
+  UserX,
+  TreePine,
   Heart,
   Calendar,
   TrendingUp,
   Crown,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
 } from "lucide-react";
 
 interface DashboardStats {
@@ -54,7 +67,7 @@ export default function AdminDashboardPage() {
     approvedUsers: 0,
     activeMatrimony: 0,
     totalRelationships: 0,
-    totalEvents: 0
+    totalEvents: 0,
   });
   const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +76,7 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     if (status === "loading") return;
-    
+
     if (!session) {
       router.push("/auth/login");
       return;
@@ -81,7 +94,7 @@ export default function AdminDashboardPage() {
     try {
       const [statsRes, pendingRes] = await Promise.all([
         fetch("/api/admin/stats"),
-        fetch("/api/admin/users/pending")
+        fetch("/api/admin/users/pending"),
       ]);
 
       if (statsRes.ok) {
@@ -116,7 +129,7 @@ export default function AdminDashboardPage() {
 
   const handleRejectUser = async (userId: string) => {
     if (!confirm("Are you sure you want to reject this user?")) return;
-    
+
     try {
       const response = await fetch(`/api/admin/users/${userId}/reject`, {
         method: "POST",
@@ -134,27 +147,32 @@ export default function AdminDashboardPage() {
     if (selectedUsers.length === pendingUsers.length) {
       setSelectedUsers([]);
     } else {
-      setSelectedUsers(pendingUsers.map(user => user._id));
+      setSelectedUsers(pendingUsers.map((user) => user._id));
     }
   };
 
   const handleSelectUser = (userId: string) => {
-    setSelectedUsers(prev => 
-      prev.includes(userId) 
-        ? prev.filter(id => id !== userId)
+    setSelectedUsers((prev) =>
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
         : [...prev, userId]
     );
   };
 
   const handleBulkApprove = async () => {
     if (selectedUsers.length === 0) return;
-    
-    if (!confirm(`Are you sure you want to approve ${selectedUsers.length} user(s)?`)) return;
+
+    if (
+      !confirm(
+        `Are you sure you want to approve ${selectedUsers.length} user(s)?`
+      )
+    )
+      return;
 
     setBulkActionLoading(true);
     try {
       await Promise.all(
-        selectedUsers.map(userId =>
+        selectedUsers.map((userId) =>
           fetch(`/api/admin/users/${userId}/approve`, {
             method: "POST",
           })
@@ -171,13 +189,18 @@ export default function AdminDashboardPage() {
 
   const handleBulkReject = async () => {
     if (selectedUsers.length === 0) return;
-    
-    if (!confirm(`Are you sure you want to reject ${selectedUsers.length} user(s)? This action cannot be undone.`)) return;
+
+    if (
+      !confirm(
+        `Are you sure you want to reject ${selectedUsers.length} user(s)? This action cannot be undone.`
+      )
+    )
+      return;
 
     setBulkActionLoading(true);
     try {
       await Promise.all(
-        selectedUsers.map(userId =>
+        selectedUsers.map((userId) =>
           fetch(`/api/admin/users/${userId}/reject`, {
             method: "POST",
           })
@@ -204,8 +227,12 @@ export default function AdminDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage users, approvals, and community settings</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Admin Dashboard
+          </h1>
+          <p className="text-gray-600">
+            Manage users, approvals, and community settings
+          </p>
         </div>
 
         {/* Search Bar */}
@@ -214,12 +241,7 @@ export default function AdminDashboardPage() {
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
                 <div className="flex-1">
-                  <SearchBar 
-                    isAdmin={true}
-                    onSelectUser={(user) => {
-                      console.log("Selected user:", user);
-                    }} 
-                  />
+                  <SearchBar isAdmin={true} onSelectUser={(user) => {}} />
                 </div>
                 <Link href="/search">
                   <Button className="avs-button-primary whitespace-nowrap">
@@ -238,7 +260,9 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Total Users</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalUsers}</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {stats.totalUsers}
+                  </p>
                 </div>
                 <div className="w-12 h-12 avs-gradient rounded-lg flex items-center justify-center">
                   <Users className="h-6 w-6 text-white" />
@@ -251,8 +275,12 @@ export default function AdminDashboardPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Pending Approvals</p>
-                  <p className="text-3xl font-bold text-[#F77F00]">{stats.pendingApprovals}</p>
+                  <p className="text-sm text-gray-600 mb-1">
+                    Pending Approvals
+                  </p>
+                  <p className="text-3xl font-bold text-[#F77F00]">
+                    {stats.pendingApprovals}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-gradient-to-r from-[#F77F00] to-[#E63946] rounded-lg flex items-center justify-center">
                   <Clock className="h-6 w-6 text-white" />
@@ -266,7 +294,9 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Approved Users</p>
-                  <p className="text-3xl font-bold text-[#2A9D8F]">{stats.approvedUsers}</p>
+                  <p className="text-3xl font-bold text-[#2A9D8F]">
+                    {stats.approvedUsers}
+                  </p>
                 </div>
                 <div className="w-12 h-12 avs-gradient-secondary rounded-lg flex items-center justify-center">
                   <UserCheck className="h-6 w-6 text-white" />
@@ -280,8 +310,12 @@ export default function AdminDashboardPage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Active Matrimony</p>
-                    <p className="text-3xl font-bold text-[#7209B7]">{stats.activeMatrimony}</p>
+                    <p className="text-sm text-gray-600 mb-1">
+                      Active Matrimony
+                    </p>
+                    <p className="text-3xl font-bold text-[#7209B7]">
+                      {stats.activeMatrimony}
+                    </p>
                   </div>
                   <div className="w-12 h-12 avs-gradient-purple rounded-lg flex items-center justify-center">
                     <Heart className="h-6 w-6 text-white" />
@@ -296,7 +330,9 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Relationships</p>
-                  <p className="text-3xl font-bold text-[#4361EE]">{stats.totalRelationships}</p>
+                  <p className="text-3xl font-bold text-[#4361EE]">
+                    {stats.totalRelationships}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-gradient-to-r from-[#2A9D8F] to-[#4361EE] rounded-lg flex items-center justify-center">
                   <TreePine className="h-6 w-6 text-white" />
@@ -311,7 +347,9 @@ export default function AdminDashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Events</p>
-                    <p className="text-3xl font-bold text-[#E63946]">{stats.totalEvents}</p>
+                    <p className="text-3xl font-bold text-[#E63946]">
+                      {stats.totalEvents}
+                    </p>
                   </div>
                   <div className="w-12 h-12 avs-gradient rounded-lg flex items-center justify-center">
                     <Calendar className="h-6 w-6 text-white" />
@@ -335,10 +373,13 @@ export default function AdminDashboardPage() {
                   Review and approve new user registrations
                 </CardDescription>
               </div>
-              
+
               {selectedUsers.length > 0 && (
                 <div className="flex gap-2">
-                  <Badge variant="outline" className="text-blue-700 border-blue-300">
+                  <Badge
+                    variant="outline"
+                    className="text-blue-700 border-blue-300"
+                  >
                     {selectedUsers.length} selected
                   </Badge>
                   <Button
@@ -378,7 +419,10 @@ export default function AdminDashboardPage() {
                       <TableHead className="w-12">
                         <input
                           type="checkbox"
-                          checked={selectedUsers.length === pendingUsers.length && pendingUsers.length > 0}
+                          checked={
+                            selectedUsers.length === pendingUsers.length &&
+                            pendingUsers.length > 0
+                          }
                           onChange={handleSelectAll}
                           className="h-4 w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
                         />
@@ -392,7 +436,12 @@ export default function AdminDashboardPage() {
                   </TableHeader>
                   <TableBody>
                     {pendingUsers.map((user) => (
-                      <TableRow key={user._id} className={selectedUsers.includes(user._id) ? "bg-blue-50" : ""}>
+                      <TableRow
+                        key={user._id}
+                        className={
+                          selectedUsers.includes(user._id) ? "bg-blue-50" : ""
+                        }
+                      >
                         <TableCell>
                           <input
                             type="checkbox"
@@ -413,12 +462,18 @@ export default function AdminDashboardPage() {
                         <TableCell>
                           <div className="flex gap-1">
                             {user.isEmailVerified && (
-                              <Badge variant="outline" className="text-green-700 border-green-300">
+                              <Badge
+                                variant="outline"
+                                className="text-green-700 border-green-300"
+                              >
                                 Email ✓
                               </Badge>
                             )}
                             {user.isMobileVerified && (
-                              <Badge variant="outline" className="text-green-700 border-green-300">
+                              <Badge
+                                variant="outline"
+                                className="text-green-700 border-green-300"
+                              >
                                 Mobile ✓
                               </Badge>
                             )}

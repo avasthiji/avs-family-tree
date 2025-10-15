@@ -78,11 +78,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // In development mode, log the OTP for easy testing
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔐 [DEV MODE] Resent OTP for', identifier, ':', otpCode);
-    }
-
     return NextResponse.json({
       message: "OTP sent successfully",
       identifier,

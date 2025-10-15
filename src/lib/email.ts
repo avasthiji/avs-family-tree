@@ -28,8 +28,6 @@ export interface EmailOptions {
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   // Skip email sending in development mode
   if (process.env.NODE_ENV === 'development' || !env.EMAIL_USER || !env.EMAIL_PASSWORD) {
-    console.log('📧 [DEV MODE] Email skipped - Would send to:', options.to);
-    console.log('📧 [DEV MODE] Subject:', options.subject);
     return true; // Return true to not block registration
   }
 
@@ -44,10 +42,8 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     };
 
     const result = await mailTransporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', result.messageId);
     return true;
   } catch (error) {
-    console.error('Error sending email:', error);
     return false;
   }
 }

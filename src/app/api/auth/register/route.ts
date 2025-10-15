@@ -85,11 +85,6 @@ export async function POST(request: NextRequest) {
       // Don't fail registration if email fails in development
     }
 
-    // In development mode, log the OTP for easy testing
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔐 [DEV MODE] OTP for', email, ':', otpCode);
-    }
-
     return NextResponse.json({
       message: "User registered successfully. Please verify your OTP.",
       userId: user._id,
