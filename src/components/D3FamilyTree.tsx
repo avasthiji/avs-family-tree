@@ -1,3 +1,4 @@
+// components/FamilyTree.tsx
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
@@ -8,19 +9,32 @@ import {
   useNodesState,
   useEdgesState,
   ConnectionLineType,
-  Position,
+  Node,
+  Edge,
+  Controls,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { layoutFromMap } from "entitree-flex";
 import FamilyTreeNode from "./FamilyTreeNode";
+
+interface Person {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  gothiram?: string;
+  nativePlace?: string;
+  profilePicture?: string;
+}
 
 interface RelationshipData {
   _id: string;
-  personId1: any;
-  personId2: any;
+  personId1: Person;
+  personId2: Person;
   relationType: string;
   description?: string;
   isApproved: boolean;
+  createdBy?: Person;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface FamilyTreeViewProps {
@@ -31,18 +45,27 @@ interface FamilyTreeViewProps {
 }
 
 const nodeTypes = {
-  custom: FamilyTreeNode,
+  custom: FamilyTreeNode as any,
 };
 
-const nodeWidth = 200;
-const nodeHeight = 160;
-
-const Orientation = {
-  Vertical: "vertical",
-  Horizontal: "horizontal",
-};
-
-const { Top, Bottom, Left, Right } = Position;
+// Define relationship mappings
+const PARENT_RELATIONS = ["Father", "Mother", "Grand Father", "Grand Mother"];
+const CHILD_RELATIONS = ["Son", "Daughter"];
+const SIBLING_RELATIONS = [
+  "Brother",
+  "Sister",
+  "Older Sibling",
+  "Younger Sibling",
+];
+const SPOUSE_RELATIONS = ["Spouse"];
+const EXTENDED_RELATIONS = [
+  "Uncle",
+  "Aunt",
+  "Cousin",
+  "Nephew",
+  "Niece",
+  "Other",
+];
 
 export default function D3FamilyTree({
   relationships,
@@ -50,543 +73,512 @@ export default function D3FamilyTree({
   currentUserName,
   onNodeClick,
 }: FamilyTreeViewProps) {
-  const [nodeCount, setNodeCount] = useState(0);
-  const [edgeCount, setEdgeCount] = useState(0);
-  const [direction, setDirection] = useState("TB");
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [direction, setDirection] = useState<"TB" | "LR">("TB");
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  useEffect(() => {
-    console.log("🎯 D3FamilyTree received data:");
-    console.log("📊 Relationships count:", relationships?.length || 0);
-    console.log("📊 Relationships data:", relationships);
-    console.log("👤 Current User ID:", currentUserId);
-    console.log("👤 Current User Name:", currentUserName);
+  // Helper to get full name
+  const getFullName = (person: Person) =>
+    `${person.firstName} ${person.lastName}`;
 
-    if (!relationships || relationships.length === 0) {
-      console.log("⚠️ No relationships found - showing only current user");
-      renderSingleNode();
-      return;
-    }
+  // Helper to get initials
+  const getInitials = (person: Person) =>
+    `${person.firstName[0]}${person.lastName[0]}`.toUpperCase();
 
-    renderFamilyTree();
-  }, [relationships, currentUserId, currentUserName, direction]);
+  // Build family structure from relationships
+  const buildFamilyStructure = useCallback(() => {
+    const people = new Map<string, Person>();
+    const parents = new Map<string, string[]>();
+    const children = new Map<string, string[]>();
+    const spouses = new Map<string, string[]>();
+    const siblings = new Map<string, string[]>();
+    const extended = new Map<string, Array<{ id: string; type: string }>>();
 
-  const renderSingleNode = () => {
-    const singleNode = {
-      id: currentUserId,
-      type: "custom",
-      position: { x: 0, y: 0 },
-      data: {
-        label: currentUserName,
+    // Add current user if not in relationships
+    if (!people.has(currentUserId)) {
+      people.set(currentUserId, {
+        _id: currentUserId,
         firstName: currentUserName.split(" ")[0],
-        lastName: currentUserName.split(" ").slice(1).join(" ") || "",
-        initials: currentUserName
-          .split(" ")
-          .map((n) => n[0])
-          .join(""),
-        isCurrentUser: true,
-        direction: direction,
-        isRoot: true,
-        onClick: () => onNodeClick?.(currentUserId),
-      },
-    };
-
-    setNodes([singleNode]);
-    setEdges([]);
-    setNodeCount(1);
-    setEdgeCount(0);
-  };
-
-  const transformToTreeData = () => {
-    const personMap = new Map<string, any>();
-    let rootId = currentUserId;
-
-    // Add current user
-    personMap.set(currentUserId, {
-      id: currentUserId,
-      name: currentUserName,
-      firstName: currentUserName.split(" ")[0],
-      lastName: currentUserName.split(" ").slice(1).join(" ") || "",
-      initials: currentUserName
-        .split(" ")
-        .map((n) => n[0])
-        .join(""),
-      isCurrentUser: true,
-      children: [],
-      spouses: [],
-      siblings: [],
-      parents: [],
-    });
-
-    // Check if current user appears in any relationships
-    const currentUserInRelationships = relationships.filter(
-      (rel) =>
-        rel.personId1?._id === currentUserId ||
-        rel.personId2?._id === currentUserId
-    );
-    console.log(
-      "🔍 Current user found in relationships:",
-      currentUserInRelationships.length
-    );
-
-    // If current user is not in relationships, we need to create parent-child relationships
-    if (currentUserInRelationships.length === 0) {
-      console.log(
-        "⚠️ Current user not found in relationships - creating parent-child relationships"
-      );
-
-      // Add all people from relationships as children of current user
-      relationships.forEach((rel) => {
-        if (rel.personId1 && rel.personId1._id !== currentUserId) {
-          const currentUser = personMap.get(currentUserId);
-          if (!currentUser.children.includes(rel.personId1._id)) {
-            currentUser.children.push(rel.personId1._id);
-            console.log(
-              `🔗 Added ${rel.personId1.firstName} as child of current user`
-            );
-          }
-        }
-        if (rel.personId2 && rel.personId2._id !== currentUserId) {
-          const currentUser = personMap.get(currentUserId);
-          if (!currentUser.children.includes(rel.personId2._id)) {
-            currentUser.children.push(rel.personId2._id);
-            console.log(
-              `🔗 Added ${rel.personId2.firstName} as child of current user`
-            );
-          }
-        }
+        lastName: currentUserName.split(" ")[1] || "",
       });
     }
 
-    // Add all people from relationships
+    // Process all relationships
     relationships.forEach((rel) => {
-      if (rel.personId1 && !personMap.has(rel.personId1._id)) {
-        personMap.set(rel.personId1._id, {
-          id: rel.personId1._id,
-          name: `${rel.personId1.firstName} ${rel.personId1.lastName}`,
-          firstName: rel.personId1.firstName || "Unknown",
-          lastName: rel.personId1.lastName || "",
-          initials: `${rel.personId1.firstName?.[0] || ""}${
-            rel.personId1.lastName?.[0] || ""
-          }`,
-          gothiram: rel.personId1.gothiram,
-          nativePlace: rel.personId1.nativePlace,
-          profilePicture: rel.personId1.profilePicture,
-          isCurrentUser: false,
-          children: [],
-          spouses: [],
-          siblings: [],
-          parents: [],
-        });
-      }
+      const p1 = rel.personId1;
+      const p2 = rel.personId2;
 
-      if (rel.personId2 && !personMap.has(rel.personId2._id)) {
-        personMap.set(rel.personId2._id, {
-          id: rel.personId2._id,
-          name: `${rel.personId2.firstName} ${rel.personId2.lastName}`,
-          firstName: rel.personId2.firstName || "Unknown",
-          lastName: rel.personId2.lastName || "",
-          initials: `${rel.personId2.firstName?.[0] || ""}${
-            rel.personId2.lastName?.[0] || ""
-          }`,
-          gothiram: rel.personId2.gothiram,
-          nativePlace: rel.personId2.nativePlace,
-          profilePicture: rel.personId2.profilePicture,
-          isCurrentUser: false,
-          children: [],
-          spouses: [],
-          siblings: [],
-          parents: [],
-        });
-      }
-    });
+      if (!p1 || !p2) return;
 
-    // If current user was not in relationships, set parents for their children
-    if (currentUserInRelationships.length === 0) {
-      const currentUser = personMap.get(currentUserId);
-      currentUser.children.forEach((childId) => {
-        const child = personMap.get(childId);
-        if (child && !child.parents.includes(currentUserId)) {
-          child.parents.push(currentUserId);
-          console.log(`🔗 Set current user as parent of ${child.name}`);
-        }
-      });
-    }
+      // Add people to map
+      people.set(p1._id, p1);
+      people.set(p2._id, p2);
 
-    // Build relationships
-    console.log("🔗 Processing relationships for tree structure:");
-    relationships.forEach((rel) => {
-      if (!rel.personId1 || !rel.personId2) return;
-
-      const person1 = personMap.get(rel.personId1._id);
-      const person2 = personMap.get(rel.personId2._id);
-
-      if (!person1 || !person2) return;
-
-      const relType = rel.relationType.toLowerCase();
+      const relType = rel.relationType;
       console.log(
-        `🔗 Relationship: ${person1.name} ${relType} ${person2.name}`
+        `Processing relationship: ${p1.firstName} ${p1.lastName} (${p1._id}) --[${relType}]--> ${p2.firstName} ${p2.lastName} (${p2._id})`
       );
 
-      if (relType === "spouse") {
-        if (!person1.spouses.includes(rel.personId2._id)) {
-          person1.spouses.push(rel.personId2._id);
-          person2.isSpouse = true;
+      // Handle different relationship types based on the semantics:
+      // The relationship type describes what personId2 is to personId1
+      // e.g., if relationType is "Son", then personId2 is the Son of personId1
+
+      if (PARENT_RELATIONS.includes(relType)) {
+        // p2 is the parent (Father/Mother/GrandFather/GrandMother) of p1
+        if (!parents.has(p1._id)) parents.set(p1._id, []);
+        if (!parents.get(p1._id)!.includes(p2._id)) {
+          parents.get(p1._id)!.push(p2._id);
         }
-        if (!person2.spouses.includes(rel.personId1._id)) {
-          person2.spouses.push(rel.personId1._id);
-          person1.isSpouse = true;
+        if (!children.has(p2._id)) children.set(p2._id, []);
+        if (!children.get(p2._id)!.includes(p1._id)) {
+          children.get(p2._id)!.push(p1._id);
         }
-      } else if (relType === "father" || relType === "mother") {
-        if (!person1.children.includes(rel.personId2._id)) {
-          person1.children.push(rel.personId2._id);
+      } else if (CHILD_RELATIONS.includes(relType)) {
+        // p2 is the child (Son/Daughter) of p1
+        if (!children.has(p1._id)) children.set(p1._id, []);
+        if (!children.get(p1._id)!.includes(p2._id)) {
+          children.get(p1._id)!.push(p2._id);
         }
-        if (!person2.parents.includes(rel.personId1._id)) {
-          person2.parents.push(rel.personId1._id);
+        if (!parents.has(p2._id)) parents.set(p2._id, []);
+        if (!parents.get(p2._id)!.includes(p1._id)) {
+          parents.get(p2._id)!.push(p1._id);
         }
-      } else if (relType === "son" || relType === "daughter") {
-        if (!person1.children.includes(rel.personId2._id)) {
-          person1.children.push(rel.personId2._id);
+      } else if (SIBLING_RELATIONS.includes(relType)) {
+        // p2 is sibling (Brother/Sister) of p1 - bidirectional
+        if (!siblings.has(p1._id)) siblings.set(p1._id, []);
+        if (!siblings.has(p2._id)) siblings.set(p2._id, []);
+        if (!siblings.get(p1._id)!.includes(p2._id)) {
+          siblings.get(p1._id)!.push(p2._id);
         }
-        if (!person2.parents.includes(rel.personId1._id)) {
-          person2.parents.push(rel.personId1._id);
+        if (!siblings.get(p2._id)!.includes(p1._id)) {
+          siblings.get(p2._id)!.push(p1._id);
         }
-      } else if (
-        relType === "brother" ||
-        relType === "sister" ||
-        relType === "sibling"
-      ) {
-        if (!person1.siblings.includes(rel.personId2._id)) {
-          person1.siblings.push(rel.personId2._id);
-          person2.isSibling = true;
+      } else if (SPOUSE_RELATIONS.includes(relType)) {
+        // p2 is spouse of p1 - bidirectional
+        if (!spouses.has(p1._id)) spouses.set(p1._id, []);
+        if (!spouses.has(p2._id)) spouses.set(p2._id, []);
+        if (!spouses.get(p1._id)!.includes(p2._id)) {
+          spouses.get(p1._id)!.push(p2._id);
         }
-        if (!person2.siblings.includes(rel.personId1._id)) {
-          person2.siblings.push(rel.personId1._id);
-          person1.isSibling = true;
+        if (!spouses.get(p2._id)!.includes(p1._id)) {
+          spouses.get(p2._id)!.push(p1._id);
         }
+      } else if (EXTENDED_RELATIONS.includes(relType)) {
+        // Extended family - store with type for reference
+        if (!extended.has(p1._id)) extended.set(p1._id, []);
+        extended.get(p1._id)!.push({ id: p2._id, type: relType });
+
+        if (!extended.has(p2._id)) extended.set(p2._id, []);
+        extended.get(p2._id)!.push({ id: p1._id, type: relType });
       }
     });
 
-    // Find the root of the family tree (person with no parents or oldest generation)
-    let actualRootId = currentUserId;
+    console.log("Family Structure Built:");
+    console.log("People:", Array.from(people.keys()));
+    console.log("Parents map:", parents);
+    console.log("Children map:", children);
+    console.log("Spouses map:", spouses);
+    console.log("Siblings map:", siblings);
+    console.log("Extended map:", extended);
 
-    // Look for someone who has no parents in the relationships
-    for (const [id, person] of personMap) {
-      if (person.parents.length === 0 && person.children.length > 0) {
-        actualRootId = id;
-        break;
-      }
-    }
+    return { people, parents, children, spouses, siblings, extended };
+  }, [relationships, currentUserId, currentUserName]);
 
-    // If no clear root found, use the current user
-    if (
-      actualRootId === currentUserId &&
-      personMap.get(currentUserId)?.parents.length > 0
-    ) {
-      // Current user has parents, so find one of their parents as root
-      const currentUser = personMap.get(currentUserId);
-      if (currentUser.parents.length > 0) {
-        actualRootId = currentUser.parents[0];
-      }
-    }
+  // Generate nodes and edges for React Flow
+  const generateTreeElements = useCallback(() => {
+    const { people, parents, children, spouses, siblings, extended } =
+      buildFamilyStructure();
+    const nodes: Node[] = [];
+    const edges: Edge[] = [];
+    const nodePositions = new Map<
+      string,
+      { x: number; y: number; level: number }
+    >();
+    const visited = new Set<string>();
 
-    console.log(
-      "🌳 Tree root set to:",
-      actualRootId,
-      personMap.get(actualRootId)?.name
-    );
+    // Layout configuration
+    const nodeWidth = 200;
+    const nodeHeight = 160;
+    const horizontalSpacing = 280;
+    const verticalSpacing = 220;
 
-    // Debug: Show the final tree structure
-    console.log("🌳 Final tree structure:");
-    for (const [id, person] of personMap) {
-      console.log(`  ${person.name}:`, {
-        parents: person.parents.length,
-        children: person.children.length,
-        spouses: person.spouses.length,
-        siblings: person.siblings.length,
-      });
-    }
+    // Assign levels to all nodes using BFS from current user
+    const assignLevels = () => {
+      const queue: { id: string; level: number }[] = [
+        { id: currentUserId, level: 0 },
+      ];
+      visited.add(currentUserId);
+      nodePositions.set(currentUserId, { x: 0, y: 0, level: 0 });
 
-    // Convert to object for entitree
-    const treeData: Record<string, any> = {};
-    personMap.forEach((person, id) => {
-      treeData[id] = person;
-    });
+      while (queue.length > 0) {
+        const { id, level } = queue.shift()!;
 
-    return { treeData, rootId: actualRootId, currentUserInRelationships };
-  };
-
-  const layoutElements = (
-    tree: Record<string, any>,
-    rootId: string,
-    dir: string,
-    relationships: RelationshipData[],
-    currentUserInRelationships: RelationshipData[]
-  ) => {
-    const isTreeHorizontal = dir === "LR";
-
-    const entitreeSettings = {
-      clone: true,
-      enableFlex: true,
-      firstDegreeSpacing: 50,
-      nextAfterAccessor: "spouses",
-      nextAfterSpacing: 80,
-      nextBeforeAccessor: "siblings",
-      nextBeforeSpacing: 80,
-      nodeHeight,
-      nodeWidth,
-      orientation: isTreeHorizontal
-        ? Orientation.Horizontal
-        : Orientation.Vertical,
-      rootX: 0,
-      rootY: 0,
-      secondDegreeSpacing: 100,
-      sourcesAccessor: "parents",
-      sourceTargetSpacing: 150,
-      targetsAccessor: "children",
-    };
-
-    const { nodes: entitreeNodes, rels: entitreeEdges } = layoutFromMap(
-      rootId,
-      tree,
-      entitreeSettings
-    );
-
-    const nodes: any[] = [];
-    const edges: any[] = [];
-
-    entitreeEdges.forEach((edge) => {
-      const sourceNode = edge.source.id;
-      const targetNode = edge.target.id;
-      const newEdge: any = {};
-      newEdge.id = "e" + sourceNode + targetNode;
-      newEdge.source = sourceNode;
-      newEdge.target = targetNode;
-      newEdge.type = "smoothstep";
-      newEdge.animated = true;
-      newEdge.style = { stroke: "#10b981", strokeWidth: 3 };
-
-      const isTargetSpouse = !!edge.target.isSpouse;
-      const isTargetSibling = !!edge.target.isSibling;
-
-      if (isTargetSpouse) {
-        newEdge.sourceHandle = isTreeHorizontal ? Bottom : Right;
-        newEdge.targetHandle = isTreeHorizontal ? Top : Left;
-      } else if (isTargetSibling) {
-        newEdge.sourceHandle = isTreeHorizontal ? Top : Left;
-        newEdge.targetHandle = isTreeHorizontal ? Bottom : Right;
-      } else {
-        newEdge.sourceHandle = isTreeHorizontal ? Right : Bottom;
-        newEdge.targetHandle = isTreeHorizontal ? Left : Top;
-      }
-
-      edges.push(newEdge);
-    });
-
-    // Fallback: Create edges directly from original relationships to ensure all connections are visible
-    const existingEdgeIds = new Set(edges.map((e) => e.id));
-
-    console.log("🔗 Entitree created edges:", entitreeEdges.length);
-    console.log("🔗 Total edges after entitree:", edges.length);
-    console.log("🔗 Existing edge IDs:", Array.from(existingEdgeIds));
-
-    // Create fallback edges for any missing relationships
-    relationships.forEach((rel) => {
-      if (!rel.personId1 || !rel.personId2) return;
-
-      const edgeId1 = `e${rel.personId1._id}${rel.personId2._id}`;
-      const edgeId2 = `e${rel.personId2._id}${rel.personId1._id}`;
-
-      // Check if edge already exists
-      const edgeExists =
-        existingEdgeIds.has(edgeId1) || existingEdgeIds.has(edgeId2);
-      console.log(
-        `🔍 Checking edge: ${rel.personId1.firstName} -> ${rel.personId2.firstName}`
-      );
-      console.log(`🔍 Edge IDs: ${edgeId1}, ${edgeId2}`);
-      console.log(`🔍 Edge exists: ${edgeExists}`);
-
-      if (!edgeExists) {
-        const relType = rel.relationType.toLowerCase();
-        let sourceHandle, targetHandle;
-
-        // Determine handle positions based on relationship type
-        if (relType === "spouse") {
-          sourceHandle = isTreeHorizontal ? Bottom : Right;
-          targetHandle = isTreeHorizontal ? Top : Left;
-        } else if (
-          relType === "brother" ||
-          relType === "sister" ||
-          relType === "sibling"
-        ) {
-          sourceHandle = isTreeHorizontal ? Top : Left;
-          targetHandle = isTreeHorizontal ? Bottom : Right;
-        } else {
-          // Parent-child relationships
-          if (relType === "father" || relType === "mother") {
-            // person1 is parent of person2
-            sourceHandle = isTreeHorizontal ? Right : Bottom;
-            targetHandle = isTreeHorizontal ? Left : Top;
-          } else if (relType === "son" || relType === "daughter") {
-            // person2 is parent of person1
-            sourceHandle = isTreeHorizontal ? Left : Top;
-            targetHandle = isTreeHorizontal ? Right : Bottom;
-          } else {
-            sourceHandle = isTreeHorizontal ? Right : Bottom;
-            targetHandle = isTreeHorizontal ? Left : Top;
-          }
-        }
-
-        const fallbackEdge = {
-          id: edgeId1,
-          source: rel.personId1._id,
-          target: rel.personId2._id,
-          type: "smoothstep",
-          animated: true,
-          style: { stroke: "#10b981", strokeWidth: 3 },
-          sourceHandle,
-          targetHandle,
-        };
-
-        edges.push(fallbackEdge);
-        existingEdgeIds.add(edgeId1);
-        console.log(
-          `🔗 Added fallback edge: ${rel.personId1.firstName} -> ${rel.personId2.firstName} (${relType})`
-        );
-      }
-    });
-
-    // Special case: Create edges for current user to their children if current user was not in relationships
-    if (currentUserInRelationships.length === 0) {
-      const currentUser = tree[currentUserId];
-      if (currentUser && currentUser.children) {
-        currentUser.children.forEach((childId) => {
-          const edgeId = `e${currentUserId}${childId}`;
-          if (!existingEdgeIds.has(edgeId)) {
-            const fallbackEdge = {
-              id: edgeId,
-              source: currentUserId,
-              target: childId,
-              type: "smoothstep",
-              animated: true,
-              style: { stroke: "#10b981", strokeWidth: 3 },
-              sourceHandle: isTreeHorizontal ? Right : Bottom,
-              targetHandle: isTreeHorizontal ? Left : Top,
-            };
-
-            edges.push(fallbackEdge);
-            existingEdgeIds.add(edgeId);
-            console.log(
-              `🔗 Added parent-child edge: ${currentUserName} -> ${tree[childId]?.name}`
-            );
+        // Add spouses at the same level
+        const personSpouses = spouses.get(id) || [];
+        personSpouses.forEach((spouseId) => {
+          if (!visited.has(spouseId)) {
+            visited.add(spouseId);
+            nodePositions.set(spouseId, { x: 0, y: 0, level });
+            queue.push({ id: spouseId, level });
           }
         });
-      }
-    }
 
-    console.log("🔗 Final edge count:", edges.length);
-    console.log(
-      "🔗 Final edges:",
-      edges.map((e) => `${e.source} -> ${e.target}`)
-    );
+        // Add siblings at the same level
+        const personSiblings = siblings.get(id) || [];
+        personSiblings.forEach((siblingId) => {
+          if (!visited.has(siblingId)) {
+            visited.add(siblingId);
+            nodePositions.set(siblingId, { x: 0, y: 0, level });
+            queue.push({ id: siblingId, level });
+          }
+        });
 
-    entitreeNodes.forEach((node) => {
-      const isSpouse = !!node?.isSpouse;
-      const isSibling = !!node?.isSibling;
-      const isRoot = node?.id === rootId;
+        // Add parents at level - 1
+        const personParents = parents.get(id) || [];
+        personParents.forEach((parentId) => {
+          if (!visited.has(parentId)) {
+            visited.add(parentId);
+            nodePositions.set(parentId, { x: 0, y: 0, level: level - 1 });
+            queue.push({ id: parentId, level: level - 1 });
+          }
+        });
 
-      const newNode: any = {
-        id: node.id,
-        type: "custom",
-        width: nodeWidth,
-        height: nodeHeight,
-        position: {
-          x: node.x,
-          y: node.y,
-        },
-        data: {
-          label: node.name,
-          firstName: node.firstName,
-          lastName: node.lastName,
-          initials: node.initials,
-          gothiram: node.gothiram,
-          nativePlace: node.nativePlace,
-          isCurrentUser: node.isCurrentUser || false,
-          isSpouse,
-          isSibling,
-          isRoot,
-          direction: dir,
-          children: node.children,
-          siblings: node.siblings,
-          spouses: node.spouses,
-          onClick: () => {
-            if (onNodeClick) {
-              // Add highlight class
-              const cardElements = document.querySelectorAll(".card-inner");
-              cardElements.forEach((card) =>
-                card.classList.remove("card-clicked")
-              );
-              setTimeout(() => {
-                const clickedCard = document.querySelector(
-                  `[data-id="${node.id}"] .card-inner`
-                );
-                if (clickedCard) {
-                  clickedCard.classList.add("card-clicked");
-                }
-              }, 10);
-              onNodeClick(node.id);
+        // Add children at level + 1
+        const personChildren = children.get(id) || [];
+        personChildren.forEach((childId) => {
+          if (!visited.has(childId)) {
+            visited.add(childId);
+            nodePositions.set(childId, { x: 0, y: 0, level: level + 1 });
+            queue.push({ id: childId, level: level + 1 });
+          }
+        });
+
+        // Add extended family at appropriate levels
+        const personExtended = extended.get(id) || [];
+        personExtended.forEach(({ id: extendedId, type }) => {
+          if (!visited.has(extendedId)) {
+            visited.add(extendedId);
+            // Determine level based on relationship type
+            let extendedLevel = level;
+            if (type === "Uncle" || type === "Aunt") {
+              extendedLevel = level - 1; // Same level as parents
+            } else if (type === "Nephew" || type === "Niece") {
+              extendedLevel = level + 1; // Same level as children
+            } else if (type === "Cousin") {
+              extendedLevel = level; // Same level as siblings
             }
-          },
-        },
-      };
-
-      if (isSpouse) {
-        newNode.sourcePosition = isTreeHorizontal ? Bottom : Right;
-        newNode.targetPosition = isTreeHorizontal ? Top : Left;
-      } else if (isSibling) {
-        newNode.sourcePosition = isTreeHorizontal ? Top : Left;
-        newNode.targetPosition = isTreeHorizontal ? Bottom : Right;
-      } else {
-        newNode.sourcePosition = isTreeHorizontal ? Right : Bottom;
-        newNode.targetPosition = isTreeHorizontal ? Left : Top;
+            nodePositions.set(extendedId, { x: 0, y: 0, level: extendedLevel });
+            queue.push({ id: extendedId, level: extendedLevel });
+          }
+        });
       }
 
-      nodes.push(newNode);
+      // Handle any disconnected nodes
+      people.forEach((_, id) => {
+        if (!visited.has(id)) {
+          nodePositions.set(id, { x: 0, y: 0, level: 0 });
+        }
+      });
+    };
+
+    assignLevels();
+
+    // Group nodes by level
+    const levels = new Map<number, string[]>();
+    nodePositions.forEach((pos, id) => {
+      if (!levels.has(pos.level)) {
+        levels.set(pos.level, []);
+      }
+      levels.get(pos.level)!.push(id);
+    });
+
+    // Sort levels by level number
+    const sortedLevels = Array.from(levels.keys()).sort((a, b) => a - b);
+
+    // Position nodes within each level
+    sortedLevels.forEach((level) => {
+      const nodeIds = levels.get(level)!;
+
+      // For the current user's level, arrange: spouses (left), current user (center), siblings (right)
+      if (nodeIds.includes(currentUserId)) {
+        const arrangedNodes: string[] = [];
+        const personSpouses = spouses.get(currentUserId) || [];
+        const personSiblings = siblings.get(currentUserId) || [];
+
+        // Add spouses first (to the left)
+        personSpouses.forEach((spouseId) => {
+          if (nodeIds.includes(spouseId) && !arrangedNodes.includes(spouseId)) {
+            arrangedNodes.push(spouseId);
+          }
+        });
+
+        // Add current user in the middle
+        arrangedNodes.push(currentUserId);
+
+        // Add siblings (to the right)
+        personSiblings.forEach((siblingId) => {
+          if (
+            nodeIds.includes(siblingId) &&
+            !arrangedNodes.includes(siblingId)
+          ) {
+            arrangedNodes.push(siblingId);
+          }
+        });
+
+        // Add any remaining nodes in this level
+        nodeIds.forEach((id) => {
+          if (!arrangedNodes.includes(id)) {
+            arrangedNodes.push(id);
+          }
+        });
+
+        // Position the arranged nodes
+        const levelWidth = arrangedNodes.length * horizontalSpacing;
+        const startX = -levelWidth / 2 + horizontalSpacing / 2;
+
+        arrangedNodes.forEach((id, index) => {
+          const x = startX + index * horizontalSpacing;
+          const y = level * verticalSpacing;
+          nodePositions.set(id, { x, y, level });
+        });
+      } else {
+        // For other levels (parents above, children below)
+        // Group nodes by their family units
+        const processedNodes = new Set<string>();
+        const familyGroups: string[][] = [];
+
+        nodeIds.forEach((id) => {
+          if (processedNodes.has(id)) return;
+
+          const group: string[] = [id];
+          processedNodes.add(id);
+
+          // Add spouse to the same group
+          const personSpouses = spouses.get(id) || [];
+          personSpouses.forEach((spouseId) => {
+            if (nodeIds.includes(spouseId) && !processedNodes.has(spouseId)) {
+              group.push(spouseId);
+              processedNodes.add(spouseId);
+            }
+          });
+
+          // Add siblings to the same group
+          const personSiblings = siblings.get(id) || [];
+          personSiblings.forEach((siblingId) => {
+            if (nodeIds.includes(siblingId) && !processedNodes.has(siblingId)) {
+              group.push(siblingId);
+              processedNodes.add(siblingId);
+            }
+          });
+
+          familyGroups.push(group);
+        });
+
+        // Position each family group
+        const totalWidth = familyGroups.reduce(
+          (sum, group) => sum + group.length * horizontalSpacing,
+          0
+        );
+        let currentX = -totalWidth / 2 + horizontalSpacing / 2;
+
+        familyGroups.forEach((group) => {
+          group.forEach((id) => {
+            const y = level * verticalSpacing;
+            nodePositions.set(id, { x: currentX, y, level });
+            currentX += horizontalSpacing;
+          });
+        });
+      }
+    });
+
+    // Create nodes
+    nodePositions.forEach((pos, id) => {
+      const person = people.get(id);
+      if (!person) return;
+
+      const isCurrentUser = id === currentUserId;
+
+      nodes.push({
+        id,
+        type: "custom",
+        position: { x: pos.x, y: pos.y },
+        data: {
+          label: getFullName(person),
+          firstName: person.firstName,
+          lastName: person.lastName,
+          profilePicture: person.profilePicture,
+          gothiram: person.gothiram,
+          nativePlace: person.nativePlace,
+          isCurrentUser,
+          onClick: () => onNodeClick?.(id),
+        },
+      });
+    });
+
+    // Create edges for parent-child relationships
+    children.forEach((childIds, parentId) => {
+      childIds.forEach((childId) => {
+        if (nodePositions.has(parentId) && nodePositions.has(childId)) {
+          edges.push({
+            id: `parent-child-${parentId}-${childId}`,
+            source: parentId,
+            sourceHandle: "bottom",
+            target: childId,
+            targetHandle: "top",
+            type: "smoothstep",
+            style: { stroke: "#10b981", strokeWidth: 2 },
+            animated: false,
+            label: "child",
+            labelStyle: { fontSize: 10, fill: "#10b981" },
+            labelBgStyle: { fill: "#fff", fillOpacity: 0.8 },
+          });
+        }
+      });
+    });
+
+    // Create edges for spouse relationships
+    spouses.forEach((spouseIds, personId) => {
+      spouseIds.forEach((spouseId) => {
+        if (nodePositions.has(personId) && nodePositions.has(spouseId)) {
+          // Only create edge once
+          if (personId < spouseId) {
+            // Determine which node is on the left/right based on x position
+            const person1Pos = nodePositions.get(personId);
+            const person2Pos = nodePositions.get(spouseId);
+            const isLeftToRight = person1Pos!.x < person2Pos!.x;
+
+            edges.push({
+              id: `spouse-${personId}-${spouseId}`,
+              source: isLeftToRight ? personId : spouseId,
+              sourceHandle: "right",
+              target: isLeftToRight ? spouseId : personId,
+              targetHandle: "left",
+              type: "straight",
+              style: {
+                stroke: "#ec4899",
+                strokeWidth: 2,
+                strokeDasharray: "5,5",
+              },
+              animated: false,
+              label: "spouse",
+              labelStyle: { fontSize: 10, fill: "#ec4899" },
+              labelBgStyle: { fill: "#fff", fillOpacity: 0.8 },
+            });
+          }
+        }
+      });
+    });
+
+    // Create edges for sibling relationships (only for visualization)
+    siblings.forEach((siblingIds, personId) => {
+      siblingIds.forEach((siblingId) => {
+        if (nodePositions.has(personId) && nodePositions.has(siblingId)) {
+          // Only create edge once and only if they are on the same level
+          const personPos = nodePositions.get(personId);
+          const siblingPos = nodePositions.get(siblingId);
+
+          if (personId < siblingId && personPos?.level === siblingPos?.level) {
+            // Determine which node is on the left/right based on x position
+            const isLeftToRight = personPos!.x < siblingPos!.x;
+
+            edges.push({
+              id: `sibling-${personId}-${siblingId}`,
+              source: isLeftToRight ? personId : siblingId,
+              sourceHandle: "right",
+              target: isLeftToRight ? siblingId : personId,
+              targetHandle: "left",
+              type: "straight",
+              style: {
+                stroke: "#f59e0b",
+                strokeWidth: 1,
+                strokeDasharray: "3,3",
+              },
+              animated: false,
+              label: "sibling",
+              labelStyle: { fontSize: 10, fill: "#f59e0b" },
+              labelBgStyle: { fill: "#fff", fillOpacity: 0.8 },
+            });
+          }
+        }
+      });
+    });
+
+    // Create edges for extended family relationships
+    extended.forEach((extendedRelations, personId) => {
+      extendedRelations.forEach(({ id: extendedId, type }) => {
+        if (nodePositions.has(personId) && nodePositions.has(extendedId)) {
+          // Only create edge once
+          if (personId < extendedId) {
+            const person1Pos = nodePositions.get(personId);
+            const person2Pos = nodePositions.get(extendedId);
+
+            // Determine if this is a same-level relationship (cousin) or vertical (uncle/nephew)
+            const isSameLevel = person1Pos!.level === person2Pos!.level;
+
+            if (isSameLevel) {
+              // Same level - use left/right handles
+              const isLeftToRight = person1Pos!.x < person2Pos!.x;
+              edges.push({
+                id: `extended-${personId}-${extendedId}`,
+                source: isLeftToRight ? personId : extendedId,
+                sourceHandle: "right",
+                target: isLeftToRight ? extendedId : personId,
+                targetHandle: "left",
+                type: "straight",
+                style: {
+                  stroke: "#8b5cf6",
+                  strokeWidth: 1,
+                  strokeDasharray: "5,2",
+                },
+                label: type.toLowerCase(),
+                labelStyle: { fontSize: 10, fill: "#8b5cf6" },
+                labelBgStyle: { fill: "#fff", fillOpacity: 0.8 },
+                animated: false,
+              });
+            } else {
+              // Different levels - use top/bottom handles
+              const isTopToBottom = person1Pos!.level < person2Pos!.level;
+              edges.push({
+                id: `extended-${personId}-${extendedId}`,
+                source: isTopToBottom ? personId : extendedId,
+                sourceHandle: "bottom",
+                target: isTopToBottom ? extendedId : personId,
+                targetHandle: "top",
+                type: "smoothstep",
+                style: {
+                  stroke: "#8b5cf6",
+                  strokeWidth: 1,
+                  strokeDasharray: "5,2",
+                },
+                label: type.toLowerCase(),
+                labelStyle: { fontSize: 10, fill: "#8b5cf6" },
+                labelBgStyle: { fill: "#fff", fillOpacity: 0.8 },
+                animated: false,
+              });
+            }
+          }
+        }
+      });
     });
 
     return { nodes, edges };
-  };
+  }, [buildFamilyStructure, currentUserId, onNodeClick]);
 
-  const renderFamilyTree = () => {
-    const { treeData, rootId, currentUserInRelationships } =
-      transformToTreeData();
-    console.log("👥 Transformed tree data:", treeData);
-    console.log("🌳 Using root ID:", rootId);
+  useEffect(() => {
+    const { nodes: newNodes, edges: newEdges } = generateTreeElements();
+    console.log("Generated nodes:", newNodes.length);
+    console.log("Generated edges:", newEdges.length);
+    console.log("Nodes:", newNodes);
+    setNodes(newNodes);
+    setEdges(newEdges);
+  }, [relationships, direction, generateTreeElements]);
 
-    const { nodes: layoutedNodes, edges: layoutedEdges } = layoutElements(
-      treeData,
-      rootId,
-      direction,
-      relationships,
-      currentUserInRelationships
-    );
-
-    setNodes(layoutedNodes);
-    setEdges(layoutedEdges);
-    setNodeCount(layoutedNodes.length);
-    setEdgeCount(layoutedEdges.length);
-  };
-
-  const onLayout = useCallback((newDirection: string) => {
-    setDirection(newDirection);
+  const onLayout = useCallback((dir: "TB" | "LR") => {
+    setDirection(dir);
   }, []);
 
   return (
-    <div
-      className="w-full h-[750px] bg-gradient-to-br from-indigo-50 via-white to-emerald-50 rounded-2xl border-4 border-indigo-200 shadow-2xl overflow-hidden"
-      style={{ position: "relative", zIndex: 40 }}
-    >
+    <div className="w-full h-[750px] bg-gradient-to-br from-indigo-50 via-white to-emerald-50 rounded-2xl border-4 border-indigo-200 shadow-xl overflow-hidden">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -595,72 +587,73 @@ export default function D3FamilyTree({
         connectionLineType={ConnectionLineType.SmoothStep}
         nodeTypes={nodeTypes}
         fitView
-        minZoom={0.1}
-        maxZoom={2}
-        defaultEdgeOptions={{
-          type: "smoothstep",
-          animated: true,
-          style: { stroke: "#10b981", strokeWidth: 3 },
-        }}
-        proOptions={{ hideAttribution: true }}
+        minZoom={0.2}
+        maxZoom={1.5}
       >
-        {/* Info Panel */}
         <Panel
           position="top-left"
-          className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 backdrop-blur-md p-3 rounded-2xl shadow-2xl border-3 border-white/30"
-          style={{ zIndex: 50 }}
+          className="bg-indigo-600 text-white p-3 rounded-lg shadow-lg"
         >
-          <div className="text-white">
-            <h3 className="font-bold text-sm mb-2 flex items-center gap-2">
-              <span className="text-lg">🌳</span>
-              Family Tree
-            </h3>
-            <div className="flex items-center gap-3 text-xs">
-              <span className="bg-white/20 px-2 py-1 rounded-full font-semibold">
-                {nodeCount} Members
-              </span>
-              <span className="bg-white/20 px-2 py-1 rounded-full font-semibold">
-                {edgeCount} Connections
-              </span>
+          <b>🌳 Family Tree</b>
+        </Panel>
+        <Panel position="top-right" className="flex gap-2">
+          <button
+            className={`px-4 py-2 rounded-md shadow transition-colors ${
+              direction === "TB"
+                ? "bg-indigo-600 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50"
+            }`}
+            onClick={() => onLayout("TB")}
+          >
+            Vertical
+          </button>
+          <button
+            className={`px-4 py-2 rounded-md shadow transition-colors ${
+              direction === "LR"
+                ? "bg-indigo-600 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50"
+            }`}
+            onClick={() => onLayout("LR")}
+          >
+            Horizontal
+          </button>
+        </Panel>
+        <Panel
+          position="bottom-left"
+          className="bg-white p-3 rounded-lg shadow-lg text-xs"
+        >
+          <div className="font-bold mb-2">Legend</div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-0.5 bg-green-500" />
+              <span>Parent-Child</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div
+                className="w-8 h-0.5 bg-pink-500"
+                style={{ borderTop: "2px dashed" }}
+              />
+              <span>Spouse</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div
+                className="w-8 h-0.5 bg-amber-500"
+                style={{ borderTop: "1px dashed" }}
+              />
+              <span>Sibling</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div
+                className="w-8 h-0.5 bg-purple-500"
+                style={{ borderTop: "1px dashed" }}
+              />
+              <span>Extended</span>
             </div>
           </div>
         </Panel>
-
-        {/* Layout Controls */}
-        <Panel position="top-right">
-          <div className="flex gap-2">
-            <button
-              className="px-3 py-1 bg-white rounded-lg shadow-md text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer"
-              onClick={() => onLayout("TB")}
-            >
-              ↕ Vertical
-            </button>
-            <button
-              className="px-3 py-1 bg-white rounded-lg shadow-md text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer"
-              onClick={() => onLayout("LR")}
-            >
-              ↔ Horizontal
-            </button>
-          </div>
-        </Panel>
-
-        <Background />
+        <Controls className="bg-white shadow-lg" />
+        <Background color="#cbd5e1" gap={32} size={1} />
       </ReactFlow>
-
-      {/* Empty State */}
-      {(!relationships || relationships.length === 0) && (
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <div className="bg-white/95 backdrop-blur-md p-8 rounded-2xl shadow-2xl border-3 border-indigo-200 text-center">
-            <div className="text-6xl mb-4">🌳</div>
-            <p className="text-gray-800 font-bold text-lg mb-2">
-              Your Family Tree Awaits
-            </p>
-            <p className="text-sm text-gray-600">
-              Add relationships to see beautiful family connections
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

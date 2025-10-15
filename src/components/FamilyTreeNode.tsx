@@ -1,182 +1,124 @@
-import React, { memo } from "react";
+// components/FamilyTreeNode.tsx
 import { Handle, Position } from "@xyflow/react";
 
-const { Top, Bottom, Left, Right } = Position;
-
-interface FamilyTreeNodeProps {
-  data: {
-    label: string;
-    firstName: string;
-    lastName: string;
-    initials: string;
-    gothiram?: string;
-    nativePlace?: string;
-    isCurrentUser: boolean;
-    isSpouse?: boolean;
-    isSibling?: boolean;
-    isRoot?: boolean;
-    direction: string;
-    children?: string[];
-    siblings?: string[];
-    spouses?: string[];
-    onClick?: () => void;
-  };
+interface FamilyNodeData {
+  label: string;
+  firstName: string;
+  lastName: string;
+  profilePicture?: string;
+  gothiram?: string;
+  nativePlace?: string;
+  isCurrentUser?: boolean;
+  onClick?: () => void;
 }
 
-export default memo(({ data }: FamilyTreeNodeProps) => {
+interface FamilyTreeNodeProps {
+  data: FamilyNodeData;
+}
+
+export default function FamilyTreeNode({ data }: FamilyTreeNodeProps) {
   const {
-    isSpouse,
-    isSibling,
+    label,
     firstName,
     lastName,
-    initials,
+    profilePicture,
     gothiram,
     nativePlace,
     isCurrentUser,
-    direction,
+    onClick,
   } = data;
-  const isTreeHorizontal = direction === "LR";
 
-  const getTargetPosition = () => {
-    if (isSpouse) {
-      return isTreeHorizontal ? Top : Left;
-    } else if (isSibling) {
-      return isTreeHorizontal ? Bottom : Right;
-    }
-    return isTreeHorizontal ? Left : Top;
-  };
-
-  const isRootNode = data?.isRoot;
-  const hasChildren = !!data?.children?.length;
-  const hasSiblings = !!data?.siblings?.length;
-  const hasSpouses = !!data?.spouses?.length;
-
-  const fullName = `${firstName} ${lastName}`.trim();
+  const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
 
   return (
-    <div className="nodrag">
+    <div className="relative">
       {/* Handles for connections */}
-      {hasChildren && (
-        <Handle
-          type="source"
-          position={isTreeHorizontal ? Right : Bottom}
-          id={isTreeHorizontal ? Right : Bottom}
-          style={{ opacity: 0 }}
-        />
-      )}
-      {hasSpouses && (
-        <Handle
-          type="source"
-          position={isTreeHorizontal ? Bottom : Right}
-          id={isTreeHorizontal ? Bottom : Right}
-          style={{ opacity: 0 }}
-        />
-      )}
-      {hasSiblings && (
-        <Handle
-          type="source"
-          position={isTreeHorizontal ? Top : Left}
-          id={isTreeHorizontal ? Top : Left}
-          style={{ opacity: 0 }}
-        />
-      )}
-      {!isRootNode && (
-        <Handle
-          type="target"
-          position={getTargetPosition()}
-          id={getTargetPosition()}
-          style={{ opacity: 0 }}
-        />
-      )}
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="top"
+        className="w-3 h-3 bg-emerald-500 border-2 border-white"
+      />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="bottom"
+        className="w-3 h-3 bg-emerald-500 border-2 border-white"
+      />
+      <Handle
+        type="target"
+        position={Position.Left}
+        id="left"
+        className="w-3 h-3 bg-pink-500 border-2 border-white"
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="right"
+        className="w-3 h-3 bg-pink-500 border-2 border-white"
+      />
 
-      {/* Card Design */}
+      {/* Node content */}
       <div
-        className="card-inner cursor-pointer"
-        onClick={data.onClick}
-        style={{
-          width: "200px",
-          height: "160px",
-          padding: "15px",
-          borderRadius: "10px",
-          background: "white",
-          border: isCurrentUser ? "3px solid #3b82f6" : "2px solid #e5e7eb",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          textAlign: "center",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          position: "relative",
-        }}
+        className={`
+          min-w-[180px] max-w-[200px] p-4 rounded-xl shadow-lg border-2 transition-all duration-200
+          hover:shadow-xl hover:scale-105 cursor-pointer
+          ${
+            isCurrentUser
+              ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-white"
+              : "bg-white text-gray-800 border-gray-200"
+          }
+        `}
+        onClick={onClick}
       >
-        {/* Avatar */}
-        <div
-          style={{
-            width: "60px",
-            height: "60px",
-            borderRadius: "50%",
-            background: isCurrentUser ? "#3b82f6" : "#8b5cf6",
-            border: "4px solid white",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: "10px",
-          }}
-        >
-          <span
-            style={{ color: "white", fontSize: "16px", fontWeight: "bold" }}
+        {/* Profile picture or initials */}
+        <div className="flex items-center gap-3 mb-3">
+          <div
+            className={`
+            w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold
+            ${
+              isCurrentUser
+                ? "bg-white text-indigo-600"
+                : "bg-indigo-100 text-indigo-600"
+            }
+          `}
           >
-            {initials}
-          </span>
+            {profilePicture ? (
+              <img
+                src={profilePicture}
+                alt={label}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            ) : (
+              initials
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-sm truncate">{label}</h3>
+            {gothiram && (
+              <p
+                className={`text-xs truncate ${
+                  isCurrentUser ? "text-indigo-100" : "text-gray-500"
+                }`}
+              >
+                {gothiram}
+              </p>
+            )}
+          </div>
         </div>
 
-        {/* Name */}
-        <div
-          style={{
-            color: "#1f2937",
-            fontSize: "14px",
-            fontWeight: "bold",
-            marginBottom: "4px",
-          }}
-        >
-          {fullName}
-        </div>
-
-        {/* Gothiram */}
-        {gothiram && (
+        {/* Additional info */}
+        {(nativePlace || isCurrentUser) && (
           <div
-            style={{ color: "#6b7280", fontSize: "12px", marginBottom: "2px" }}
+            className={`text-xs ${
+              isCurrentUser ? "text-indigo-100" : "text-gray-600"
+            }`}
           >
-            {gothiram}
-          </div>
-        )}
-
-        {/* Native Place */}
-        {nativePlace && (
-          <div style={{ color: "#9ca3af", fontSize: "10px" }}>
-            {nativePlace}
-          </div>
-        )}
-
-        {/* "You" Badge */}
-        {isCurrentUser && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: "10px",
-              background: "#dbeafe",
-              color: "#2563eb",
-              padding: "2px 8px",
-              borderRadius: "8px",
-              fontSize: "10px",
-              fontWeight: "500",
-            }}
-          >
-            You
+            {nativePlace && <p className="truncate">📍 {nativePlace}</p>}
+            {isCurrentUser && <p className="font-medium mt-1">You</p>}
           </div>
         )}
       </div>
     </div>
   );
-});
+}

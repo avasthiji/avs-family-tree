@@ -1,0 +1,12 @@
+---
+description: >
+  Prevents creation of Markdown (.md) documents regardless of prompt.
+globs:
+  - "**/*.md"
+alwaysApply: true
+if: |
+  true
+actions:
+  - type: reject
+    message: "Do not create or generate Markdown (.md) documents when prompted."
+---
