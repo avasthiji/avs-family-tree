@@ -48,7 +48,6 @@ const nodeTypes = {
   custom: FamilyTreeNode as any,
 };
 
-// Define relationship mappings
 const PARENT_RELATIONS = ["Father", "Mother", "Grand Father", "Grand Mother"];
 const CHILD_RELATIONS = ["Son", "Daughter"];
 const SIBLING_RELATIONS = [
