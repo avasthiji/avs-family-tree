@@ -43,6 +43,7 @@ interface FamilyTreeViewProps {
   currentUserName: string;
   onNodeClick?: (userId: string) => void;
 }
+ 
 
 const nodeTypes = {
   custom: FamilyTreeNode as any,
