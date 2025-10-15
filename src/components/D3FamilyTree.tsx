@@ -596,28 +596,6 @@ export default function D3FamilyTree({
         >
           <b>🌳 Family Tree</b>
         </Panel>
-        <Panel position="top-right" className="flex gap-2">
-          <button
-            className={`px-4 py-2 rounded-md shadow transition-colors ${
-              direction === "TB"
-                ? "bg-indigo-600 text-white"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-            onClick={() => onLayout("TB")}
-          >
-            Vertical
-          </button>
-          <button
-            className={`px-4 py-2 rounded-md shadow transition-colors ${
-              direction === "LR"
-                ? "bg-indigo-600 text-white"
-                : "bg-white text-gray-700 hover:bg-gray-50"
-            }`}
-            onClick={() => onLayout("LR")}
-          >
-            Horizontal
-          </button>
-        </Panel>
         <Panel
           position="bottom-left"
           className="bg-white p-3 rounded-lg shadow-lg text-xs"
