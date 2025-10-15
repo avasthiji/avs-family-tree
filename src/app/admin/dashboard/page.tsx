@@ -37,6 +37,7 @@ import {
   XCircle,
   Clock,
 } from "lucide-react";
+import { AdminLoader } from "@/components/ui/loader";
 
 interface DashboardStats {
   totalUsers: number;
