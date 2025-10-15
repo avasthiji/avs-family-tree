@@ -84,7 +84,7 @@ export default function AppHeader() {
               <div className="hidden md:flex items-center gap-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-1 border border-gray-200">
                 <button
                   onClick={() => handleModeSwitch("user")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 cursor-pointer ${
                     viewMode === "user"
                       ? "bg-white text-gray-900 shadow-md"
                       : "text-gray-600 hover:text-gray-900"
@@ -95,7 +95,7 @@ export default function AppHeader() {
                 </button>
                 <button
                   onClick={() => handleModeSwitch("admin")}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 cursor-pointer ${
                     viewMode === "admin"
                       ? "bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-md"
                       : "text-gray-600 hover:text-gray-900"

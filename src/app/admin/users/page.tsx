@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminLoader } from "@/components/ui/loader";
 import AppHeader from "@/components/AppHeader";
 import { MATRIMONIAL_ENABLED } from "@/lib/features";
 import {
@@ -301,16 +302,7 @@ export default function AdminUsersPage() {
   };
 
   if (status === "loading" || loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto avs-gradient rounded-full flex items-center justify-center mb-4 animate-pulse">
-            <span className="text-white font-bold text-xl">AVS</span>
-          </div>
-          <p className="text-gray-600">Loading users...</p>
-        </div>
-      </div>
-    );
+    return <AdminLoader text="Loading users..." />;
   }
 
   return (

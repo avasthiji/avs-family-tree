@@ -3,10 +3,10 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader } from "@/components/ui/loader";
 import { 
   Users, 
   TreePine, 
@@ -44,22 +44,7 @@ export default function DashboardPage() {
   }, [session, status, router]);
 
   if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 animate-pulse">
-            <Image
-              src="/avs-logo.png"
-              alt="AVS Logo"
-              width={64}
-              height={64}
-              className="object-contain"
-            />
-          </div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+    return <Loader variant="page" text="Loading..." size="lg" />;
   }
 
   if (!session) {

@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/label";
 import SearchBar from "@/components/SearchBar";
 import UserProfileModal from "@/components/UserProfileModal";
+import { AdminLoader } from "@/components/ui/loader";
 import Link from "next/link";
 import { toast } from "sonner";
 import { 
@@ -189,16 +190,7 @@ export default function RelationshipsPage() {
   };
 
   if (status === "loading" || loading)
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-        <div className="text-center space-y-3">
-          <div className="w-16 h-16 avs-gradient rounded-full flex items-center justify-center text-white font-bold text-xl animate-pulse">
-            AVS
-          </div>
-          <p className="text-gray-600">Loading your relationships...</p>
-        </div>
-      </div>
-    );
+    return <AdminLoader text="Loading your relationships..." />;
 
   if (!session) return null;
 
@@ -353,7 +345,7 @@ export default function RelationshipsPage() {
                   return (
                     <div
                       key={rel._id}
-                      className="flex justify-between items-center p-5 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow transition"
+                      className="flex justify-between items-center p-5 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow transition cursor-pointer"
                     >
                       <div className="flex items-center gap-4 flex-1">
                         <Avatar className="h-12 w-12">

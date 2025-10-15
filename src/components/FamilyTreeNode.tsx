@@ -91,7 +91,7 @@ export default memo(({ data }: FamilyTreeNodeProps) => {
 
       {/* Card Design */}
       <div
-        className="card-inner"
+        className="card-inner cursor-pointer"
         onClick={data.onClick}
         style={{
           width: "200px",

@@ -630,13 +630,13 @@ export default function D3FamilyTree({
         <Panel position="top-right">
           <div className="flex gap-2">
             <button
-              className="px-3 py-1 bg-white rounded-lg shadow-md text-sm font-medium hover:bg-gray-50 transition-colors"
+              className="px-3 py-1 bg-white rounded-lg shadow-md text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer"
               onClick={() => onLayout("TB")}
             >
               ↕ Vertical
             </button>
             <button
-              className="px-3 py-1 bg-white rounded-lg shadow-md text-sm font-medium hover:bg-gray-50 transition-colors"
+              className="px-3 py-1 bg-white rounded-lg shadow-md text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer"
               onClick={() => onLayout("LR")}
             >
               ↔ Horizontal

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FamilyTreeView from "@/components/FamilyTreeView";
+import { Loader } from "@/components/ui/loader";
 import Link from "next/link";
 import Image from "next/image";
 import { TreePine, Search, Users, Plus, Network, List } from "lucide-react";
@@ -76,22 +77,7 @@ export default function FamilyTreePage() {
   };
 
   if (status === "loading" || loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 animate-pulse">
-            <Image
-              src="/avs-logo.png"
-              alt="AVS Logo"
-              width={64}
-              height={64}
-              className="object-contain"
-            />
-          </div>
-          <p className="text-gray-600">Loading family tree...</p>
-        </div>
-      </div>
-    );
+    return <Loader variant="page" text="Loading family tree..." size="lg" />;
   }
 
   return (
@@ -140,7 +126,7 @@ export default function FamilyTreePage() {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+          <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer">
             <CardHeader>
               <div className="w-12 h-12 avs-gradient rounded-lg flex items-center justify-center mb-2">
                 <Search className="h-6 w-6 text-white" />
@@ -159,7 +145,7 @@ export default function FamilyTreePage() {
             </CardContent>
           </Card>
 
-          <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+          <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer">
             <CardHeader>
               <div className="w-12 h-12 avs-gradient-secondary rounded-lg flex items-center justify-center mb-2">
                 <Plus className="h-6 w-6 text-white" />
@@ -254,7 +240,7 @@ export default function FamilyTreePage() {
                       return (
                         <div
                           key={rel._id}
-                          className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow"
+                          className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
                         >
                           <div className="flex items-center space-x-4">
                             <div className="w-10 h-10 avs-gradient rounded-full flex items-center justify-center">

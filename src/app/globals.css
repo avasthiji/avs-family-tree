@@ -121,6 +121,30 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Cursor pointer for all interactive elements */
+  button,
+  a,
+  [role="button"],
+  [role="link"],
+  [onClick],
+  [onSubmit],
+  input[type="submit"],
+  input[type="button"],
+  input[type="checkbox"],
+  input[type="radio"],
+  select,
+  label[for] {
+    cursor: pointer;
+  }
+  
+  /* Disabled elements should show not-allowed cursor */
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    cursor: not-allowed;
+  }
 }
 
 @layer components {
@@ -142,11 +166,11 @@
   }
   
   .avs-button-primary {
-    @apply bg-gradient-to-r from-[#E63946] to-[#F77F00] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105;
+    @apply bg-gradient-to-r from-[#E63946] to-[#F77F00] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer;
   }
   
   .avs-button-secondary {
-    @apply bg-gradient-to-r from-[#2A9D8F] to-[#4361EE] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105;
+    @apply bg-gradient-to-r from-[#2A9D8F] to-[#4361EE] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer;
   }
   
   .avs-text-gradient {
@@ -177,7 +201,7 @@
   }
   
   .profile-dropdown-item {
-    @apply transition-all duration-200 ease-in-out;
+    @apply transition-all duration-200 ease-in-out cursor-pointer;
   }
   
   .profile-dropdown-item:hover {
@@ -191,7 +215,7 @@
   
   /* Enhanced card hover effects */
   .avs-card-hover {
-    @apply transition-all duration-300 ease-in-out;
+    @apply transition-all duration-300 ease-in-out cursor-pointer;
   }
   
   .avs-card-hover:hover {

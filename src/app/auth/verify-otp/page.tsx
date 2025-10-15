@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader } from "@/components/ui/loader";
 import Logo from "@/components/Logo";
 import { Loader2, ArrowLeft, Clock, Users, Shield, CheckCircle } from "lucide-react";
 
@@ -395,16 +396,7 @@ function VerifyOTPPageContent() {
 
 export default function VerifyOTPPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4">
-            <Logo size="lg" className="rounded-full animate-pulse" />
-          </div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    }>
+    <Suspense fallback={<Loader variant="page" text="Loading..." size="lg" />}>
       <VerifyOTPPageContent />
     </Suspense>
   );

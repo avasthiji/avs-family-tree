@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AdminLoader } from "@/components/ui/loader";
 import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
 import { 
@@ -189,16 +190,7 @@ export default function GothiramManagementPage() {
   };
 
   if (status === "loading" || loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto avs-gradient rounded-full flex items-center justify-center mb-4 animate-pulse">
-            <span className="text-white font-bold text-xl">AVS</span>
-          </div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+    return <AdminLoader text="Loading gothirams..." />;
   }
 
   return (

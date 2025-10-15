@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import SearchBar from "@/components/SearchBar";
 import UserProfileModal from "@/components/UserProfileModal";
+import { Loader } from "@/components/ui/loader";
 import Link from "next/link";
 import { 
   User, 
@@ -69,22 +70,7 @@ function SearchPageContent() {
   };
 
   if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 animate-pulse">
-            <Image
-              src="/avs-logo.png"
-              alt="AVS Logo"
-              width={64}
-              height={64}
-              className="object-contain"
-            />
-          </div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
+    return <Loader variant="page" text="Loading..." size="lg" />;
   }
 
   if (!session) {
@@ -295,22 +281,7 @@ function SearchPageContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 animate-pulse">
-            <Image
-              src="/avs-logo.png"
-              alt="AVS Logo"
-              width={64}
-              height={64}
-              className="object-contain"
-            />
-          </div>
-          <p className="text-gray-600">Loading search...</p>
-        </div>
-      </div>
-    }>
+    <Suspense fallback={<Loader variant="page" text="Loading search..." size="lg" />}>
       <SearchPageContent />
     </Suspense>
   );
