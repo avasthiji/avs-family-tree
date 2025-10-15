@@ -10,11 +10,23 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -34,6 +46,7 @@ import {
 } from "lucide-react";
 import FamilyTreeView from "@/components/FamilyTreeView";
 import { toast } from "sonner";
+import D3FamilyTree from "./D3FamilyTree";
 
 interface UserData {
   _id: string;
@@ -82,26 +95,43 @@ interface UserProfileModalProps {
 }
 
 const RELATIONSHIP_TYPES = [
-  'Father', 'Mother', 'Spouse', 'Son', 'Daughter',
-  'Brother', 'Sister', 'Older Sibling', 'Younger Sibling',
-  'Grand Father', 'Grand Mother', 'Uncle', 'Aunt',
-  'Cousin', 'Nephew', 'Niece', 'Other'
+  "Father",
+  "Mother",
+  "Spouse",
+  "Son",
+  "Daughter",
+  "Brother",
+  "Sister",
+  "Older Sibling",
+  "Younger Sibling",
+  "Grand Father",
+  "Grand Mother",
+  "Uncle",
+  "Aunt",
+  "Cousin",
+  "Nephew",
+  "Niece",
+  "Other",
 ];
 
-export default function UserProfileModal({ userId, open, onOpenChange }: UserProfileModalProps) {
+export default function UserProfileModal({
+  userId,
+  open,
+  onOpenChange,
+}: UserProfileModalProps) {
   const { data: session } = useSession();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [relationships, setRelationships] = useState<Relationship[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
-  
+
   // Add relationship state
   const [showAddRelationship, setShowAddRelationship] = useState(false);
   const [relationType, setRelationType] = useState("");
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const isAdmin = session?.user?.role === 'admin';
+  const isAdmin = session?.user?.role === "admin";
 
   useEffect(() => {
     if (open && userId) {
@@ -164,8 +194,8 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
         body: JSON.stringify({
           personId2: userId,
           relationType,
-          description
-        })
+          description,
+        }),
       });
 
       const data = await response.json();
@@ -191,13 +221,14 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent  className="!max-w-7xl w-full max-h-[90vh] overflow-y-auto">
+      <DialogContent className="!max-w-7xl w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <Avatar className="h-12 w-12">
               <AvatarImage src={userData?.profilePicture} />
               <AvatarFallback className="avs-gradient text-white">
-                {userData?.firstName?.[0]}{userData?.lastName?.[0]}
+                {userData?.firstName?.[0]}
+                {userData?.lastName?.[0]}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -221,7 +252,11 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
             <Loader2 className="h-8 w-8 animate-spin text-[#E63946]" />
           </div>
         ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="profile">
                 <User className="h-4 w-4 mr-2" />
@@ -268,7 +303,9 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                 <CardContent className="space-y-6">
                   {/* Basic Info */}
                   <div>
-                    <h4 className="font-semibold text-sm text-gray-700 mb-3">Basic Information</h4>
+                    <h4 className="font-semibold text-sm text-gray-700 mb-3">
+                      Basic Information
+                    </h4>
                     <div className="grid md:grid-cols-2 gap-4">
                       {userData?.gender && (
                         <div className="flex items-start gap-2">
@@ -283,7 +320,9 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                         <div className="flex items-start gap-2">
                           <User className="h-5 w-5 text-gray-400 mt-0.5" />
                           <div>
-                            <p className="text-sm text-gray-600">Date of Birth</p>
+                            <p className="text-sm text-gray-600">
+                              Date of Birth
+                            </p>
                             <p className="font-medium">
                               {new Date(userData.dob).toLocaleDateString()}
                             </p>
@@ -305,7 +344,9 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                   {/* Contact Info - Only show to admin */}
                   {isAdmin && (
                     <div>
-                      <h4 className="font-semibold text-sm text-gray-700 mb-3">Contact Information</h4>
+                      <h4 className="font-semibold text-sm text-gray-700 mb-3">
+                        Contact Information
+                      </h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         {userData?.email && (
                           <div className="flex items-start gap-2">
@@ -329,8 +370,12 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                           <div className="flex items-start gap-2">
                             <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
                             <div>
-                              <p className="text-sm text-gray-600">Primary Phone</p>
-                              <p className="font-medium">{userData.primaryPhone}</p>
+                              <p className="text-sm text-gray-600">
+                                Primary Phone
+                              </p>
+                              <p className="font-medium">
+                                {userData.primaryPhone}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -338,8 +383,12 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                           <div className="flex items-start gap-2">
                             <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
                             <div>
-                              <p className="text-sm text-gray-600">Secondary Phone</p>
-                              <p className="font-medium">{userData.secondaryPhone}</p>
+                              <p className="text-sm text-gray-600">
+                                Secondary Phone
+                              </p>
+                              <p className="font-medium">
+                                {userData.secondaryPhone}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -349,14 +398,20 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
 
                   {/* Location */}
                   <div>
-                    <h4 className="font-semibold text-sm text-gray-700 mb-3">Location</h4>
+                    <h4 className="font-semibold text-sm text-gray-700 mb-3">
+                      Location
+                    </h4>
                     <div className="grid md:grid-cols-2 gap-4">
                       {userData?.nativePlace && (
                         <div className="flex items-start gap-2">
                           <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
                           <div>
-                            <p className="text-sm text-gray-600">Native Place</p>
-                            <p className="font-medium">{userData.nativePlace}</p>
+                            <p className="text-sm text-gray-600">
+                              Native Place
+                            </p>
+                            <p className="font-medium">
+                              {userData.nativePlace}
+                            </p>
                           </div>
                         </div>
                       )}
@@ -364,9 +419,13 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                         <div className="flex items-start gap-2">
                           <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
                           <div>
-                            <p className="text-sm text-gray-600">Current Location</p>
+                            <p className="text-sm text-gray-600">
+                              Current Location
+                            </p>
                             <p className="font-medium">
-                              {[userData?.city, userData?.state].filter(Boolean).join(', ')}
+                              {[userData?.city, userData?.state]
+                                .filter(Boolean)
+                                .join(", ")}
                             </p>
                           </div>
                         </div>
@@ -384,16 +443,24 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                   </div>
 
                   {/* Professional */}
-                  {(userData?.qualification || userData?.jobDesc || userData?.workPlace) && (
+                  {(userData?.qualification ||
+                    userData?.jobDesc ||
+                    userData?.workPlace) && (
                     <div>
-                      <h4 className="font-semibold text-sm text-gray-700 mb-3">Professional Information</h4>
+                      <h4 className="font-semibold text-sm text-gray-700 mb-3">
+                        Professional Information
+                      </h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         {userData?.qualification && (
                           <div className="flex items-start gap-2">
                             <Briefcase className="h-5 w-5 text-gray-400 mt-0.5" />
                             <div>
-                              <p className="text-sm text-gray-600">Qualification</p>
-                              <p className="font-medium">{userData.qualification}</p>
+                              <p className="text-sm text-gray-600">
+                                Qualification
+                              </p>
+                              <p className="font-medium">
+                                {userData.qualification}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -401,7 +468,9 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                           <div className="flex items-start gap-2">
                             <Briefcase className="h-5 w-5 text-gray-400 mt-0.5" />
                             <div>
-                              <p className="text-sm text-gray-600">Job Description</p>
+                              <p className="text-sm text-gray-600">
+                                Job Description
+                              </p>
                               <p className="font-medium">{userData.jobDesc}</p>
                             </div>
                           </div>
@@ -410,8 +479,12 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                           <div className="flex items-start gap-2">
                             <Briefcase className="h-5 w-5 text-gray-400 mt-0.5" />
                             <div>
-                              <p className="text-sm text-gray-600">Work Place</p>
-                              <p className="font-medium">{userData.workPlace}</p>
+                              <p className="text-sm text-gray-600">
+                                Work Place
+                              </p>
+                              <p className="font-medium">
+                                {userData.workPlace}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -420,9 +493,14 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                   )}
 
                   {/* Cultural */}
-                  {(userData?.gothiram || userData?.rasi || userData?.natchathiram || userData?.kuladeivam) && (
+                  {(userData?.gothiram ||
+                    userData?.rasi ||
+                    userData?.natchathiram ||
+                    userData?.kuladeivam) && (
                     <div>
-                      <h4 className="font-semibold text-sm text-gray-700 mb-3">Cultural Information</h4>
+                      <h4 className="font-semibold text-sm text-gray-700 mb-3">
+                        Cultural Information
+                      </h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         {userData?.gothiram && (
                           <div className="flex items-start gap-2">
@@ -446,8 +524,12 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                           <div className="flex items-start gap-2">
                             <User className="h-5 w-5 text-gray-400 mt-0.5" />
                             <div>
-                              <p className="text-sm text-gray-600">Natchathiram</p>
-                              <p className="font-medium">{userData.natchathiram}</p>
+                              <p className="text-sm text-gray-600">
+                                Natchathiram
+                              </p>
+                              <p className="font-medium">
+                                {userData.natchathiram}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -455,8 +537,12 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                           <div className="flex items-start gap-2">
                             <User className="h-5 w-5 text-gray-400 mt-0.5" />
                             <div>
-                              <p className="text-sm text-gray-600">Kuladeivam</p>
-                              <p className="font-medium">{userData.kuladeivam}</p>
+                              <p className="text-sm text-gray-600">
+                                Kuladeivam
+                              </p>
+                              <p className="font-medium">
+                                {userData.kuladeivam}
+                              </p>
                             </div>
                           </div>
                         )}
@@ -467,7 +553,9 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                   {/* Bio */}
                   {userData?.bioDesc && (
                     <div>
-                      <h4 className="font-semibold text-sm text-gray-700 mb-3">About</h4>
+                      <h4 className="font-semibold text-sm text-gray-700 mb-3">
+                        About
+                      </h4>
                       <p className="text-gray-700">{userData.bioDesc}</p>
                     </div>
                   )}
@@ -475,7 +563,9 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                   {/* Partner Description - Only if matrimony is active */}
                   {userData?.enableMarriageFlag && userData?.partnerDesc && (
                     <div>
-                      <h4 className="font-semibold text-sm text-gray-700 mb-3">Partner Preferences</h4>
+                      <h4 className="font-semibold text-sm text-gray-700 mb-3">
+                        Partner Preferences
+                      </h4>
                       <p className="text-gray-700">{userData.partnerDesc}</p>
                     </div>
                   )}
@@ -507,7 +597,7 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                       </p>
                     </div>
                   ) : (
-                    <FamilyTreeView
+                    <D3FamilyTree
                       relationships={relationships}
                       currentUserId={userId}
                       currentUserName={`${userData?.firstName} ${userData?.lastName}`}
@@ -520,14 +610,18 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
               {relationships.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Relationships ({relationships.length})</CardTitle>
+                    <CardTitle>
+                      Relationships ({relationships.length})
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       {relationships.map((rel) => {
                         const isUserPerson1 = rel.personId1?._id === userId;
-                        const otherPerson = isUserPerson1 ? rel.personId2 : rel.personId1;
-                        
+                        const otherPerson = isUserPerson1
+                          ? rel.personId2
+                          : rel.personId1;
+
                         return (
                           <div
                             key={rel._id}
@@ -535,18 +629,26 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                           >
                             <div className="flex items-center space-x-4">
                               <Avatar className="h-10 w-10">
-                                <AvatarImage src={otherPerson?.profilePicture} />
+                                <AvatarImage
+                                  src={otherPerson?.profilePicture}
+                                />
                                 <AvatarFallback className="avs-gradient text-white">
-                                  {otherPerson?.firstName?.[0]}{otherPerson?.lastName?.[0]}
+                                  {otherPerson?.firstName?.[0]}
+                                  {otherPerson?.lastName?.[0]}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
                                 <p className="font-semibold text-gray-900">
-                                  {otherPerson?.firstName} {otherPerson?.lastName}
+                                  {otherPerson?.firstName}{" "}
+                                  {otherPerson?.lastName}
                                 </p>
-                                <p className="text-sm text-gray-600">{rel.relationType}</p>
+                                <p className="text-sm text-gray-600">
+                                  {rel.relationType}
+                                </p>
                                 {otherPerson?.gothiram && (
-                                  <p className="text-xs text-gray-500">{otherPerson.gothiram}</p>
+                                  <p className="text-xs text-gray-500">
+                                    {otherPerson.gothiram}
+                                  </p>
                                 )}
                               </div>
                             </div>
@@ -590,7 +692,8 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                       <Avatar className="h-12 w-12">
                         <AvatarImage src={userData?.profilePicture} />
                         <AvatarFallback className="avs-gradient text-white">
-                          {userData?.firstName?.[0]}{userData?.lastName?.[0]}
+                          {userData?.firstName?.[0]}
+                          {userData?.lastName?.[0]}
                         </AvatarFallback>
                       </Avatar>
                       <div>
@@ -618,7 +721,10 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                   {/* Relationship Type */}
                   <div>
                     <Label>How is {userData?.firstName} related to you?</Label>
-                    <Select value={relationType} onValueChange={setRelationType}>
+                    <Select
+                      value={relationType}
+                      onValueChange={setRelationType}
+                    >
                       <SelectTrigger className="mt-2">
                         <SelectValue placeholder="Select relationship type" />
                       </SelectTrigger>
@@ -631,7 +737,8 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-gray-500 mt-1">
-                      Example: If {userData?.firstName} is your father, select "Father"
+                      Example: If {userData?.firstName} is your father, select
+                      "Father"
                     </p>
                   </div>
 
@@ -681,8 +788,9 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
                           Relationship Approval
                         </p>
                         <p className="text-xs text-amber-700">
-                          Your relationship will be pending until approved by the other person or an admin.
-                          Once approved, it will appear in both family trees.
+                          Your relationship will be pending until approved by
+                          the other person or an admin. Once approved, it will
+                          appear in both family trees.
                         </p>
                       </div>
                     </div>
@@ -696,4 +804,3 @@ export default function UserProfileModal({ userId, open, onOpenChange }: UserPro
     </Dialog>
   );
 }
-
