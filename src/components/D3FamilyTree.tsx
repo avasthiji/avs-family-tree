@@ -35,6 +35,7 @@ interface RelationshipData {
   createdBy?: Person;
   createdAt?: string;
   updatedAt?: string;
+  
 }
 
 interface FamilyTreeViewProps {
