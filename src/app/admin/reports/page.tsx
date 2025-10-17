@@ -28,6 +28,7 @@ import {
   PieChart,
   Activity
 } from "lucide-react";
+import { AdminLoader } from "@/components/ui/loader";
 
 interface ReportStats {
   totalUsers: number;
