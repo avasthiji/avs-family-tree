@@ -19,7 +19,8 @@ export const env = {
   
   // Feature Flags
   MATRIMONIAL_FEATURE: process.env.MATRIMONIAL_FEATURE === 'true',
-  EVENT_FEATURE: process.env.EVENT_FEATURE === 'true'
+  EVENT_FEATURE: process.env.EVENT_FEATURE === 'true',
+  NODE_ENV: process.env.NODE_ENV || 'development',
 };
 
 // Helper functions to check if features are enabled

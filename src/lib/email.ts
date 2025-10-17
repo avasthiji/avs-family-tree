@@ -3,11 +3,13 @@ import { env } from './env';
 // Lazy-load nodemailer only when needed
 let transporter: any = null;
 
-function getTransporter() {
+async function getTransporter() {
   if (!transporter) {
     // Only import and create transporter when actually needed
-    const nodemailer = require('nodemailer');
-    transporter = nodemailer.createTransporter({
+    const nodemailer = await import('nodemailer');
+    // Handle both default and named exports
+    const nodemailerModule = nodemailer.default || nodemailer;
+    transporter = nodemailerModule.createTransport({
       service: 'gmail',
       auth: {
         user: env.EMAIL_USER,
@@ -26,13 +28,12 @@ export interface EmailOptions {
 }
 
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
-  // Skip email sending in development mode
-  if (process.env.NODE_ENV === 'development' || !env.EMAIL_USER || !env.EMAIL_PASSWORD) {
+  if (env.NODE_ENV === 'development' || !env.EMAIL_USER || !env.EMAIL_PASSWORD) {
     return true; // Return true to not block registration
   }
 
   try {
-    const mailTransporter = getTransporter();
+    const mailTransporter = await getTransporter();
     const mailOptions = {
       from: env.EMAIL_FROM,
       to: options.to,
@@ -41,8 +42,8 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       text: options.text
     };
 
-    const result = await mailTransporter.sendMail(mailOptions);
-    return true;
+    await mailTransporter.sendMail(mailOptions);
+    return true;  
   } catch (error) {
     return false;
   }
