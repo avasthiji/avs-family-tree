@@ -74,6 +74,7 @@ export default function D3FamilyTree({
   currentUserName,
   onNodeClick,
 }: FamilyTreeViewProps) {
+  
   const [direction, setDirection] = useState<"TB" | "LR">("TB");
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
