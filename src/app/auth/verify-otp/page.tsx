@@ -326,12 +326,15 @@ function VerifyOTPPageContent() {
                   Verify Your Account
                 </CardTitle>
                 <CardDescription>
-                  Enter the 6-digit OTP sent to your{" "}
-                  {type === "email" ? "email" : "mobile number"}
+                  Enter the 6-digit OTP sent to your email
+                  {/* Mobile authentication hidden - only email supported */}
+                  {/* {type === "email" ? "email" : "mobile number"} */}
                 </CardDescription>
                 <div className="mt-2">
                   <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                    {type === "email" ? "📧" : "📱"} {identifier}
+                    📧 {identifier}
+                    {/* Mobile authentication hidden */}
+                    {/* {type === "email" ? "📧" : "📱"} {identifier} */}
                   </span>
                 </div>
               </CardHeader>
