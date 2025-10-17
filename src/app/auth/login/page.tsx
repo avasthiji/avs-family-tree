@@ -328,12 +328,6 @@ export default function LoginPage() {
                     </Link>
                   </p>
                 </div>
-
-                <div className="mt-4 text-center">
-                  <p className="text-xs text-gray-500">
-                    Demo accounts available after seeding the database
-                  </p>
-                </div>
               </CardContent>
             </Card>
           </div>

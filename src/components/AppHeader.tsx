@@ -72,8 +72,12 @@ export default function AppHeader() {
               <Logo size="md" className="rounded-xl" />
             </div>
             <div>
-              <span className="text-xl font-bold avs-text-gradient block">AVS Family Tree</span>
-              <span className="text-xs text-gray-500">அகில இந்திய வேளாளர் சங்கம்</span>
+              <span className="text-xl font-bold avs-text-gradient block">
+                AVS Family Tree
+              </span>
+              <span className="text-xs text-gray-500">
+                அகில இந்திய வேளாளர் சங்கம்
+              </span>
             </div>
           </Link>
 
@@ -167,75 +171,26 @@ export default function AppHeader() {
                       </p>
                       <div className="flex gap-1 mt-1">
                         {user.isEmailVerified && (
-                          <Badge variant="outline" className="text-xs px-1.5 py-0 h-5 text-green-700 border-green-300">
+                          <Badge
+                            variant="outline"
+                            className="text-xs px-1.5 py-0 h-5 text-green-700 border-green-300"
+                          >
                             Email ✓
                           </Badge>
                         )}
-                        {user.isMobileVerified && (
+                        {/* {user.isMobileVerified && (
                           <Badge variant="outline" className="text-xs px-1.5 py-0 h-5 text-green-700 border-green-300">
                             Mobile ✓
                           </Badge>
-                        )}
+                        )} */}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Admin Mode Switcher (Mobile) */}
-                {isAdmin && (
-                  <>
-                    <DropdownMenuLabel className="text-xs text-gray-500 px-3">
-                      Switch View Mode
-                    </DropdownMenuLabel>
-                    <div className="px-2 mb-2">
-                      <div className="flex flex-col gap-1">
-                        <button
-                          onClick={() => handleModeSwitch("user")}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-                            viewMode === "user"
-                              ? "bg-gray-100 text-gray-900"
-                              : "text-gray-600 hover:bg-gray-50"
-                          }`}
-                        >
-                          <User className="w-4 h-4" />
-                          User Dashboard
-                          {viewMode === "user" && (
-                            <Sparkles className="w-3 h-3 ml-auto text-yellow-500" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => handleModeSwitch("admin")}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
-                            viewMode === "admin"
-                              ? "bg-gradient-to-r from-red-500 to-orange-500 text-white"
-                              : "text-gray-600 hover:bg-gray-50"
-                          }`}
-                        >
-                          <Crown className="w-4 h-4" />
-                          Admin Dashboard
-                          {viewMode === "admin" && (
-                            <Sparkles className="w-3 h-3 ml-auto text-yellow-300" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
-
                 <DropdownMenuLabel className="text-xs text-gray-500 px-3">
                   Quick Actions
                 </DropdownMenuLabel>
-
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/profile"
-                    className="flex items-center px-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
-                  >
-                    <User className="mr-3 h-4 w-4 text-gray-600" />
-                    <span className="text-sm font-medium">My Profile</span>
-                  </Link>
-                </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
                   <Link
@@ -246,6 +201,15 @@ export default function AppHeader() {
                     <span className="text-sm font-medium">Dashboard</span>
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/profile"
+                    className="flex items-center px-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    <User className="mr-3 h-4 w-4 text-gray-600" />
+                    <span className="text-sm font-medium">My Profile</span>
+                  </Link>
+                </DropdownMenuItem>
 
                 {isAdmin && (
                   <>
@@ -253,16 +217,6 @@ export default function AppHeader() {
                     <DropdownMenuLabel className="text-xs text-gray-500 px-3">
                       Admin Tools
                     </DropdownMenuLabel>
-                    
-                    <DropdownMenuItem asChild>
-                      <Link
-                        href="/admin/dashboard"
-                        className="flex items-center px-3 py-2 cursor-pointer hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <Shield className="mr-3 h-4 w-4 text-red-600" />
-                        <span className="text-sm font-medium text-red-700">Admin Panel</span>
-                      </Link>
-                    </DropdownMenuItem>
 
                     <DropdownMenuItem asChild>
                       <Link
@@ -280,23 +234,13 @@ export default function AppHeader() {
                         className="flex items-center px-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
                       >
                         <TreePine className="mr-3 h-4 w-4 text-gray-600" />
-                        <span className="text-sm font-medium">Manage Gothiram</span>
+                        <span className="text-sm font-medium">
+                          Manage Gothiram
+                        </span>
                       </Link>
                     </DropdownMenuItem>
                   </>
                 )}
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/settings"
-                    className="flex items-center px-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
-                  >
-                    <Settings className="mr-3 h-4 w-4 text-gray-600" />
-                    <span className="text-sm font-medium">Settings</span>
-                  </Link>
-                </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 
@@ -315,4 +259,3 @@ export default function AppHeader() {
     </nav>
   );
 }
-

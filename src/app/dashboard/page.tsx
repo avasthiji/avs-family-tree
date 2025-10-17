@@ -89,11 +89,6 @@ export default function DashboardPage() {
                     }}
                   />
                 </div>
-                <Link href="/search">
-                  <Button className="avs-button-primary whitespace-nowrap">
-                    Advanced Search
-                  </Button>
-                </Link>
               </div>
             </CardContent>
           </Card>

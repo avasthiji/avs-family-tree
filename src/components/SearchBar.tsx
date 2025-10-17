@@ -7,8 +7,27 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
-import { Search, X, User, MapPin, Filter, Loader2, ChevronDown, ChevronUp, Sparkles, Eye } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Search,
+  X,
+  User,
+  MapPin,
+  Filter,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
+  Eye,
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { env } from "@/lib/env";
+import UserDetailsModal from "@/components/UserDetailsModal";
 
 interface SearchResult {
   _id: string;
@@ -39,15 +58,19 @@ interface GothiramOption {
   name: string;
 }
 
-export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile }: SearchBarProps) {
+export default function SearchBar({
+  isAdmin = false,
+  onSelectUser,
+  onViewProfile,
+}: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
-  const [status, setStatus] = useState("approved");
+  const status = "approved"; // Always search approved users only
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
-  
+
   // Advanced Search State - Make Advanced Search default
   const [showAdvanced, setShowAdvanced] = useState(true);
   const [advancedName, setAdvancedName] = useState("");
@@ -55,11 +78,15 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
   const [advancedGothiram, setAdvancedGothiram] = useState("");
   const [gothiramOptions, setGothiramOptions] = useState<GothiramOption[]>([]);
 
+  // User Details Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
   // Load Gothiram options
   useEffect(() => {
     const loadGothirams = async () => {
       try {
-        const response = await fetch('/api/gothiram');
+        const response = await fetch("/api/gothiram");
         if (response.ok) {
           const data = await response.json();
           setGothiramOptions(data.gothirams || []);
@@ -74,13 +101,16 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
   // Close results when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
         setShowResults(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Debounced search for quick search
@@ -102,7 +132,11 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
   useEffect(() => {
     if (showAdvanced) {
       const delayDebounceFn = setTimeout(() => {
-        if (advancedName.trim().length >= 2 || advancedNativePlace.trim().length >= 2 || advancedGothiram) {
+        if (
+          advancedName.trim().length >= 2 ||
+          advancedNativePlace.trim().length >= 2 ||
+          advancedGothiram
+        ) {
           performAdvancedSearch();
         } else {
           setResults([]);
@@ -111,16 +145,22 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
 
       return () => clearTimeout(delayDebounceFn);
     }
-  }, [advancedName, advancedNativePlace, advancedGothiram, status, showAdvanced]);
+  }, [
+    advancedName,
+    advancedNativePlace,
+    advancedGothiram,
+    status,
+    showAdvanced,
+  ]);
 
   const performSearch = async () => {
     setLoading(true);
     try {
-      const endpoint = isAdmin ? '/api/admin/search' : '/api/search';
+      const endpoint = isAdmin ? "/api/admin/search" : "/api/search";
       const params = new URLSearchParams({
         q: query,
         filter,
-        ...(isAdmin && { status })
+        ...(isAdmin && { status }),
       });
 
       const response = await fetch(`${endpoint}?${params}`);
@@ -139,13 +179,14 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
   const performAdvancedSearch = async () => {
     setLoading(true);
     try {
-      const endpoint = isAdmin ? '/api/admin/search' : '/api/search';
+      const endpoint = isAdmin ? "/api/admin/search" : "/api/search";
       const params = new URLSearchParams({
         ...(advancedName && { name: advancedName }),
         ...(advancedNativePlace && { nativePlace: advancedNativePlace }),
-        ...(advancedGothiram && advancedGothiram !== '__none__' && { gothiram: advancedGothiram }),
-        advanced: 'true',
-        ...(isAdmin && { status })
+        ...(advancedGothiram &&
+          advancedGothiram !== "__none__" && { gothiram: advancedGothiram }),
+        advanced: "true",
+        ...(isAdmin && { status }),
       });
 
       const response = await fetch(`${endpoint}?${params}`);
@@ -176,10 +217,15 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
   };
 
   const handleSelectUser = (user: SearchResult) => {
+    // Open the modal with selected user
+    setSelectedUserId(user._id);
+    setIsModalOpen(true);
+    setShowResults(false); // Close search results popup
+
+    // Still call the callback if provided
     if (onSelectUser) {
       onSelectUser(user);
     }
-    setShowResults(false);
   };
 
   return (
@@ -196,7 +242,7 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
                 Search Members
               </h3>
             </div>
-            
+
             {/* Search Mode Toggle */}
             <div className="flex bg-gray-100 rounded-lg p-1">
               <button
@@ -205,9 +251,9 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
                   handleClearAdvanced();
                 }}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                  !showAdvanced 
-                    ? 'bg-white text-[#E63946] shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-800'
+                  !showAdvanced
+                    ? "bg-white text-[#E63946] shadow-sm"
+                    : "text-gray-600 hover:text-gray-800"
                 }`}
               >
                 <Search className="h-4 w-4 mr-2 inline" />
@@ -219,9 +265,9 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
                   handleClear();
                 }}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                  showAdvanced 
-                    ? 'bg-[#E63946] text-white shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-800'
+                  showAdvanced
+                    ? "bg-[#E63946] text-white shadow-sm"
+                    : "text-gray-600 hover:text-gray-800"
                 }`}
               >
                 <Sparkles className="h-4 w-4 mr-2 inline" />
@@ -259,7 +305,7 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
 
                 {/* Filter Dropdown */}
                 <Select value={filter} onValueChange={setFilter}>
-                  <SelectTrigger className="w-36 h-11">
+                  <SelectTrigger className="w-36 h-11 border-gray-200">
                     <Filter className="h-4 w-4 mr-2" />
                     <SelectValue />
                   </SelectTrigger>
@@ -273,8 +319,8 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
                   </SelectContent>
                 </Select>
 
-                {/* Admin Status Filter */}
-                {isAdmin && (
+                {/* Admin Status Filter - REMOVED: Always search approved users only */}
+                {/* {isAdmin && (
                   <Select value={status} onValueChange={setStatus}>
                     <SelectTrigger className="w-36 h-11">
                       <SelectValue />
@@ -284,7 +330,7 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
                       <SelectItem value="approved">Approved</SelectItem>
                     </SelectContent>
                   </Select>
-                )}
+                )} */}
               </div>
             </div>
           ) : (
@@ -294,7 +340,10 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Name Field */}
                 <div>
-                  <Label htmlFor="advancedName" className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                  <Label
+                    htmlFor="advancedName"
+                    className="text-sm font-medium text-gray-700 mb-2 flex items-center"
+                  >
                     <User className="h-4 w-4 mr-2 text-[#E63946]" />
                     Name
                   </Label>
@@ -304,14 +353,22 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
                     placeholder="Enter name..."
                     value={advancedName}
                     onChange={(e) => setAdvancedName(e.target.value)}
-                    onFocus={() => (advancedName.length >= 2 || advancedNativePlace.length >= 2 || advancedGothiram) && setShowResults(true)}
+                    onFocus={() =>
+                      (advancedName.length >= 2 ||
+                        advancedNativePlace.length >= 2 ||
+                        advancedGothiram) &&
+                      setShowResults(true)
+                    }
                     className="h-11 border-gray-200 focus:border-[#E63946]"
                   />
                 </div>
 
                 {/* Native Place Field */}
                 <div>
-                  <Label htmlFor="advancedNativePlace" className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                  <Label
+                    htmlFor="advancedNativePlace"
+                    className="text-sm font-medium text-gray-700 mb-2 flex items-center"
+                  >
                     <MapPin className="h-4 w-4 mr-2 text-[#E63946]" />
                     Native Place
                   </Label>
@@ -321,19 +378,33 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
                     placeholder="Enter native place..."
                     value={advancedNativePlace}
                     onChange={(e) => setAdvancedNativePlace(e.target.value)}
-                    onFocus={() => (advancedName.length >= 2 || advancedNativePlace.length >= 2 || advancedGothiram) && setShowResults(true)}
+                    onFocus={() =>
+                      (advancedName.length >= 2 ||
+                        advancedNativePlace.length >= 2 ||
+                        advancedGothiram) &&
+                      setShowResults(true)
+                    }
                     className="h-11 border-gray-200 focus:border-[#E63946]"
                   />
                 </div>
 
                 {/* Gothiram Dropdown */}
                 <div>
-                  <Label htmlFor="advancedGothiram" className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                  <Label
+                    htmlFor="advancedGothiram"
+                    className="text-sm font-medium text-gray-700 mb-2 flex items-center"
+                  >
                     <Filter className="h-4 w-4 mr-2 text-[#E63946]" />
                     Gothiram
                   </Label>
-                  <Select value={advancedGothiram} onValueChange={setAdvancedGothiram}>
-                    <SelectTrigger id="advancedGothiram" className="h-11 border-gray-200 focus:border-[#E63946]">
+                  <Select
+                    value={advancedGothiram}
+                    onValueChange={setAdvancedGothiram}
+                  >
+                    <SelectTrigger
+                      id="advancedGothiram"
+                      className="h-11 border-gray-200 focus:border-[#E63946]"
+                    >
                       <SelectValue placeholder="Select Gothiram" />
                     </SelectTrigger>
                     <SelectContent className="max-h-60">
@@ -351,8 +422,8 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
               {/* Action Buttons */}
               <div className="flex items-center justify-between pt-2">
                 <div className="flex items-center gap-3">
-                  {/* Admin Status Filter */}
-                  {isAdmin && (
+                  {/* Admin Status Filter - REMOVED: Always search approved users only */}
+                  {/* {isAdmin && (
                     <Select value={status} onValueChange={setStatus}>
                       <SelectTrigger className="w-40 h-11">
                         <SelectValue />
@@ -362,8 +433,8 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
                         <SelectItem value="approved">Approved Only</SelectItem>
                       </SelectContent>
                     </Select>
-                  )}
-                  
+                  )} */}
+
                   {loading && (
                     <div className="flex items-center space-x-2 text-[#E63946]">
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -371,25 +442,33 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex gap-3">
                   <Button
                     variant="outline"
                     onClick={handleClearAdvanced}
-                    disabled={!advancedName && !advancedNativePlace && !advancedGothiram}
+                    disabled={
+                      !advancedName && !advancedNativePlace && !advancedGothiram
+                    }
                     className="h-11 px-6"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Clear All
                   </Button>
-                  
+
                   <Button
                     onClick={() => {
-                      if (advancedName.length >= 2 || advancedNativePlace.length >= 2 || advancedGothiram) {
+                      if (
+                        advancedName.length >= 2 ||
+                        advancedNativePlace.length >= 2 ||
+                        advancedGothiram
+                      ) {
                         performAdvancedSearch();
                       }
                     }}
-                    disabled={!advancedName && !advancedNativePlace && !advancedGothiram}
+                    disabled={
+                      !advancedName && !advancedNativePlace && !advancedGothiram
+                    }
                     className="h-11 px-8 avs-button-primary"
                   >
                     <Search className="h-4 w-4 mr-2" />
@@ -403,9 +482,12 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
                 <div className="flex items-start space-x-2">
                   <Sparkles className="h-4 w-4 text-blue-600 mt-0.5" />
                   <div>
-                    <div className="font-medium text-blue-900 mb-1 text-sm">Search Tips</div>
+                    <div className="font-medium text-blue-900 mb-1 text-sm">
+                      Search Tips
+                    </div>
                     <p className="text-xs text-blue-700">
-                      Use any combination of fields. Leave fields empty to search by other criteria. All filled fields must match.
+                      Use any combination of fields. Leave fields empty to
+                      search by other criteria. All filled fields must match.
                     </p>
                   </div>
                 </div>
@@ -416,104 +498,121 @@ export default function SearchBar({ isAdmin = false, onSelectUser, onViewProfile
       </Card>
 
       {/* Search Results Dropdown */}
-      {showResults && ((query.length >= 2 && !showAdvanced) || (showAdvanced && (advancedName.length >= 2 || advancedNativePlace.length >= 2 || (advancedGothiram && advancedGothiram !== '__none__')))) && (
-        <Card className="absolute top-full mt-2 w-full max-h-96 overflow-y-auto z-50 shadow-xl">
-          {results.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>No users found matching your search criteria</p>
-            </div>
-          ) : (
-            <div className="divide-y">
-              {results.map((user) => (
-                <div
-                  key={user._id}
-                  className="p-3 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={user.profilePicture} />
-                      <AvatarFallback className="avs-gradient text-white">
-                        {user.firstName?.[0]}{user.lastName?.[0]}
-                      </AvatarFallback>
-                    </Avatar>
+      {showResults &&
+        ((query.length >= 2 && !showAdvanced) ||
+          (showAdvanced &&
+            (advancedName.length >= 2 ||
+              advancedNativePlace.length >= 2 ||
+              (advancedGothiram && advancedGothiram !== "__none__")))) && (
+          <Card className="absolute top-full mt-2 w-full max-h-96 overflow-y-auto z-50 shadow-xl">
+            {results.length === 0 ? (
+              <div className="p-4 text-center text-gray-500">
+                <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p>No users found matching your search criteria</p>
+              </div>
+            ) : (
+              <div className="divide-y">
+                {results.map((user) => (
+                  <div
+                    key={user._id}
+                    className="p-3 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={user.profilePicture} />
+                        <AvatarFallback className="avs-gradient text-white">
+                          {user.firstName?.[0]}
+                          {user.lastName?.[0]}
+                        </AvatarFallback>
+                      </Avatar>
 
-                    <div 
-                      className="flex-1 min-w-0 cursor-pointer"
-                      onClick={() => handleSelectUser(user)}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-semibold text-gray-900">
-                          {user.firstName} {user.lastName}
-                        </p>
-                        {isAdmin && user.role === 'admin' && (
-                          <Badge className="bg-red-100 text-red-800 text-xs">Admin</Badge>
-                        )}
-                        {isAdmin && !user.isApprovedByAdmin && (
-                          <Badge variant="outline" className="text-yellow-700 text-xs">Pending</Badge>
-                        )}
-                        {user.enableMarriageFlag && (
-                          <Badge className="bg-pink-100 text-pink-800 text-xs">Matrimony</Badge>
-                        )}
+                      <div
+                        className="flex-1 min-w-0 cursor-pointer"
+                        onClick={() => handleSelectUser(user)}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-semibold text-gray-900">
+                            {user.firstName} {user.lastName}
+                          </p>
+                          {isAdmin && user.role === "admin" && (
+                            <Badge className="bg-red-100 text-red-800 text-xs">
+                              Admin
+                            </Badge>
+                          )}
+                          {isAdmin && !user.isApprovedByAdmin && (
+                            <Badge
+                              variant="outline"
+                              className="text-yellow-700 text-xs"
+                            >
+                              Pending
+                            </Badge>
+                          )}
+                          {user.enableMarriageFlag &&
+                            env.MATRIMONIAL_FEATURE && (
+                              <Badge className="bg-pink-100 text-pink-800 text-xs">
+                                Matrimony
+                              </Badge>
+                            )}
+                        </div>
+
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-600">
+                          {user.gothiram && (
+                            <span className="flex items-center">
+                              <User className="h-3 w-3 mr-1" />
+                              {user.gothiram}
+                            </span>
+                          )}
+                          {(user.nativePlace || user.city) && (
+                            <span className="flex items-center">
+                              <MapPin className="h-3 w-3 mr-1" />
+                              {user.nativePlace || user.city}
+                            </span>
+                          )}
+                          {isAdmin && user.email && (
+                            <span className="truncate max-w-xs">
+                              📧 {user.email}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-600">
-                        {user.gothiram && (
-                          <span className="flex items-center">
-                            <User className="h-3 w-3 mr-1" />
-                            {user.gothiram}
-                          </span>
+                      <div className="flex items-center gap-2">
+                        {user.gender && (
+                          <Badge variant="outline" className="text-xs">
+                            {user.gender}
+                          </Badge>
                         )}
-                        {(user.nativePlace || user.city) && (
-                          <span className="flex items-center">
-                            <MapPin className="h-3 w-3 mr-1" />
-                            {user.nativePlace || user.city}
-                          </span>
-                        )}
-                        {isAdmin && user.email && (
-                          <span className="truncate max-w-xs">
-                            📧 {user.email}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {user.gender && (
-                        <Badge variant="outline" className="text-xs">
-                          {user.gender}
-                        </Badge>
-                      )}
-                      {onViewProfile && (
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onViewProfile(user._id);
-                            setShowResults(false);
+                            setSelectedUserId(user._id);
+                            setIsModalOpen(true);
+                            setShowResults(false); // Close search results popup
+                            if (onViewProfile) {
+                              onViewProfile(user._id);
+                            }
                           }}
                           className="h-7 px-2"
                         >
                           <Eye className="h-3 w-3 mr-1" />
                           View
                         </Button>
-                      )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
 
-          {results.length > 0 && (
-            <div className="p-2 bg-gray-50 text-center text-xs text-gray-500 border-t">
-              Found {results.length} user{results.length !== 1 ? 's' : ''}
-            </div>
-          )}
-        </Card>
-      )}
+            {results.length > 0 && (
+              <div className="p-2 bg-gray-50 text-center text-xs text-gray-500 border-t">
+                Found {results.length} user{results.length !== 1 ? "s" : ""}
+              </div>
+            )}
+          </Card>
+        )}
     </div>
   );
 }
-

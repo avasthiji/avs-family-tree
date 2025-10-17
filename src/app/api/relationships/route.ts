@@ -118,6 +118,14 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
+    // Prevent creating relationship with yourself
+    if (session.user.id === personId2) {
+      return NextResponse.json(
+        { error: "You cannot create a relationship with yourself" },
+        { status: 400 }
+      );
+    }
+
     // Check if person2 exists
     const person2 = await User.findById(personId2);
     if (!person2) {

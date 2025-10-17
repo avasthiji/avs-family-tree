@@ -3,10 +3,23 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminLoader } from "@/components/ui/loader";
@@ -18,9 +31,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  Users, 
-  UserCheck, 
+import {
+  Users,
+  UserCheck,
   UserX,
   Search,
   CheckCircle,
@@ -38,7 +51,7 @@ import {
   ChevronRight,
   Shield,
   User as UserIcon,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
 
 interface User {
@@ -69,21 +82,29 @@ export default function AdminUsersPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "approved" | "pending"
+  >("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [pagination, setPagination] = useState<Pagination>({
     currentPage: 1,
     totalPages: 1,
     totalUsers: 0,
-    limit: 50
+    limit: 50,
   });
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
+  const [userCounts, setUserCounts] = useState({
+    all: 0,
+    approved: 0,
+    pending: 0,
+  });
 
   useEffect(() => {
     if (status === "loading") return;
-    
+
     if (!session) {
       router.push("/auth/login");
       return;
@@ -95,6 +116,7 @@ export default function AdminUsersPage() {
     }
 
     fetchUsers();
+    fetchUserCounts();
   }, [session, status, router, statusFilter, pagination.currentPage]);
 
   const fetchUsers = async () => {
@@ -107,11 +129,11 @@ export default function AdminUsersPage() {
       });
 
       if (searchQuery) {
-        params.append('search', searchQuery);
+        params.append("search", searchQuery);
       }
 
       const response = await fetch(`/api/admin/users?${params}`);
-      
+
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);
@@ -121,11 +143,38 @@ export default function AdminUsersPage() {
       console.error("Error fetching users:", error);
     } finally {
       setLoading(false);
+      setInitialLoading(false);
+    }
+  };
+
+  const fetchUserCounts = async () => {
+    try {
+      // Fetch counts for all categories in parallel
+      const [allResponse, approvedResponse, pendingResponse] =
+        await Promise.all([
+          fetch(`/api/admin/users?status=all&limit=1`),
+          fetch(`/api/admin/users?status=approved&limit=1`),
+          fetch(`/api/admin/users?status=pending&limit=1`),
+        ]);
+
+      if (allResponse.ok && approvedResponse.ok && pendingResponse.ok) {
+        const allData = await allResponse.json();
+        const approvedData = await approvedResponse.json();
+        const pendingData = await pendingResponse.json();
+
+        setUserCounts({
+          all: allData.pagination.totalUsers,
+          approved: approvedData.pagination.totalUsers,
+          pending: pendingData.pagination.totalUsers,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching user counts:", error);
     }
   };
 
   const handleSearch = () => {
-    setPagination(prev => ({ ...prev, currentPage: 1 }));
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
     fetchUsers();
   };
 
@@ -137,6 +186,7 @@ export default function AdminUsersPage() {
 
       if (response.ok) {
         fetchUsers();
+        fetchUserCounts(); // Update counts after approval
       }
     } catch (error) {
       console.error("Error approving user:", error);
@@ -144,8 +194,9 @@ export default function AdminUsersPage() {
   };
 
   const handleRejectUser = async (userId: string) => {
-    if (!confirm("Are you sure you want to reject and delete this user?")) return;
-    
+    if (!confirm("Are you sure you want to reject and delete this user?"))
+      return;
+
     try {
       const response = await fetch(`/api/admin/users/${userId}/reject`, {
         method: "POST",
@@ -153,6 +204,7 @@ export default function AdminUsersPage() {
 
       if (response.ok) {
         fetchUsers();
+        fetchUserCounts(); // Update counts after rejection
       }
     } catch (error) {
       console.error("Error rejecting user:", error);
@@ -163,27 +215,32 @@ export default function AdminUsersPage() {
     if (selectedUsers.length === users.length) {
       setSelectedUsers([]);
     } else {
-      setSelectedUsers(users.map(user => user._id));
+      setSelectedUsers(users.map((user) => user._id));
     }
   };
 
   const handleSelectUser = (userId: string) => {
-    setSelectedUsers(prev => 
-      prev.includes(userId) 
-        ? prev.filter(id => id !== userId)
+    setSelectedUsers((prev) =>
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
         : [...prev, userId]
     );
   };
 
   const handleBulkApprove = async () => {
     if (selectedUsers.length === 0) return;
-    
-    if (!confirm(`Are you sure you want to approve ${selectedUsers.length} user(s)?`)) return;
+
+    if (
+      !confirm(
+        `Are you sure you want to approve ${selectedUsers.length} user(s)?`
+      )
+    )
+      return;
 
     setBulkActionLoading(true);
     try {
       await Promise.all(
-        selectedUsers.map(userId =>
+        selectedUsers.map((userId) =>
           fetch(`/api/admin/users/${userId}/approve`, {
             method: "POST",
           })
@@ -191,6 +248,7 @@ export default function AdminUsersPage() {
       );
       setSelectedUsers([]);
       fetchUsers();
+      fetchUserCounts(); // Update counts after bulk approval
     } catch (error) {
       console.error("Error approving users:", error);
     } finally {
@@ -200,13 +258,18 @@ export default function AdminUsersPage() {
 
   const handleBulkReject = async () => {
     if (selectedUsers.length === 0) return;
-    
-    if (!confirm(`Are you sure you want to reject ${selectedUsers.length} user(s)? This action cannot be undone.`)) return;
+
+    if (
+      !confirm(
+        `Are you sure you want to reject ${selectedUsers.length} user(s)? This action cannot be undone.`
+      )
+    )
+      return;
 
     setBulkActionLoading(true);
     try {
       await Promise.all(
-        selectedUsers.map(userId =>
+        selectedUsers.map((userId) =>
           fetch(`/api/admin/users/${userId}/reject`, {
             method: "POST",
           })
@@ -214,6 +277,7 @@ export default function AdminUsersPage() {
       );
       setSelectedUsers([]);
       fetchUsers();
+      fetchUserCounts(); // Update counts after bulk rejection
     } catch (error) {
       console.error("Error rejecting users:", error);
     } finally {
@@ -222,7 +286,7 @@ export default function AdminUsersPage() {
   };
 
   const handlePageChange = (newPage: number) => {
-    setPagination(prev => ({ ...prev, currentPage: newPage }));
+    setPagination((prev) => ({ ...prev, currentPage: newPage }));
   };
 
   const handleChangeRole = async (userId: string, newRole: string) => {
@@ -249,13 +313,18 @@ export default function AdminUsersPage() {
 
   const handleBulkMakeAdmin = async () => {
     if (selectedUsers.length === 0) return;
-    
-    if (!confirm(`Are you sure you want to make ${selectedUsers.length} user(s) admin?`)) return;
+
+    if (
+      !confirm(
+        `Are you sure you want to make ${selectedUsers.length} user(s) admin?`
+      )
+    )
+      return;
 
     setBulkActionLoading(true);
     try {
       await Promise.all(
-        selectedUsers.map(userId =>
+        selectedUsers.map((userId) =>
           fetch(`/api/admin/users/${userId}/role`, {
             method: "POST",
             headers: {
@@ -276,13 +345,18 @@ export default function AdminUsersPage() {
 
   const handleBulkMakeUser = async () => {
     if (selectedUsers.length === 0) return;
-    
-    if (!confirm(`Are you sure you want to change ${selectedUsers.length} user(s) to regular user role?`)) return;
+
+    if (
+      !confirm(
+        `Are you sure you want to change ${selectedUsers.length} user(s) to regular user role?`
+      )
+    )
+      return;
 
     setBulkActionLoading(true);
     try {
       await Promise.all(
-        selectedUsers.map(userId =>
+        selectedUsers.map((userId) =>
           fetch(`/api/admin/users/${userId}/role`, {
             method: "POST",
             headers: {
@@ -301,7 +375,7 @@ export default function AdminUsersPage() {
     }
   };
 
-  if (status === "loading" || loading) {
+  if (status === "loading" || initialLoading) {
     return <AdminLoader text="Loading users..." />;
   }
 
@@ -316,7 +390,9 @@ export default function AdminUsersPage() {
             <Users className="h-8 w-8 mr-3 text-[#E63946]" />
             User Management
           </h1>
-          <p className="text-gray-600">Manage all registered users and their permissions</p>
+          <p className="text-gray-600">
+            Manage all registered users and their permissions
+          </p>
         </div>
 
         {/* Search and Filters */}
@@ -331,7 +407,7 @@ export default function AdminUsersPage() {
                     placeholder="Search by name, email, or mobile..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                     className="pl-10"
                   />
                 </div>
@@ -349,19 +425,23 @@ export default function AdminUsersPage() {
         </Card>
 
         {/* Status Tabs */}
-        <Tabs value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)} className="mb-8">
+        <Tabs
+          value={statusFilter}
+          onValueChange={(value) => setStatusFilter(value as any)}
+          className="mb-8"
+        >
           <TabsList className="grid w-full md:w-auto grid-cols-3 gap-2">
             <TabsTrigger value="all" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              All Users ({pagination.totalUsers})
+              All Users ({userCounts.all})
             </TabsTrigger>
             <TabsTrigger value="approved" className="flex items-center gap-2">
               <UserCheck className="h-4 w-4" />
-              Approved
+              Approved ({userCounts.approved})
             </TabsTrigger>
             <TabsTrigger value="pending" className="flex items-center gap-2">
               <UserX className="h-4 w-4" />
-              Pending
+              Pending ({userCounts.pending})
             </TabsTrigger>
           </TabsList>
 
@@ -371,23 +451,28 @@ export default function AdminUsersPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>
-                      {statusFilter === 'all' && 'All Users'}
-                      {statusFilter === 'approved' && 'Approved Users'}
-                      {statusFilter === 'pending' && 'Pending Approvals'}
+                      {statusFilter === "all" && "All Users"}
+                      {statusFilter === "approved" && "Approved Users"}
+                      {statusFilter === "pending" && "Pending Approvals"}
                     </CardTitle>
                     <CardDescription>
-                      {statusFilter === 'all' && 'Complete list of all registered users'}
-                      {statusFilter === 'approved' && 'Users approved by admin'}
-                      {statusFilter === 'pending' && 'Users awaiting admin approval'}
+                      {statusFilter === "all" &&
+                        "Complete list of all registered users"}
+                      {statusFilter === "approved" && "Users approved by admin"}
+                      {statusFilter === "pending" &&
+                        "Users awaiting admin approval"}
                     </CardDescription>
                   </div>
-                  
+
                   {selectedUsers.length > 0 && (
                     <div className="flex gap-2">
-                      <Badge variant="outline" className="text-blue-700 border-blue-300">
+                      <Badge
+                        variant="outline"
+                        className="text-blue-700 border-blue-300"
+                      >
                         {selectedUsers.length} selected
                       </Badge>
-                      {statusFilter === 'pending' && (
+                      {statusFilter === "pending" && (
                         <>
                           <Button
                             size="sm"
@@ -434,13 +519,23 @@ export default function AdminUsersPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                {users.length === 0 ? (
+                {loading && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 flex items-center justify-center gap-3">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#E63946]"></div>
+                    <span className="text-sm text-gray-700 font-medium">
+                      Loading users...
+                    </span>
+                  </div>
+                )}
+                {!loading && users.length === 0 ? (
                   <div className="text-center py-12 text-gray-500">
                     <Users className="h-16 w-16 mx-auto mb-4 opacity-50" />
                     <p className="text-lg font-medium">No users found</p>
-                    <p className="text-sm">Try adjusting your filters or search query</p>
+                    <p className="text-sm">
+                      Try adjusting your filters or search query
+                    </p>
                   </div>
-                ) : (
+                ) : users.length > 0 ? (
                   <>
                     <div className="overflow-x-auto">
                       <Table>
@@ -449,7 +544,10 @@ export default function AdminUsersPage() {
                             <TableHead className="w-12">
                               <input
                                 type="checkbox"
-                                checked={selectedUsers.length === users.length && users.length > 0}
+                                checked={
+                                  selectedUsers.length === users.length &&
+                                  users.length > 0
+                                }
                                 onChange={handleSelectAll}
                                 className="h-4 w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
                               />
@@ -466,7 +564,14 @@ export default function AdminUsersPage() {
                         </TableHeader>
                         <TableBody>
                           {users.map((user) => (
-                            <TableRow key={user._id} className={selectedUsers.includes(user._id) ? "bg-blue-50" : ""}>
+                            <TableRow
+                              key={user._id}
+                              className={
+                                selectedUsers.includes(user._id)
+                                  ? "bg-blue-50"
+                                  : ""
+                              }
+                            >
                               <TableCell>
                                 <input
                                   type="checkbox"
@@ -481,7 +586,9 @@ export default function AdminUsersPage() {
                                     {user.firstName} {user.lastName}
                                   </p>
                                   {user.gothiram && (
-                                    <p className="text-xs text-gray-500">{user.gothiram}</p>
+                                    <p className="text-xs text-gray-500">
+                                      {user.gothiram}
+                                    </p>
                                   )}
                                 </div>
                               </TableCell>
@@ -490,51 +597,65 @@ export default function AdminUsersPage() {
                                   {user.email && (
                                     <div className="flex items-center gap-1 mb-1">
                                       <Mail className="h-3 w-3 text-gray-400" />
-                                      <span className="text-xs">{user.email}</span>
+                                      <span className="text-xs">
+                                        {user.email}
+                                      </span>
                                     </div>
                                   )}
                                   {user.mobile && (
                                     <div className="flex items-center gap-1">
                                       <Phone className="h-3 w-3 text-gray-400" />
-                                      <span className="text-xs">{user.mobile}</span>
+                                      <span className="text-xs">
+                                        {user.mobile}
+                                      </span>
                                     </div>
                                   )}
                                 </div>
                               </TableCell>
                               <TableCell>
-                                {user.role === 'admin' && (
+                                {user.role === "admin" && (
                                   <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0">
                                     <Crown className="w-3 h-3 mr-1" />
                                     Admin
                                   </Badge>
                                 )}
-                                {user.role === 'matchmaker' && MATRIMONIAL_ENABLED && (
-                                  <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
-                                    <Heart className="w-3 h-3 mr-1" />
-                                    Matchmaker
-                                  </Badge>
-                                )}
-                                {(user.role === 'user' || (user.role === 'matchmaker' && !MATRIMONIAL_ENABLED)) && (
+                                {user.role === "matchmaker" &&
+                                  MATRIMONIAL_ENABLED && (
+                                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
+                                      <Heart className="w-3 h-3 mr-1" />
+                                      Matchmaker
+                                    </Badge>
+                                  )}
+                                {(user.role === "user" ||
+                                  (user.role === "matchmaker" &&
+                                    !MATRIMONIAL_ENABLED)) && (
                                   <Badge variant="outline">User</Badge>
                                 )}
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-1 flex-wrap">
                                   {user.isEmailVerified && (
-                                    <Badge variant="outline" className="text-xs text-green-700 border-green-300">
+                                    <Badge
+                                      variant="outline"
+                                      className="text-xs text-green-700 border-green-300"
+                                    >
                                       Email ✓
                                     </Badge>
                                   )}
-                                  {user.isMobileVerified && (
+                                  {/* {user.isMobileVerified && (
                                     <Badge variant="outline" className="text-xs text-green-700 border-green-300">
                                       Mobile ✓
                                     </Badge>
-                                  )}
-                                  {MATRIMONIAL_ENABLED && user.enableMarriageFlag && (
-                                    <Badge variant="outline" className="text-xs text-purple-700 border-purple-300">
-                                      Matrimony
-                                    </Badge>
-                                  )}
+                                  )} */}
+                                  {MATRIMONIAL_ENABLED &&
+                                    user.enableMarriageFlag && (
+                                      <Badge
+                                        variant="outline"
+                                        className="text-xs text-purple-700 border-purple-300"
+                                      >
+                                        Matrimony
+                                      </Badge>
+                                    )}
                                 </div>
                               </TableCell>
                               <TableCell>
@@ -569,7 +690,9 @@ export default function AdminUsersPage() {
                               <TableCell>
                                 <div className="flex items-center gap-1 text-xs text-gray-600">
                                   <Calendar className="h-3 w-3" />
-                                  {new Date(user.createdAt).toLocaleDateString()}
+                                  {new Date(
+                                    user.createdAt
+                                  ).toLocaleDateString()}
                                 </div>
                               </TableCell>
                               <TableCell>
@@ -578,7 +701,9 @@ export default function AdminUsersPage() {
                                     <>
                                       <Button
                                         size="sm"
-                                        onClick={() => handleApproveUser(user._id)}
+                                        onClick={() =>
+                                          handleApproveUser(user._id)
+                                        }
                                         className="bg-green-600 hover:bg-green-700 text-white"
                                       >
                                         <CheckCircle className="h-4 w-4" />
@@ -586,7 +711,9 @@ export default function AdminUsersPage() {
                                       <Button
                                         size="sm"
                                         variant="outline"
-                                        onClick={() => handleRejectUser(user._id)}
+                                        onClick={() =>
+                                          handleRejectUser(user._id)
+                                        }
                                         className="border-red-300 text-red-700 hover:bg-red-50"
                                       >
                                         <XCircle className="h-4 w-4" />
@@ -608,24 +735,35 @@ export default function AdminUsersPage() {
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
                                         <DropdownMenuItem
-                                          onClick={() => handleChangeRole(user._id, 'admin')}
-                                          disabled={user.role === 'admin'}
+                                          onClick={() =>
+                                            handleChangeRole(user._id, "admin")
+                                          }
+                                          disabled={user.role === "admin"}
                                         >
                                           <Crown className="h-4 w-4 mr-2 text-orange-500" />
                                           Make Admin
                                         </DropdownMenuItem>
                                         {MATRIMONIAL_ENABLED && (
                                           <DropdownMenuItem
-                                            onClick={() => handleChangeRole(user._id, 'matchmaker')}
-                                            disabled={user.role === 'matchmaker'}
+                                            onClick={() =>
+                                              handleChangeRole(
+                                                user._id,
+                                                "matchmaker"
+                                              )
+                                            }
+                                            disabled={
+                                              user.role === "matchmaker"
+                                            }
                                           >
                                             <Heart className="h-4 w-4 mr-2 text-purple-500" />
                                             Make Matchmaker
                                           </DropdownMenuItem>
                                         )}
                                         <DropdownMenuItem
-                                          onClick={() => handleChangeRole(user._id, 'user')}
-                                          disabled={user.role === 'user'}
+                                          onClick={() =>
+                                            handleChangeRole(user._id, "user")
+                                          }
+                                          disabled={user.role === "user"}
                                         >
                                           <UserIcon className="h-4 w-4 mr-2 text-gray-500" />
                                           Make User
@@ -645,49 +783,76 @@ export default function AdminUsersPage() {
                     {pagination.totalPages > 1 && (
                       <div className="mt-6 flex items-center justify-between">
                         <div className="text-sm text-gray-600">
-                          Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to {Math.min(pagination.currentPage * pagination.limit, pagination.totalUsers)} of {pagination.totalUsers} users
+                          Showing{" "}
+                          {(pagination.currentPage - 1) * pagination.limit + 1}{" "}
+                          to{" "}
+                          {Math.min(
+                            pagination.currentPage * pagination.limit,
+                            pagination.totalUsers
+                          )}{" "}
+                          of {pagination.totalUsers} users
                         </div>
                         <div className="flex gap-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handlePageChange(pagination.currentPage - 1)}
+                            onClick={() =>
+                              handlePageChange(pagination.currentPage - 1)
+                            }
                             disabled={pagination.currentPage === 1}
                           >
                             <ChevronLeft className="h-4 w-4 mr-1" />
                             Previous
                           </Button>
                           <div className="flex items-center gap-2">
-                            {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                              let pageNum;
-                              if (pagination.totalPages <= 5) {
-                                pageNum = i + 1;
-                              } else if (pagination.currentPage <= 3) {
-                                pageNum = i + 1;
-                              } else if (pagination.currentPage >= pagination.totalPages - 2) {
-                                pageNum = pagination.totalPages - 4 + i;
-                              } else {
-                                pageNum = pagination.currentPage - 2 + i;
+                            {Array.from(
+                              { length: Math.min(5, pagination.totalPages) },
+                              (_, i) => {
+                                let pageNum;
+                                if (pagination.totalPages <= 5) {
+                                  pageNum = i + 1;
+                                } else if (pagination.currentPage <= 3) {
+                                  pageNum = i + 1;
+                                } else if (
+                                  pagination.currentPage >=
+                                  pagination.totalPages - 2
+                                ) {
+                                  pageNum = pagination.totalPages - 4 + i;
+                                } else {
+                                  pageNum = pagination.currentPage - 2 + i;
+                                }
+
+                                return (
+                                  <Button
+                                    key={pageNum}
+                                    variant={
+                                      pagination.currentPage === pageNum
+                                        ? "default"
+                                        : "outline"
+                                    }
+                                    size="sm"
+                                    onClick={() => handlePageChange(pageNum)}
+                                    className={
+                                      pagination.currentPage === pageNum
+                                        ? "avs-button-primary"
+                                        : ""
+                                    }
+                                  >
+                                    {pageNum}
+                                  </Button>
+                                );
                               }
-                              
-                              return (
-                                <Button
-                                  key={pageNum}
-                                  variant={pagination.currentPage === pageNum ? "default" : "outline"}
-                                  size="sm"
-                                  onClick={() => handlePageChange(pageNum)}
-                                  className={pagination.currentPage === pageNum ? "avs-button-primary" : ""}
-                                >
-                                  {pageNum}
-                                </Button>
-                              );
-                            })}
+                            )}
                           </div>
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handlePageChange(pagination.currentPage + 1)}
-                            disabled={pagination.currentPage === pagination.totalPages}
+                            onClick={() =>
+                              handlePageChange(pagination.currentPage + 1)
+                            }
+                            disabled={
+                              pagination.currentPage === pagination.totalPages
+                            }
                           >
                             Next
                             <ChevronRight className="h-4 w-4 ml-1" />
@@ -696,7 +861,7 @@ export default function AdminUsersPage() {
                       </div>
                     )}
                   </>
-                )}
+                ) : null}
               </CardContent>
             </Card>
           </TabsContent>
@@ -705,4 +870,3 @@ export default function AdminUsersPage() {
     </div>
   );
 }
-
