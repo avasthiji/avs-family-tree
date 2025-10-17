@@ -306,15 +306,6 @@ export default function Home() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/contact">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white text-[#E63946] hover:bg-white hover:text-[#E63946] text-lg px-8 py-4"
-              >
-                Contact Us
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
