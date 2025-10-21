@@ -417,9 +417,9 @@ export default function D3FamilyTree({
             id: `parent-child-${parentId}-${childId}`,
             source: parentId,
             sourceHandle: "bottom",
-            target: childId,
+              target: childId,
             targetHandle: "top",
-            type: "smoothstep",
+              type: "smoothstep",
             style: { stroke: "#10b981", strokeWidth: 2 },
             animated: false,
             label: "child",
@@ -491,9 +491,9 @@ export default function D3FamilyTree({
               label: "sibling",
               labelStyle: { fontSize: 10, fill: "#f59e0b" },
               labelBgStyle: { fill: "#fff", fillOpacity: 0.8 },
-            });
-          }
-        }
+        });
+      }
+    }
       });
     });
 

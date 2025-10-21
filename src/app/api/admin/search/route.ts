@@ -46,11 +46,37 @@ export async function GET(request: NextRequest) {
 
       if (name && name.trim().length >= 2) {
         const nameQuery = name.trim();
-        advancedConditions.push({
-          $or: [
+        const nameParts = nameQuery.split(/\s+/);
+        
+        const nameConditions: any[] = [];
+        
+        if (nameParts.length >= 2) {
+          // Full name search: "Neetu Rao" -> firstName: "Neetu" AND lastName: "Rao"
+          const [firstPart, ...restParts] = nameParts;
+          const lastPart = restParts.join(' ');
+          
+          nameConditions.push(
+            // Match first name with first part AND last name with rest
+            {
+              $and: [
+                { firstName: { $regex: firstPart, $options: 'i' } },
+                { lastName: { $regex: lastPart, $options: 'i' } }
+              ]
+            },
+            // Also search the full query in either field
             { firstName: { $regex: nameQuery, $options: 'i' } },
             { lastName: { $regex: nameQuery, $options: 'i' } }
-          ]
+          );
+        } else {
+          // Single word search
+          nameConditions.push(
+            { firstName: { $regex: nameQuery, $options: 'i' } },
+            { lastName: { $regex: nameQuery, $options: 'i' } }
+          );
+        }
+        
+        advancedConditions.push({
+          $or: nameConditions
         });
       }
 
@@ -61,8 +87,9 @@ export async function GET(request: NextRequest) {
       }
 
       if (gothiram && gothiram.trim()) {
+        // Remove exact match requirement - allow partial matches for gothiram
         advancedConditions.push({
-          gothiram: { $regex: `^${gothiram.trim()}$`, $options: 'i' }
+          gothiram: { $regex: gothiram.trim(), $options: 'i' }
         });
       }
 
@@ -83,10 +110,35 @@ export async function GET(request: NextRequest) {
       const searchConditions: any[] = [];
 
       if (!filter || filter === 'all' || filter === 'name') {
-        searchConditions.push(
-          { firstName: { $regex: searchQuery, $options: 'i' } },
-          { lastName: { $regex: searchQuery, $options: 'i' } }
-        );
+        // Check if query contains a space (full name search)
+        const nameParts = searchQuery.split(/\s+/);
+        
+        if (nameParts.length >= 2) {
+          // Full name search: "Neetu Rao" -> firstName: "Neetu" AND lastName: "Rao"
+          const [firstPart, ...restParts] = nameParts;
+          const lastPart = restParts.join(' ');
+          
+          searchConditions.push(
+            // Match first name with first part AND last name with rest
+            {
+              $and: [
+                { firstName: { $regex: firstPart, $options: 'i' } },
+                { lastName: { $regex: lastPart, $options: 'i' } }
+              ]
+            },
+            // Also search each part individually in first or last name
+            { firstName: { $regex: searchQuery, $options: 'i' } },
+            { lastName: { $regex: searchQuery, $options: 'i' } },
+            { firstName: { $regex: firstPart, $options: 'i' } },
+            { lastName: { $regex: lastPart, $options: 'i' } }
+          );
+        } else {
+          // Single word search - original behavior
+          searchConditions.push(
+            { firstName: { $regex: searchQuery, $options: 'i' } },
+            { lastName: { $regex: searchQuery, $options: 'i' } }
+          );
+        }
       }
 
       if (!filter || filter === 'all' || filter === 'email') {
