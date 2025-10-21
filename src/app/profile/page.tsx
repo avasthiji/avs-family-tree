@@ -52,6 +52,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(true);
   const [userData, setUserData] = useState<any>(null);
+  const [originalUserData, setOriginalUserData] = useState<any>(null);
   const [gothirams, setGothirams] = useState<
     Array<{ _id: string; name: string }>
   >([]);
@@ -77,7 +78,9 @@ export default function ProfilePage() {
 
       if (profileRes.ok) {
         const data = await profileRes.json();
+        // Store both current and original data
         setUserData(data.user);
+        setOriginalUserData(JSON.parse(JSON.stringify(data.user))); // Deep copy
       }
 
       if (gothiramRes.ok) {
@@ -116,6 +119,14 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCancel = () => {
+    // Reset userData to original values from API
+    if (originalUserData) {
+      setUserData(JSON.parse(JSON.stringify(originalUserData))); // Deep copy
+    }
+    setEditing(false);
   };
 
   if (status === "loading" || !userData) {
@@ -199,26 +210,26 @@ export default function ProfilePage() {
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Profile
               </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleSave}
-                  disabled={loading}
-                  className="avs-button-primary whitespace-nowrap"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  {loading ? "Saving..." : "Save Changes"}
-                </Button>
-                <Button
-                  onClick={() => setEditing(false)}
-                  variant="outline"
-                  disabled={loading}
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </Button>
-              </div>
-            )}
+             ) : (
+               <div className="flex gap-2">
+                 <Button
+                   onClick={handleSave}
+                   disabled={loading}
+                   className="avs-button-primary whitespace-nowrap"
+                 >
+                   <Save className="h-4 w-4 mr-2" />
+                   {loading ? "Saving..." : "Save Changes"}
+                 </Button>
+                 <Button
+                   onClick={handleCancel}
+                   variant="outline"
+                   disabled={loading}
+                 >
+                   <X className="h-4 w-4 mr-2" />
+                   Cancel
+                 </Button>
+               </div>
+             )}
           </div>
 
           {/* Basic Information */}
@@ -657,28 +668,28 @@ export default function ProfilePage() {
           </TabsContent>
         </Tabs>
 
-        {/* Bottom Save Button */}
-        {editing && (
-          <div className="flex justify-end gap-2 mt-6">
-            <Button
-              onClick={handleSave}
-              disabled={loading}
-              className="avs-button-primary min-w-[150px]"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {loading ? "Saving..." : "Save Changes"}
-            </Button>
-            <Button
-              onClick={() => setEditing(false)}
-              variant="outline"
-              disabled={loading}
-              className="min-w-[100px]"
-            >
-              <X className="h-4 w-4 mr-2" />
-              Cancel
-            </Button>
-          </div>
-        )}
+         {/* Bottom Save Button */}
+         {editing && (
+           <div className="flex justify-end gap-2 mt-6">
+             <Button
+               onClick={handleSave}
+               disabled={loading}
+               className="avs-button-primary min-w-[150px]"
+             >
+               <Save className="h-4 w-4 mr-2" />
+               {loading ? "Saving..." : "Save Changes"}
+             </Button>
+             <Button
+               onClick={handleCancel}
+               variant="outline"
+               disabled={loading}
+               className="min-w-[100px]"
+             >
+               <X className="h-4 w-4 mr-2" />
+               Cancel
+             </Button>
+           </div>
+         )}
       </div>
     </div>
   );
