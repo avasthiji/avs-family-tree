@@ -187,7 +187,7 @@ export default function FamilyTreePage() {
           <CardContent className="p-0">
             <Tabs defaultValue="visual" className="w-full">
               <div className="px-6 pt-2">
-                <TabsList className="grid w-full max-w-[400px] grid-cols-2">
+                {/* <TabsList className="grid w-full max-w-[400px] grid-cols-2">
                   <TabsTrigger value="visual">
                     <Network className="h-4 w-4 mr-2" />
                     Visual Tree
@@ -196,7 +196,7 @@ export default function FamilyTreePage() {
                     <List className="h-4 w-4 mr-2" />
                     List View
                   </TabsTrigger>
-                </TabsList>
+                </TabsList> */}
               </div>
 
               <TabsContent value="visual" className="p-6">
