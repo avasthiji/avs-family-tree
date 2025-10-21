@@ -471,7 +471,7 @@ export default function UserDetailsModal({
             </Card>
 
             {/* Marriage Information */}
-            {userProfile.enableMarriageFlag && (
+            {/* {userProfile.enableMarriageFlag && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -496,7 +496,7 @@ export default function UserDetailsModal({
                   )}
                 </CardContent>
               </Card>
-            )}
+            )} */}
 
             {/* Account Information */}
             <Card>
