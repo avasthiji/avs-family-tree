@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import { sendEmail } from "@/lib/email";
+import { SUPPORT_EMAIL } from "@/lib/constants";
 
 export const runtime = 'nodejs';
 
@@ -38,14 +39,14 @@ export async function POST(
         await sendEmail({
           to: user.email,
           subject: "Account Application Status - AVS Family Tree",
-          text: `Dear ${user.firstName} ${user.lastName},\n\nThank you for your interest in joining AVS Family Tree.\n\nAfter careful review, we are unable to approve your account at this time. If you believe this is an error or would like to reapply, please contact our support team.\n\nBest regards,\nAVS Family Tree Team`,
+          text: `Dear ${user.firstName} ${user.lastName},\n\nThank you for your interest in joining AVS Family Tree.\n\nAfter careful review, we are unable to approve your account at this time. If you believe this is an error or would like to reapply, please contact our support team at ${SUPPORT_EMAIL}.\n\nBest regards,\nAVS Family Tree Team`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #E63946;">Account Application Update</h2>
               <p>Dear ${user.firstName} ${user.lastName},</p>
               <p>Thank you for your interest in joining the AVS Family Tree platform.</p>
               <p>After careful review of your application, we are unable to approve your account at this time.</p>
-              <p>If you believe this is an error or would like to discuss your application, please contact our support team at <a href="mailto:support@avsfamilytree.com">support@avsfamilytree.com</a>.</p>
+              <p>If you believe this is an error or would like to discuss your application, please contact our support team at <a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a>.</p>
               <p style="margin-top: 30px;">We appreciate your understanding.</p>
               <p>Best regards,<br>AVS Family Tree Team</p>
               <hr style="margin-top: 30px; border: none; border-top: 1px solid #eee;">

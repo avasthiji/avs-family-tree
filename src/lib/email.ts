@@ -1,4 +1,5 @@
 import { env } from './env';
+import { SUPPORT_EMAIL } from './constants';
 
 // Lazy-load nodemailer only when needed
 let transporter: any = null;
@@ -152,6 +153,7 @@ export function generateOTPEmailTemplate(otp: string, purpose: string): string {
         <div class="footer">
           <p>&copy; 2025 AVS Family Tree. All rights reserved.</p>
           <p>This is an automated message. Please do not reply to this email.</p>
+          <p style="margin-top: 10px;">Need help? Contact us at <a href="mailto:${SUPPORT_EMAIL}" style="color: #E63946;">${SUPPORT_EMAIL}</a></p>
         </div>
       </div>
     </body>
@@ -238,7 +240,7 @@ export function generateWelcomeEmailTemplate(firstName: string): string {
           
           <p><strong>Important:</strong> Your account is currently pending admin approval. Once approved, you'll have full access to all features.</p>
           
-          <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+          <p>If you have any questions or need assistance, please contact our support team at <a href="mailto:${SUPPORT_EMAIL}" style="color: #E63946;">${SUPPORT_EMAIL}</a>.</p>
           
           <p>Welcome to the AVS family!</p>
           
@@ -248,6 +250,7 @@ export function generateWelcomeEmailTemplate(firstName: string): string {
         <div class="footer">
           <p>&copy; 2025 AVS Family Tree. All rights reserved.</p>
           <p>This is an automated message. Please do not reply to this email.</p>
+          <p style="margin-top: 10px;">Need help? Contact us at <a href="mailto:${SUPPORT_EMAIL}" style="color: #E63946;">${SUPPORT_EMAIL}</a></p>
         </div>
       </div>
     </body>

@@ -627,10 +627,10 @@ export default function AdminDashboardPage() {
               <>
                 <div className="overflow-x-auto">
                   <Table>
-                    <TableHeader>
-                      <TableRow>
+                    <TableHeader className="bg-gradient-to-r from-[#E63946] to-[#F77F00]">
+                      <TableRow className="hover:bg-transparent">
                         {userFilter === "pending" && (
-                          <TableHead className="w-12">
+                          <TableHead className="w-12 text-white">
                             <input
                               type="checkbox"
                               checked={
@@ -638,19 +638,31 @@ export default function AdminDashboardPage() {
                                 pendingUsers.length > 0
                               }
                               onChange={handleSelectAll}
-                              className="h-4 w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
+                              className="h-4 w-4 rounded border-white bg-white/20 text-white focus:ring-white cursor-pointer"
                             />
                           </TableHead>
                         )}
-                        <TableHead>Name</TableHead>
-                        <TableHead>Contact</TableHead>
-                        <TableHead>Verification</TableHead>
+                        <TableHead className="text-white font-semibold">
+                          Name
+                        </TableHead>
+                        <TableHead className="text-white font-semibold">
+                          Contact
+                        </TableHead>
+                        <TableHead className="text-white font-semibold">
+                          Verification
+                        </TableHead>
                         {userFilter !== "pending" && (
-                          <TableHead>Status</TableHead>
+                          <TableHead className="text-white font-semibold">
+                            Status
+                          </TableHead>
                         )}
-                        <TableHead>Registered</TableHead>
+                        <TableHead className="text-white font-semibold">
+                          Registered
+                        </TableHead>
                         {userFilter === "pending" && (
-                          <TableHead>Actions</TableHead>
+                          <TableHead className="text-white font-semibold">
+                            Actions
+                          </TableHead>
                         )}
                       </TableRow>
                     </TableHeader>
@@ -676,7 +688,12 @@ export default function AdminDashboardPage() {
                             </TableCell>
                           )}
                           <TableCell className="font-medium">
-                            {user.firstName} {user.lastName}
+                            <button
+                              onClick={() => handleViewProfile(user._id)}
+                              className="text-[#E63946] hover:text-[#F77F00] hover:underline cursor-pointer transition-colors"
+                            >
+                              {user.firstName} {user.lastName}
+                            </button>
                           </TableCell>
                           <TableCell>
                             <div className="text-sm">
@@ -694,14 +711,14 @@ export default function AdminDashboardPage() {
                                   Email ✓
                                 </Badge>
                               )}
-                              {user.isMobileVerified && (
+                              {/* {user.isMobileVerified && (
                                 <Badge
                                   variant="outline"
                                   className="text-green-700 border-green-300"
                                 >
                                   Mobile ✓
                                 </Badge>
-                              )}
+                              )} */}
                             </div>
                           </TableCell>
                           {userFilter !== "pending" && (
@@ -903,8 +920,8 @@ export default function AdminDashboardPage() {
               </CardContent>
             </Card>
           )}
-
-          <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+          {/* hide for now */}
+          {/* <Card className="avs-card border-0 shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center text-lg">
                 <TreePine className="h-5 w-5 mr-2 text-[#4361EE]" />
@@ -921,7 +938,7 @@ export default function AdminDashboardPage() {
                 </Button>
               </Link>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </div>
 

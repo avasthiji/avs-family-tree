@@ -110,7 +110,6 @@ Approved Users,${stats.approvedUsers}
 Pending Approvals,${stats.pendingUsers}
 Male Users,${stats.maleUsers}
 Female Users,${stats.femaleUsers}
-Active Matrimony Profiles,${stats.activeMatrimony}
 Total Relationships,${stats.totalRelationships}
 
 GENDER DISTRIBUTION
@@ -558,13 +557,15 @@ Female,${stats.femaleUsers}
                   {stats.approvedUsers} approved members actively participating
                 </p>
               </div>
-              <div className="flex items-start">
-                <div className="w-2 h-2 bg-[#7209B7] rounded-full mt-2 mr-3"></div>
-                <p className="text-sm text-gray-700">
-                  <strong>{stats.activeMatrimony} matrimony profiles</strong> (
-                  {matrimonyRate}% of approved users) seeking matches
-                </p>
-              </div>
+              {MATRIMONIAL_ENABLED && (
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-[#7209B7] rounded-full mt-2 mr-3"></div>
+                  <p className="text-sm text-gray-700">
+                    <strong>{stats.activeMatrimony} matrimony profiles</strong>{" "}
+                    ({matrimonyRate}% of approved users) seeking matches
+                  </p>
+                </div>
+              )}
               <div className="flex items-start">
                 <div className="w-2 h-2 bg-[#4361EE] rounded-full mt-2 mr-3"></div>
                 <p className="text-sm text-gray-700">

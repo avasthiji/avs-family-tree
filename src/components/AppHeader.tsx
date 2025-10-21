@@ -228,7 +228,8 @@ export default function AppHeader() {
                       </Link>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem asChild>
+                    {/* hide for now */}
+                    {/* <DropdownMenuItem asChild>
                       <Link
                         href="/admin/gothiram"
                         className="flex items-center px-3 py-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
@@ -238,7 +239,7 @@ export default function AppHeader() {
                           Manage Gothiram
                         </span>
                       </Link>
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                   </>
                 )}
 

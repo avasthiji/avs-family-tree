@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Logo from "@/components/Logo";
 import { MATRIMONIAL_ENABLED, EVENT_ENABLED } from "@/lib/features";
+import { CONTACT_EMAIL, SUPPORT_EMAIL } from "@/lib/constants";
 import {
   Users,
   Heart,
@@ -328,54 +329,6 @@ export default function Home() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-              <ul className="space-y-3">
-                <li>
-                  <a
-                    href="mailto:contact@avsfamilytree.com"
-                    className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      />
-                    </svg>
-                    contact@avsfamilytree.com
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="mailto:support@avsfamilytree.com"
-                    className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
-                      />
-                    </svg>
-                    support@avsfamilytree.com
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
               <h3 className="text-lg font-semibold mb-4">Community</h3>
               <ul className="space-y-2">
                 <li>
@@ -445,6 +398,33 @@ export default function Home() {
                   </svg>
                 </a>
               </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+              <ul className="space-y-3">
+                <li>
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                    {CONTACT_EMAIL}
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
 

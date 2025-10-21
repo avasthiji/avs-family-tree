@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import { sendEmail } from "@/lib/email";
+import { SUPPORT_EMAIL } from "@/lib/constants";
 
 export const runtime = 'nodejs';
 
@@ -66,6 +67,7 @@ export async function POST(
               <p>Best regards,<br>AVS Family Tree Team</p>
               <hr style="margin-top: 30px; border: none; border-top: 1px solid #eee;">
               <p style="font-size: 12px; color: #999;">This is an automated message. Please do not reply to this email.</p>
+              <p style="font-size: 12px; color: #666; margin-top: 10px;">Need help? Contact us at <a href="mailto:${SUPPORT_EMAIL}" style="color: #E63946;">${SUPPORT_EMAIL}</a></p>
             </div>
           `,
         });
