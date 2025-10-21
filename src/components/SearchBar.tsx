@@ -51,6 +51,7 @@ interface SearchBarProps {
   isAdmin?: boolean;
   onSelectUser?: (user: SearchResult) => void;
   onViewProfile?: (userId: string) => void;
+  onSearchChange?: () => void; // New callback for when search changes
 }
 
 interface GothiramOption {
@@ -62,6 +63,7 @@ export default function SearchBar({
   isAdmin = false,
   onSelectUser,
   onViewProfile,
+  onSearchChange,
 }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
@@ -154,6 +156,11 @@ export default function SearchBar({
   ]);
 
   const performSearch = async () => {
+    // Call the onSearchChange callback to clear selected user
+    if (onSearchChange) {
+      onSearchChange();
+    }
+    
     setLoading(true);
     try {
       const endpoint = isAdmin ? "/api/admin/search" : "/api/search";
@@ -177,6 +184,11 @@ export default function SearchBar({
   };
 
   const performAdvancedSearch = async () => {
+    // Call the onSearchChange callback to clear selected user
+    if (onSearchChange) {
+      onSearchChange();
+    }
+    
     setLoading(true);
     try {
       const endpoint = isAdmin ? "/api/admin/search" : "/api/search";

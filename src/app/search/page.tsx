@@ -75,6 +75,11 @@ function SearchPageContent() {
     setProfileModalOpen(true);
   };
 
+  const handleSearchChange = () => {
+    // Clear selected user when search changes
+    setSelectedUser(null);
+  };
+
   if (status === "loading") {
     return <Loader variant="page" text="Loading..." size="lg" />;
   }
@@ -140,6 +145,7 @@ function SearchPageContent() {
               isAdmin={isAdmin}
               onSelectUser={handleSelectUser}
               onViewProfile={handleViewProfile}
+              onSearchChange={handleSearchChange}
             />
           </div>
         </div>
