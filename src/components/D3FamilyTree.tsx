@@ -127,6 +127,7 @@ export default function D3FamilyTree({
         // p2 is the parent (Father/Mother/GrandFather/GrandMother) of p1
         if (!parents.has(p1._id)) parents.set(p1._id, []);
         if (!parents.get(p1._id)!.includes(p2._id)) {
+          
           parents.get(p1._id)!.push(p2._id);
         }
         if (!children.has(p2._id)) children.set(p2._id, []);
