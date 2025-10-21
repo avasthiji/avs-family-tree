@@ -250,20 +250,20 @@ Female,${stats.femaleUsers}
               <PieChart className="h-4 w-4 mr-2" />
               Overview
             </TabsTrigger>
-            <TabsTrigger value="demographics">
+            {/* <TabsTrigger value="demographics">
               <MapPin className="h-4 w-4 mr-2" />
               Demographics
-            </TabsTrigger>
+            </TabsTrigger> */}
             {MATRIMONIAL_ENABLED && (
               <TabsTrigger value="matrimony">
                 <Heart className="h-4 w-4 mr-2" />
                 Matrimony
               </TabsTrigger>
             )}
-            <TabsTrigger value="activity">
+            {/* <TabsTrigger value="activity">
               <Activity className="h-4 w-4 mr-2" />
               Activity
-            </TabsTrigger>
+            </TabsTrigger> */}
           </TabsList>
 
           {/* Overview Tab */}
