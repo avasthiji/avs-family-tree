@@ -22,6 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
+import UserProfileModal from "@/components/UserProfileModal";
 import AppHeader from "@/components/AppHeader";
 import { MATRIMONIAL_ENABLED, EVENT_ENABLED } from "@/lib/features";
 import {
@@ -90,6 +91,13 @@ export default function AdminDashboardPage() {
     totalUsers: 0,
     limit: 25,
   });
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [profileUserId, setProfileUserId] = useState<string | null>(null);
+
+  const handleViewProfile = (userId: string) => {
+    setProfileUserId(userId);
+    setProfileModalOpen(true);
+  };
 
   useEffect(() => {
     if (status === "loading") return;
@@ -384,7 +392,13 @@ export default function AdminDashboardPage() {
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
                 <div className="flex-1">
-                  <SearchBar isAdmin={true} onSelectUser={(user) => {}} />
+                  <SearchBar
+                    isAdmin={true}
+                    onSelectUser={(user) => {
+                      handleViewProfile(user._id);
+                    }}
+                    onViewProfile={handleViewProfile}
+                  />
                 </div>
               </div>
             </CardContent>
@@ -910,6 +924,13 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
       </div>
+
+      {/* User Profile Modal */}
+      <UserProfileModal
+        userId={profileUserId}
+        open={profileModalOpen}
+        onOpenChange={setProfileModalOpen}
+      />
     </div>
   );
 }

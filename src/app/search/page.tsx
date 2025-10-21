@@ -30,6 +30,7 @@ import {
   Search as SearchIcon,
   Eye,
 } from "lucide-react";
+import { env } from "@/lib/env";
 
 interface SearchResult {
   _id: string;
@@ -56,7 +57,6 @@ function SearchPageContent() {
   const [selectedUser, setSelectedUser] = useState<SearchResult | null>(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
-
   useEffect(() => {
     if (status === "loading") return;
 
@@ -193,12 +193,13 @@ function SearchPageContent() {
                       {selectedUser.gender && (
                         <Badge variant="outline">{selectedUser.gender}</Badge>
                       )}
-                      {selectedUser.enableMarriageFlag && (
-                        <Badge className="bg-pink-100 text-pink-800">
-                          <Heart className="h-3 w-3 mr-1" />
-                          Matrimony Active
-                        </Badge>
-                      )}
+                      {selectedUser.enableMarriageFlag &&
+                        env.MATRIMONIAL_FEATURE && (
+                          <Badge className="bg-pink-100 text-pink-800">
+                            <Heart className="h-3 w-3 mr-1" />
+                            Matrimony Active
+                          </Badge>
+                        )}
                       {isAdmin && selectedUser.role === "admin" && (
                         <Badge className="bg-red-100 text-red-800">Admin</Badge>
                       )}

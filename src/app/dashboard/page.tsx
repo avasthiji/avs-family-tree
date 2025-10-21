@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -27,12 +27,15 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
+import UserProfileModal from "@/components/UserProfileModal";
 import AppHeader from "@/components/AppHeader";
 import { MATRIMONIAL_ENABLED, EVENT_ENABLED } from "@/lib/features";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [profileUserId, setProfileUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "loading") return; // Still loading
@@ -48,6 +51,11 @@ export default function DashboardPage() {
       return;
     }
   }, [session, status, router]);
+
+  const handleViewProfile = (userId: string) => {
+    setProfileUserId(userId);
+    setProfileModalOpen(true);
+  };
 
   if (status === "loading") {
     return <Loader variant="page" text="Loading..." size="lg" />;
@@ -85,8 +93,9 @@ export default function DashboardPage() {
                   <SearchBar
                     isAdmin={user.role === "admin"}
                     onSelectUser={(user) => {
-                      // Could add modal or redirect to user profile
+                      handleViewProfile(user._id);
                     }}
+                    onViewProfile={handleViewProfile}
                   />
                 </div>
               </div>
@@ -309,6 +318,13 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* User Profile Modal */}
+      <UserProfileModal
+        userId={profileUserId}
+        open={profileModalOpen}
+        onOpenChange={setProfileModalOpen}
+      />
     </div>
   );
 }
