@@ -305,17 +305,17 @@ export default function RelationshipsPage() {
                 </Button>
               </DialogTrigger>
               <DialogContent
-                className="max-w-3xl w-full p-6 space-y-5"
+                className="max-w-3xl w-full max-h-[90vh] flex flex-col p-0"
                 style={{ maxWidth: "800px" }}
               >
-                <DialogHeader>
+                <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
                   <DialogTitle>Add New Relationship</DialogTitle>
                   <DialogDescription>
                     Search for a family member and select your relationship
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-5">
+                <div className="space-y-5 overflow-y-auto px-6 py-4">
                   {/* Search Bar */}
                   <div>
                     <Label>Search Member</Label>
@@ -446,7 +446,7 @@ export default function RelationshipsPage() {
                   </div>
                 </div>
 
-                <DialogFooter>
+                <DialogFooter className="px-6 py-4 border-t shrink-0">
                   <Button variant="outline" onClick={resetAddDialog}>
                     Cancel
                   </Button>
@@ -597,12 +597,12 @@ export default function RelationshipsPage() {
 
         {/* Edit Dialog */}
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="max-w-md w-full p-6 space-y-5">
-            <DialogHeader>
+          <DialogContent className="max-w-md w-full max-h-[90vh] flex flex-col p-0">
+            <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
               <DialogTitle>Edit Relationship</DialogTitle>
               <DialogDescription>Update relationship details</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4">
+            <div className="space-y-4 overflow-y-auto px-6 py-4">
               <div>
                 <Label>Relationship Type</Label>
                 <Select value={relationType} onValueChange={setRelationType}>
@@ -632,7 +632,7 @@ export default function RelationshipsPage() {
                 </p>
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="px-6 py-4 border-t shrink-0">
               <Button variant="outline" onClick={resetEditDialog}>
                 Cancel
               </Button>

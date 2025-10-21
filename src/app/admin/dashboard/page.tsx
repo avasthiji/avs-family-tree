@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -36,8 +36,11 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { AdminLoader } from "@/components/ui/loader";
+import { toast } from "sonner";
 
 interface DashboardStats {
   totalUsers: number;
@@ -57,11 +60,14 @@ interface PendingUser {
   createdAt: string;
   isEmailVerified: boolean;
   isMobileVerified: boolean;
+  isApprovedByAdmin?: boolean;
+  role?: string;
 }
 
 export default function AdminDashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const isInitialMount = useRef(true);
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     pendingApprovals: 0,
@@ -71,9 +77,19 @@ export default function AdminDashboardPage() {
     totalEvents: 0,
   });
   const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
+  const [userFilter, setUserFilter] = useState<"all" | "pending" | "approved">(
+    "pending"
+  );
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalUsers: 0,
+    limit: 25,
+  });
 
   useEffect(() => {
     if (status === "loading") return;
@@ -89,13 +105,51 @@ export default function AdminDashboardPage() {
     }
 
     fetchDashboardData();
+    isInitialMount.current = false;
   }, [session, status, router]);
+
+  // Refetch users when filter changes (but not on initial mount)
+  useEffect(() => {
+    if (
+      !isInitialMount.current &&
+      session?.user?.role === "admin" &&
+      status !== "loading"
+    ) {
+      setLoading(true);
+      fetchDashboardData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userFilter]);
+
+  // Refetch users when page changes (but not on initial mount)
+  useEffect(() => {
+    if (
+      !isInitialMount.current &&
+      session?.user?.role === "admin" &&
+      status !== "loading"
+    ) {
+      setLoading(true);
+      fetchDashboardData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.currentPage]);
 
   const fetchDashboardData = async () => {
     try {
-      const [statsRes, pendingRes] = await Promise.all([
+      // Determine which endpoint to use based on filter
+      let usersEndpoint = "/api/admin/users/pending";
+      if (userFilter === "all") {
+        usersEndpoint = `/api/admin/users?page=${pagination.currentPage}&limit=${pagination.limit}`;
+      } else if (userFilter === "approved") {
+        usersEndpoint = `/api/admin/users?status=approved&page=${pagination.currentPage}&limit=${pagination.limit}`;
+      } else {
+        // For pending, we need to add pagination params
+        usersEndpoint = `/api/admin/users?status=pending&page=${pagination.currentPage}&limit=${pagination.limit}`;
+      }
+
+      const [statsRes, usersRes] = await Promise.all([
         fetch("/api/admin/stats"),
-        fetch("/api/admin/users/pending"),
+        fetch(usersEndpoint),
       ]);
 
       if (statsRes.ok) {
@@ -103,14 +157,24 @@ export default function AdminDashboardPage() {
         setStats(data.stats);
       }
 
-      if (pendingRes.ok) {
-        const data = await pendingRes.json();
+      if (usersRes.ok) {
+        const data = await usersRes.json();
         setPendingUsers(data.users);
+        // Update pagination if available
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            totalUsers: data.pagination.totalUsers,
+            limit: data.pagination.limit,
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
+      setInitialLoading(false);
     }
   };
 
@@ -121,10 +185,27 @@ export default function AdminDashboardPage() {
       });
 
       if (response.ok) {
-        fetchDashboardData();
+        const data = await response.json();
+        toast.success(
+          `${data.user.firstName} ${data.user.lastName} has been approved! An email notification has been sent.`
+        );
+
+        // If we're on a page that becomes empty after approval, go to previous page
+        if (pendingUsers.length === 1 && pagination.currentPage > 1) {
+          setPagination((prev) => ({
+            ...prev,
+            currentPage: prev.currentPage - 1,
+          }));
+        } else {
+          fetchDashboardData();
+        }
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to approve user");
       }
     } catch (error) {
       console.error("Error approving user:", error);
+      toast.error("An error occurred while approving the user");
     }
   };
 
@@ -137,10 +218,26 @@ export default function AdminDashboardPage() {
       });
 
       if (response.ok) {
-        fetchDashboardData();
+        toast.success(
+          "User has been rejected and removed. An email notification has been sent."
+        );
+
+        // If we're on a page that becomes empty after rejection, go to previous page
+        if (pendingUsers.length === 1 && pagination.currentPage > 1) {
+          setPagination((prev) => ({
+            ...prev,
+            currentPage: prev.currentPage - 1,
+          }));
+        } else {
+          fetchDashboardData();
+        }
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to reject user");
       }
     } catch (error) {
       console.error("Error rejecting user:", error);
+      toast.error("An error occurred while rejecting the user");
     }
   };
 
@@ -179,10 +276,27 @@ export default function AdminDashboardPage() {
           })
         )
       );
+
+      toast.success(
+        `${selectedUsers.length} user(s) have been approved! Email notifications have been sent.`
+      );
       setSelectedUsers([]);
-      fetchDashboardData();
+
+      // If we're approving all users on the current page, go to previous page
+      if (
+        selectedUsers.length === pendingUsers.length &&
+        pagination.currentPage > 1
+      ) {
+        setPagination((prev) => ({
+          ...prev,
+          currentPage: prev.currentPage - 1,
+        }));
+      } else {
+        fetchDashboardData();
+      }
     } catch (error) {
       console.error("Error approving users:", error);
+      toast.error("An error occurred while approving users");
     } finally {
       setBulkActionLoading(false);
     }
@@ -207,16 +321,44 @@ export default function AdminDashboardPage() {
           })
         )
       );
+
+      toast.success(
+        `${selectedUsers.length} user(s) have been rejected and removed. Email notifications have been sent.`
+      );
       setSelectedUsers([]);
-      fetchDashboardData();
+
+      // If we're rejecting all users on the current page, go to previous page
+      if (
+        selectedUsers.length === pendingUsers.length &&
+        pagination.currentPage > 1
+      ) {
+        setPagination((prev) => ({
+          ...prev,
+          currentPage: prev.currentPage - 1,
+        }));
+      } else {
+        fetchDashboardData();
+      }
     } catch (error) {
       console.error("Error rejecting users:", error);
+      toast.error("An error occurred while rejecting users");
     } finally {
       setBulkActionLoading(false);
     }
   };
 
-  if (status === "loading" || loading) {
+  const handleCardClick = (filter: "all" | "pending" | "approved") => {
+    setUserFilter(filter);
+    setSelectedUsers([]); // Clear selection when changing filter
+    setPagination((prev) => ({ ...prev, currentPage: 1 })); // Reset to page 1
+  };
+
+  const handlePageChange = (page: number) => {
+    setPagination((prev) => ({ ...prev, currentPage: page }));
+    setSelectedUsers([]); // Clear selection when changing page
+  };
+
+  if (status === "loading" || initialLoading) {
     return <AdminLoader text="Loading admin dashboard..." />;
   }
 
@@ -244,19 +386,23 @@ export default function AdminDashboardPage() {
                 <div className="flex-1">
                   <SearchBar isAdmin={true} onSelectUser={(user) => {}} />
                 </div>
-                <Link href="/search">
-                  <Button className="avs-button-primary whitespace-nowrap">
-                    Advanced Search
-                  </Button>
-                </Link>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Statistics Cards */}
-        <div className={`grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8`}>
-          <Card className="avs-card border-0 shadow-lg">
+        <div
+          className={`grid md:grid-cols-2 lg:grid-cols-${
+            MATRIMONIAL_ENABLED ? 3 : 4
+          } gap-6 mb-8`}
+        >
+          <Card
+            className={`avs-card border-0 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 ${
+              userFilter === "all" ? "ring-2 ring-[#E63946]" : ""
+            }`}
+            onClick={() => handleCardClick("all")}
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -272,7 +418,12 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="avs-card border-0 shadow-lg">
+          <Card
+            className={`avs-card border-0 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 ${
+              userFilter === "pending" ? "ring-2 ring-[#F77F00]" : ""
+            }`}
+            onClick={() => handleCardClick("pending")}
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -290,7 +441,12 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="avs-card border-0 shadow-lg">
+          <Card
+            className={`avs-card border-0 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 ${
+              userFilter === "approved" ? "ring-2 ring-[#2A9D8F]" : ""
+            }`}
+            onClick={() => handleCardClick("approved")}
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -361,21 +517,42 @@ export default function AdminDashboardPage() {
           )}
         </div>
 
-        {/* Pending Approvals Table */}
+        {/* Users Table */}
         <Card className="avs-card border-0 shadow-lg">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center">
-                  <Clock className="h-5 w-5 mr-2 text-[#F77F00]" />
-                  Pending User Approvals
+                  {userFilter === "all" && (
+                    <>
+                      <Users className="h-5 w-5 mr-2 text-[#E63946]" />
+                      All Users
+                    </>
+                  )}
+                  {userFilter === "pending" && (
+                    <>
+                      <Clock className="h-5 w-5 mr-2 text-[#F77F00]" />
+                      Pending User Approvals
+                    </>
+                  )}
+                  {userFilter === "approved" && (
+                    <>
+                      <UserCheck className="h-5 w-5 mr-2 text-[#2A9D8F]" />
+                      Approved Users
+                    </>
+                  )}
                 </CardTitle>
                 <CardDescription>
-                  Review and approve new user registrations
+                  {userFilter === "all" &&
+                    "View all registered users in the system"}
+                  {userFilter === "pending" &&
+                    "Review and approve new user registrations"}
+                  {userFilter === "approved" &&
+                    "View all approved and active users"}
                 </CardDescription>
               </div>
 
-              {selectedUsers.length > 0 && (
+              {selectedUsers.length > 0 && userFilter === "pending" && (
                 <div className="flex gap-2">
                   <Badge
                     variant="outline"
@@ -407,109 +584,248 @@ export default function AdminDashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {pendingUsers.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <UserCheck className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No pending approvals</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">
-                        <input
-                          type="checkbox"
-                          checked={
-                            selectedUsers.length === pendingUsers.length &&
-                            pendingUsers.length > 0
-                          }
-                          onChange={handleSelectAll}
-                          className="h-4 w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
-                        />
-                      </TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Contact</TableHead>
-                      <TableHead>Verification</TableHead>
-                      <TableHead>Registered</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pendingUsers.map((user) => (
-                      <TableRow
-                        key={user._id}
-                        className={
-                          selectedUsers.includes(user._id) ? "bg-blue-50" : ""
-                        }
-                      >
-                        <TableCell>
-                          <input
-                            type="checkbox"
-                            checked={selectedUsers.includes(user._id)}
-                            onChange={() => handleSelectUser(user._id)}
-                            className="h-4 w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {user.firstName} {user.lastName}
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            {user.email && <div>{user.email}</div>}
-                            {user.mobile && <div>{user.mobile}</div>}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-1">
-                            {user.isEmailVerified && (
-                              <Badge
-                                variant="outline"
-                                className="text-green-700 border-green-300"
-                              >
-                                Email ✓
-                              </Badge>
-                            )}
-                            {user.isMobileVerified && (
-                              <Badge
-                                variant="outline"
-                                className="text-green-700 border-green-300"
-                              >
-                                Mobile ✓
-                              </Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {new Date(user.createdAt).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              onClick={() => handleApproveUser(user._id)}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              <CheckCircle className="h-4 w-4 mr-1" />
-                              Approve
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleRejectUser(user._id)}
-                              className="border-red-300 text-red-700 hover:bg-red-50"
-                            >
-                              <XCircle className="h-4 w-4 mr-1" />
-                              Reject
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+            {loading && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 flex items-center justify-center gap-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#E63946]"></div>
+                <span className="text-sm text-gray-700 font-medium">
+                  Loading users...
+                </span>
               </div>
             )}
+            {!loading && pendingUsers.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                {userFilter === "all" && (
+                  <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                )}
+                {userFilter === "pending" && (
+                  <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                )}
+                {userFilter === "approved" && (
+                  <UserCheck className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                )}
+                <p>
+                  {userFilter === "all" && "No users found"}
+                  {userFilter === "pending" && "No pending approvals"}
+                  {userFilter === "approved" && "No approved users"}
+                </p>
+              </div>
+            ) : !loading && pendingUsers.length > 0 ? (
+              <>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        {userFilter === "pending" && (
+                          <TableHead className="w-12">
+                            <input
+                              type="checkbox"
+                              checked={
+                                selectedUsers.length === pendingUsers.length &&
+                                pendingUsers.length > 0
+                              }
+                              onChange={handleSelectAll}
+                              className="h-4 w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
+                            />
+                          </TableHead>
+                        )}
+                        <TableHead>Name</TableHead>
+                        <TableHead>Contact</TableHead>
+                        <TableHead>Verification</TableHead>
+                        {userFilter !== "pending" && (
+                          <TableHead>Status</TableHead>
+                        )}
+                        <TableHead>Registered</TableHead>
+                        {userFilter === "pending" && (
+                          <TableHead>Actions</TableHead>
+                        )}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {pendingUsers.map((user) => (
+                        <TableRow
+                          key={user._id}
+                          className={
+                            selectedUsers.includes(user._id) &&
+                            userFilter === "pending"
+                              ? "bg-blue-50"
+                              : ""
+                          }
+                        >
+                          {userFilter === "pending" && (
+                            <TableCell>
+                              <input
+                                type="checkbox"
+                                checked={selectedUsers.includes(user._id)}
+                                onChange={() => handleSelectUser(user._id)}
+                                className="h-4 w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
+                              />
+                            </TableCell>
+                          )}
+                          <TableCell className="font-medium">
+                            {user.firstName} {user.lastName}
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              {user.email && <div>{user.email}</div>}
+                              {user.mobile && <div>{user.mobile}</div>}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              {user.isEmailVerified && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-green-700 border-green-300"
+                                >
+                                  Email ✓
+                                </Badge>
+                              )}
+                              {user.isMobileVerified && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-green-700 border-green-300"
+                                >
+                                  Mobile ✓
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                          {userFilter !== "pending" && (
+                            <TableCell>
+                              {user.isApprovedByAdmin ? (
+                                <Badge className="bg-green-100 text-green-800 border-green-300">
+                                  Approved
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                                  Pending
+                                </Badge>
+                              )}
+                            </TableCell>
+                          )}
+                          <TableCell>
+                            {new Date(user.createdAt).toLocaleDateString()}
+                          </TableCell>
+                          {userFilter === "pending" && (
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleApproveUser(user._id)}
+                                  className="bg-green-600 hover:bg-green-700 text-white"
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                  Approve
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleRejectUser(user._id)}
+                                  className="border-red-300 text-red-700 hover:bg-red-50"
+                                >
+                                  <XCircle className="h-4 w-4 mr-1" />
+                                  Reject
+                                </Button>
+                              </div>
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Pagination */}
+                {pagination.totalPages > 1 && (
+                  <div className="mt-6 flex items-center justify-between border-t pt-4">
+                    <div className="text-sm text-gray-600">
+                      Showing{" "}
+                      <span className="font-medium">
+                        {(pagination.currentPage - 1) * pagination.limit + 1}
+                      </span>{" "}
+                      to{" "}
+                      <span className="font-medium">
+                        {Math.min(
+                          pagination.currentPage * pagination.limit,
+                          pagination.totalUsers
+                        )}
+                      </span>{" "}
+                      of{" "}
+                      <span className="font-medium">
+                        {pagination.totalUsers}
+                      </span>{" "}
+                      users
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handlePageChange(pagination.currentPage - 1)
+                        }
+                        disabled={pagination.currentPage === 1}
+                      >
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        Previous
+                      </Button>
+                      <div className="flex items-center gap-2">
+                        {Array.from(
+                          { length: Math.min(5, pagination.totalPages) },
+                          (_, i) => {
+                            let pageNum;
+                            if (pagination.totalPages <= 5) {
+                              pageNum = i + 1;
+                            } else if (pagination.currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (
+                              pagination.currentPage >=
+                              pagination.totalPages - 2
+                            ) {
+                              pageNum = pagination.totalPages - 4 + i;
+                            } else {
+                              pageNum = pagination.currentPage - 2 + i;
+                            }
+
+                            return (
+                              <Button
+                                key={pageNum}
+                                variant={
+                                  pagination.currentPage === pageNum
+                                    ? "default"
+                                    : "outline"
+                                }
+                                size="sm"
+                                onClick={() => handlePageChange(pageNum)}
+                                className={
+                                  pagination.currentPage === pageNum
+                                    ? "avs-button-primary"
+                                    : ""
+                                }
+                              >
+                                {pageNum}
+                              </Button>
+                            );
+                          }
+                        )}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handlePageChange(pagination.currentPage + 1)
+                        }
+                        disabled={
+                          pagination.currentPage === pagination.totalPages
+                        }
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : null}
           </CardContent>
         </Card>
 

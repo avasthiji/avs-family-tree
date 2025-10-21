@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -77,15 +77,22 @@ export default function LoginPage() {
       if (result?.error) {
         setError(
           result.error === "CredentialsSignin"
-            ? "Invalid email/mobile or password"
+            ? "Invalid email or password"
             : result.error
         );
         return;
       }
 
       if (result?.ok) {
-        // Redirect based on user status
-        router.push("/dashboard");
+        // Fetch session to get user role
+        const session = await getSession();
+
+        // Redirect based on user role - admin users go to admin dashboard
+        if (session?.user?.role === "admin") {
+          router.push("/admin/dashboard");
+        } else {
+          router.push("/dashboard");
+        }
       }
     } catch (error) {
       console.error("Login error:", error);

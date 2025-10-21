@@ -150,7 +150,7 @@ export function generateOTPEmailTemplate(otp: string, purpose: string): string {
         </div>
         
         <div class="footer">
-          <p>&copy; 2024 AVS Family Tree. All rights reserved.</p>
+          <p>&copy; 2025 AVS Family Tree. All rights reserved.</p>
           <p>This is an automated message. Please do not reply to this email.</p>
         </div>
       </div>
@@ -246,7 +246,7 @@ export function generateWelcomeEmailTemplate(firstName: string): string {
         </div>
         
         <div class="footer">
-          <p>&copy; 2024 AVS Family Tree. All rights reserved.</p>
+          <p>&copy; 2025 AVS Family Tree. All rights reserved.</p>
           <p>This is an automated message. Please do not reply to this email.</p>
         </div>
       </div>

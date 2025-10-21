@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminLoader } from "@/components/ui/loader";
 import AppHeader from "@/components/AppHeader";
 import { MATRIMONIAL_ENABLED } from "@/lib/features";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -185,11 +186,19 @@ export default function AdminUsersPage() {
       });
 
       if (response.ok) {
+        const data = await response.json();
+        toast.success(
+          `${data.user.firstName} ${data.user.lastName} has been approved! An email notification has been sent.`
+        );
         fetchUsers();
         fetchUserCounts(); // Update counts after approval
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to approve user");
       }
     } catch (error) {
       console.error("Error approving user:", error);
+      toast.error("An error occurred while approving the user");
     }
   };
 
@@ -203,11 +212,18 @@ export default function AdminUsersPage() {
       });
 
       if (response.ok) {
+        toast.success(
+          "User has been rejected and removed. An email notification has been sent."
+        );
         fetchUsers();
         fetchUserCounts(); // Update counts after rejection
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to reject user");
       }
     } catch (error) {
       console.error("Error rejecting user:", error);
+      toast.error("An error occurred while rejecting the user");
     }
   };
 
@@ -246,11 +262,15 @@ export default function AdminUsersPage() {
           })
         )
       );
+      toast.success(
+        `${selectedUsers.length} user(s) have been approved! Email notifications have been sent.`
+      );
       setSelectedUsers([]);
       fetchUsers();
       fetchUserCounts(); // Update counts after bulk approval
     } catch (error) {
       console.error("Error approving users:", error);
+      toast.error("An error occurred while approving users");
     } finally {
       setBulkActionLoading(false);
     }
@@ -275,11 +295,15 @@ export default function AdminUsersPage() {
           })
         )
       );
+      toast.success(
+        `${selectedUsers.length} user(s) have been rejected and removed. Email notifications have been sent.`
+      );
       setSelectedUsers([]);
       fetchUsers();
       fetchUserCounts(); // Update counts after bulk rejection
     } catch (error) {
       console.error("Error rejecting users:", error);
+      toast.error("An error occurred while rejecting users");
     } finally {
       setBulkActionLoading(false);
     }

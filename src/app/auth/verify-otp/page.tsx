@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -134,9 +134,15 @@ function VerifyOTPPageContent() {
               router.push("/auth/login");
             }, 2000);
           } else {
-            // Successfully logged in, redirect to dashboard
+            // Successfully logged in, fetch session and redirect based on role
+            const session = await getSession();
             setTimeout(() => {
-              router.push("/dashboard");
+              // Admin users go to admin dashboard
+              if (session?.user?.role === "admin") {
+                router.push("/admin/dashboard");
+              } else {
+                router.push("/dashboard");
+              }
             }, 1500);
           }
         } else {
