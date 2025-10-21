@@ -5,7 +5,13 @@ import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,16 +19,16 @@ import SearchBar from "@/components/SearchBar";
 import UserProfileModal from "@/components/UserProfileModal";
 import { Loader } from "@/components/ui/loader";
 import Link from "next/link";
-import { 
-  User, 
-  MapPin, 
+import {
+  User,
+  MapPin,
   Briefcase,
   Heart,
   Mail,
   Phone,
   ArrowLeft,
   Search as SearchIcon,
-  Eye
+  Eye,
 } from "lucide-react";
 
 interface SearchResult {
@@ -53,7 +59,7 @@ function SearchPageContent() {
 
   useEffect(() => {
     if (status === "loading") return;
-    
+
     if (!session) {
       router.push("/auth/login");
       return;
@@ -77,7 +83,7 @@ function SearchPageContent() {
     return null;
   }
 
-  const isAdmin = session.user.role === 'admin';
+  const isAdmin = session.user.role === "admin";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA]">
@@ -95,9 +101,11 @@ function SearchPageContent() {
                   className="object-contain"
                 />
               </div>
-              <span className="text-xl font-bold avs-text-gradient">AVS Family Tree</span>
+              <span className="text-xl font-bold avs-text-gradient">
+                AVS Family Tree
+              </span>
             </Link>
-            
+
             <div className="flex items-center space-x-4">
               <Link href="/dashboard">
                 <Button variant="outline" size="sm">
@@ -120,16 +128,17 @@ function SearchPageContent() {
                 Search Community Members
               </h1>
               <p className="text-gray-600">
-                Use quick search for simple queries or advanced search to combine multiple criteria
+                Use quick search for simple queries or advanced search to
+                combine multiple criteria
               </p>
             </div>
           </div>
-          
+
           {/* Search Bar */}
           <div className="flex justify-center">
-            <SearchBar 
-              isAdmin={isAdmin} 
-              onSelectUser={handleSelectUser} 
+            <SearchBar
+              isAdmin={isAdmin}
+              onSelectUser={handleSelectUser}
               onViewProfile={handleViewProfile}
             />
           </div>
@@ -168,7 +177,8 @@ function SearchPageContent() {
                   <Avatar className="h-24 w-24 border-4 border-white shadow-lg">
                     <AvatarImage src={selectedUser.profilePicture} />
                     <AvatarFallback className="text-2xl bg-gradient-to-br from-purple-500 to-pink-600 text-white">
-                      {selectedUser.firstName?.[0]}{selectedUser.lastName?.[0]}
+                      {selectedUser.firstName?.[0]}
+                      {selectedUser.lastName?.[0]}
                     </AvatarFallback>
                   </Avatar>
                 </div>
@@ -189,11 +199,13 @@ function SearchPageContent() {
                           Matrimony Active
                         </Badge>
                       )}
-                      {isAdmin && selectedUser.role === 'admin' && (
+                      {isAdmin && selectedUser.role === "admin" && (
                         <Badge className="bg-red-100 text-red-800">Admin</Badge>
                       )}
                       {isAdmin && !selectedUser.isApprovedByAdmin && (
-                        <Badge variant="outline" className="text-yellow-700">Pending Approval</Badge>
+                        <Badge variant="outline" className="text-yellow-700">
+                          Pending Approval
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -214,7 +226,9 @@ function SearchPageContent() {
                         <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
                         <div>
                           <p className="text-sm text-gray-600">Native Place</p>
-                          <p className="font-medium">{selectedUser.nativePlace}</p>
+                          <p className="font-medium">
+                            {selectedUser.nativePlace}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -223,9 +237,13 @@ function SearchPageContent() {
                       <div className="flex items-start gap-2">
                         <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
                         <div>
-                          <p className="text-sm text-gray-600">Current Location</p>
+                          <p className="text-sm text-gray-600">
+                            Current Location
+                          </p>
                           <p className="font-medium">
-                            {[selectedUser.city, selectedUser.state].filter(Boolean).join(', ')}
+                            {[selectedUser.city, selectedUser.state]
+                              .filter(Boolean)
+                              .join(", ")}
                           </p>
                         </div>
                       </div>
@@ -236,7 +254,9 @@ function SearchPageContent() {
                         <Briefcase className="h-5 w-5 text-gray-400 mt-0.5" />
                         <div>
                           <p className="text-sm text-gray-600">Work Place</p>
-                          <p className="font-medium">{selectedUser.workPlace}</p>
+                          <p className="font-medium">
+                            {selectedUser.workPlace}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -273,7 +293,6 @@ function SearchPageContent() {
           open={profileModalOpen}
           onOpenChange={setProfileModalOpen}
         />
-
       </div>
     </div>
   );
@@ -281,7 +300,9 @@ function SearchPageContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<Loader variant="page" text="Loading search..." size="lg" />}>
+    <Suspense
+      fallback={<Loader variant="page" text="Loading search..." size="lg" />}
+    >
       <SearchPageContent />
     </Suspense>
   );

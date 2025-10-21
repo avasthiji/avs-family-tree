@@ -16,21 +16,39 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const keywords = MATRIMONIAL_ENABLED 
-  ? ["AVS", "Family Tree", "Genealogy", "Tamil", "Vellalar", "Matrimony", "Heritage"]
+const keywords = MATRIMONIAL_ENABLED
+  ? [
+      "AVS",
+      "Family Tree",
+      "Genealogy",
+      "Tamil",
+      "Vellalar",
+      "Matrimony",
+      "Heritage",
+    ]
   : ["AVS", "Family Tree", "Genealogy", "Tamil", "Vellalar", "Heritage"];
 
 export const metadata: Metadata = {
   title: "AVS Family Tree - அகில இந்திய வேளாளர் சங்கம்",
-  description: "Connect with your roots, discover your heritage, and build lasting relationships within the AVS community. Preserve your family legacy for future generations.",
+  description:
+    "Connect with your roots, discover your heritage, and build lasting relationships within the AVS community. Preserve your family legacy for future generations.",
   keywords,
   authors: [{ name: "AVS Family Tree Team" }],
   openGraph: {
     title: "AVS Family Tree - அகில இந்திய வேளாளர் சங்கம்",
-    description: "Connect with your roots, discover your heritage, and build lasting relationships within the AVS community.",
+    description:
+      "Connect with your roots, discover your heritage, and build lasting relationships within the AVS community.",
     type: "website",
     locale: "en_US",
   },
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
