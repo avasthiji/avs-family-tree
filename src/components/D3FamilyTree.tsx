@@ -59,6 +59,7 @@ const SIBLING_RELATIONS = [
   "Younger Sibling",
 ];
 const SPOUSE_RELATIONS = ["Spouse"];
+
 const EXTENDED_RELATIONS = [
   "Uncle",
   "Aunt",
@@ -74,7 +75,7 @@ export default function D3FamilyTree({
   currentUserName,
   onNodeClick,
 }: FamilyTreeViewProps) {
-  
+
   const [direction, setDirection] = useState<"TB" | "LR">("TB");
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
