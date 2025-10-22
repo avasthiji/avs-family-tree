@@ -588,7 +588,7 @@ export default function AdminDashboardPage() {
                     variant="outline"
                     onClick={handleBulkReject}
                     disabled={bulkActionLoading}
-                    className="border-red-300 text-red-700 hover:bg-red-50"
+                    className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
                   >
                     <XCircle className="h-4 w-4 mr-1" />
                     Reject Selected
@@ -752,7 +752,7 @@ export default function AdminDashboardPage() {
                                   size="sm"
                                   variant="outline"
                                   onClick={() => handleRejectUser(user._id)}
-                                  className="border-red-300 text-red-700 hover:bg-red-50"
+                                  className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
                                 >
                                   <XCircle className="h-4 w-4 mr-1" />
                                   Reject

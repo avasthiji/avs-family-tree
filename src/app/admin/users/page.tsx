@@ -53,6 +53,7 @@ import {
   Shield,
   User as UserIcon,
   ChevronDown,
+  X,
 } from "lucide-react";
 
 interface User {
@@ -118,6 +119,7 @@ export default function AdminUsersPage() {
 
     fetchUsers();
     fetchUserCounts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, status, router, statusFilter, pagination.currentPage]);
 
   const fetchUsers = async () => {
@@ -150,12 +152,28 @@ export default function AdminUsersPage() {
 
   const fetchUserCounts = async () => {
     try {
+      const allParams = new URLSearchParams({ status: "all", limit: "1" });
+      const approvedParams = new URLSearchParams({
+        status: "approved",
+        limit: "1",
+      });
+      const pendingParams = new URLSearchParams({
+        status: "pending",
+        limit: "1",
+      });
+
+      if (searchQuery && searchQuery.trim()) {
+        allParams.append("search", searchQuery.trim());
+        approvedParams.append("search", searchQuery.trim());
+        pendingParams.append("search", searchQuery.trim());
+      }
+
       // Fetch counts for all categories in parallel
       const [allResponse, approvedResponse, pendingResponse] =
         await Promise.all([
-          fetch(`/api/admin/users?status=all&limit=1`),
-          fetch(`/api/admin/users?status=approved&limit=1`),
-          fetch(`/api/admin/users?status=pending&limit=1`),
+          fetch(`/api/admin/users?${allParams}`),
+          fetch(`/api/admin/users?${approvedParams}`),
+          fetch(`/api/admin/users?${pendingParams}`),
         ]);
 
       if (allResponse.ok && approvedResponse.ok && pendingResponse.ok) {
@@ -177,6 +195,64 @@ export default function AdminUsersPage() {
   const handleSearch = () => {
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
     fetchUsers();
+    fetchUserCounts(); // Update counts based on search
+  };
+
+  const handleClearSearch = async () => {
+    setSearchQuery("");
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+
+    // Fetch without search query
+    try {
+      setLoading(true);
+
+      // Fetch users without search
+      const params = new URLSearchParams({
+        status: statusFilter,
+        page: "1",
+        limit: pagination.limit.toString(),
+      });
+
+      const response = await fetch(`/api/admin/users?${params}`);
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data.users);
+        setPagination(data.pagination);
+      }
+
+      // Fetch counts without search
+      const allParams = new URLSearchParams({ status: "all", limit: "1" });
+      const approvedParams = new URLSearchParams({
+        status: "approved",
+        limit: "1",
+      });
+      const pendingParams = new URLSearchParams({
+        status: "pending",
+        limit: "1",
+      });
+
+      const [allResponse, approvedResponse, pendingResponse] =
+        await Promise.all([
+          fetch(`/api/admin/users?${allParams}`),
+          fetch(`/api/admin/users?${approvedParams}`),
+          fetch(`/api/admin/users?${pendingParams}`),
+        ]);
+
+      if (allResponse.ok && approvedResponse.ok && pendingResponse.ok) {
+        const allData = await allResponse.json();
+        const approvedData = await approvedResponse.json();
+        const pendingData = await pendingResponse.json();
+
+        setUserCounts({
+          all: allData.pagination.totalUsers,
+          approved: approvedData.pagination.totalUsers,
+          pending: pendingData.pagination.totalUsers,
+        });
+      }
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleApproveUser = async (userId: string) => {
@@ -432,7 +508,7 @@ export default function AdminUsersPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                    className="pl-10"
+                    className="pl-10 pr-10"
                   />
                 </div>
               </div>
@@ -512,7 +588,7 @@ export default function AdminUsersPage() {
                             variant="outline"
                             onClick={handleBulkReject}
                             disabled={bulkActionLoading}
-                            className="border-red-300 text-red-700 hover:bg-red-50"
+                            className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
                           >
                             <XCircle className="h-4 w-4 mr-1" />
                             Reject Selected
@@ -738,7 +814,7 @@ export default function AdminUsersPage() {
                                         onClick={() =>
                                           handleRejectUser(user._id)
                                         }
-                                        className="border-red-300 text-red-700 hover:bg-red-50"
+                                        className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
                                       >
                                         <XCircle className="h-4 w-4" />
                                       </Button>

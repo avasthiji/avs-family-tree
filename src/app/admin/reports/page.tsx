@@ -245,26 +245,26 @@ Female,${stats.femaleUsers}
 
         {/* Detailed Reports Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full max-w-3xl">
+          {/* <TabsList className="grid grid-cols-4 w-full max-w-3xl">
             <TabsTrigger value="overview">
               <PieChart className="h-4 w-4 mr-2" />
               Overview
             </TabsTrigger>
-            {/* <TabsTrigger value="demographics">
+            <TabsTrigger value="demographics">
               <MapPin className="h-4 w-4 mr-2" />
               Demographics
-            </TabsTrigger> */}
+            </TabsTrigger>
             {MATRIMONIAL_ENABLED && (
               <TabsTrigger value="matrimony">
                 <Heart className="h-4 w-4 mr-2" />
                 Matrimony
               </TabsTrigger>
             )}
-            {/* <TabsTrigger value="activity">
+            <TabsTrigger value="activity">
               <Activity className="h-4 w-4 mr-2" />
               Activity
-            </TabsTrigger> */}
-          </TabsList>
+            </TabsTrigger>
+          </TabsList> */}
 
           {/* Overview Tab */}
           <TabsContent value="overview">

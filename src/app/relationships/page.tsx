@@ -366,9 +366,14 @@ export default function RelationshipsPage() {
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
-                              <p className="font-semibold text-gray-900">
+                              <button
+                                onClick={() =>
+                                  handleViewProfile(selectedUser._id)
+                                }
+                                className="font-semibold text-gray-900 hover:text-[#E63946] hover:underline cursor-pointer transition-colors text-left"
+                              >
                                 {selectedUser.firstName} {selectedUser.lastName}
-                              </p>
+                              </button>
                               <div className="flex gap-3 text-xs text-gray-600">
                                 {selectedUser.gothiram && (
                                   <span>
@@ -508,7 +513,7 @@ export default function RelationshipsPage() {
                   return (
                     <div
                       key={rel._id}
-                      className="flex justify-between items-center p-5 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow transition cursor-pointer"
+                      className="flex justify-between items-center p-5 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow transition"
                     >
                       <div className="flex items-center gap-4 flex-1">
                         <Avatar className="h-12 w-12">
@@ -520,9 +525,12 @@ export default function RelationshipsPage() {
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <p className="font-semibold text-gray-900">
+                            <button
+                              onClick={() => handleViewProfile(person._id)}
+                              className="font-semibold text-gray-900 hover:text-[#E63946] hover:underline cursor-pointer transition-colors"
+                            >
                               {person.firstName} {person.lastName}
-                            </p>
+                            </button>
                             <Badge
                               variant="outline"
                               className="border-[#E63946] text-[#E63946]"
@@ -581,7 +589,7 @@ export default function RelationshipsPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-red-600 hover:bg-red-50"
+                          className="border-red-300 text-red-600 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
                           onClick={() => handleDeleteRelationship(rel._id)}
                         >
                           <Trash2 className="h-4 w-4" />

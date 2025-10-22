@@ -36,12 +36,34 @@ export async function GET(request: NextRequest) {
 
     // Search functionality
     if (search) {
-      query.$or = [
-        { firstName: { $regex: search, $options: 'i' } },
-        { lastName: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { mobile: { $regex: search, $options: 'i' } }
-      ];
+      const searchTerms = search.trim().split(/\s+/);
+      
+      if (searchTerms.length > 1) {
+        // Multi-word search (e.g., "amit sharma")
+        // Create conditions for full name match
+        query.$or = [
+          // Match all words in firstName or lastName
+          {
+            $and: searchTerms.map(term => ({
+              $or: [
+                { firstName: { $regex: term, $options: 'i' } },
+                { lastName: { $regex: term, $options: 'i' } }
+              ]
+            }))
+          },
+          // Also check email and mobile
+          { email: { $regex: search, $options: 'i' } },
+          { mobile: { $regex: search, $options: 'i' } }
+        ];
+      } else {
+        // Single word search
+        query.$or = [
+          { firstName: { $regex: search, $options: 'i' } },
+          { lastName: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { mobile: { $regex: search, $options: 'i' } }
+        ];
+      }
     }
 
     const skip = (page - 1) * limit;
