@@ -168,12 +168,12 @@ export default function ProfilePage() {
                       Email Verified
                     </span>
                   )}
-                  {user?.isMobileVerified && (
+                  {/* {user?.isMobileVerified && (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                       <CheckCircle className="w-3 h-3 mr-1" />
                       Mobile Verified
                     </span>
-                  )}
+                  )} */}
                   {user?.isApprovedByAdmin && (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       <Shield className="w-3 h-3 mr-1" />
@@ -210,26 +210,26 @@ export default function ProfilePage() {
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Profile
               </Button>
-             ) : (
-               <div className="flex gap-2">
-                 <Button
-                   onClick={handleSave}
-                   disabled={loading}
-                   className="avs-button-primary whitespace-nowrap"
-                 >
-                   <Save className="h-4 w-4 mr-2" />
-                   {loading ? "Saving..." : "Save Changes"}
-                 </Button>
-                 <Button
-                   onClick={handleCancel}
-                   variant="outline"
-                   disabled={loading}
-                 >
-                   <X className="h-4 w-4 mr-2" />
-                   Cancel
-                 </Button>
-               </div>
-             )}
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSave}
+                  disabled={loading}
+                  className="avs-button-primary whitespace-nowrap"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {loading ? "Saving..." : "Save Changes"}
+                </Button>
+                <Button
+                  onClick={handleCancel}
+                  variant="outline"
+                  disabled={loading}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Basic Information */}
@@ -308,6 +308,8 @@ export default function ProfilePage() {
                     onChange={(e) =>
                       setUserData({ ...userData, height: e.target.value })
                     }
+                    min={100}
+                    max={250}
                     disabled={!editing}
                     className="mt-1"
                   />
@@ -668,28 +670,28 @@ export default function ProfilePage() {
           </TabsContent>
         </Tabs>
 
-         {/* Bottom Save Button */}
-         {editing && (
-           <div className="flex justify-end gap-2 mt-6">
-             <Button
-               onClick={handleSave}
-               disabled={loading}
-               className="avs-button-primary min-w-[150px]"
-             >
-               <Save className="h-4 w-4 mr-2" />
-               {loading ? "Saving..." : "Save Changes"}
-             </Button>
-             <Button
-               onClick={handleCancel}
-               variant="outline"
-               disabled={loading}
-               className="min-w-[100px]"
-             >
-               <X className="h-4 w-4 mr-2" />
-               Cancel
-             </Button>
-           </div>
-         )}
+        {/* Bottom Save Button */}
+        {editing && (
+          <div className="flex justify-end gap-2 mt-6">
+            <Button
+              onClick={handleSave}
+              disabled={loading}
+              className="avs-button-primary min-w-[150px]"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {loading ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button
+              onClick={handleCancel}
+              variant="outline"
+              disabled={loading}
+              className="min-w-[100px]"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Cancel
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

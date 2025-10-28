@@ -103,8 +103,18 @@ export async function PUT(request: NextRequest) {
       }})
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Profile update error:", error);
+    
+    // Handle mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map((err: any) => err.message);
+      return NextResponse.json(
+        { error: validationErrors.join(", ") },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

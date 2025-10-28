@@ -22,54 +22,73 @@ export async function GET(request: NextRequest) {
     // Get userId from query params - if provided, fetch relationships for that user
     const { searchParams } = new URL(request.url);
     const targetUserId = searchParams.get('userId') || session.user.id;
+    const includeFamily = searchParams.get('includeFamily') === 'true';
 
-    // Build a set of all connected family members
-    const connectedPeople = new Set<string>();
-    connectedPeople.add(targetUserId);
+    // If includeFamily is true, use BFS to get entire family tree relationships
+    // Otherwise, only get direct relationships
+    if (includeFamily) {
+      // Build a set of all connected family members
+      const connectedPeople = new Set<string>();
+      connectedPeople.add(targetUserId);
 
-    // BFS to find all connected family members
-    const queue: string[] = [targetUserId];
-    const visited = new Set<string>();
-    visited.add(targetUserId);
+      // BFS to find all connected family members
+      const queue: string[] = [targetUserId];
+      const visited = new Set<string>();
+      visited.add(targetUserId);
 
-    while (queue.length > 0) {
-      const currentPerson = queue.shift()!;
-      
-      // Find all relationships involving current person
-      const personRelationships = await Relationship.find({
-        $or: [
-          { personId1: currentPerson },
-          { personId2: currentPerson }
-        ],
+      while (queue.length > 0) {
+        const currentPerson = queue.shift()!;
+        
+        // Find all relationships involving current person
+        const personRelationships = await Relationship.find({
+          $or: [
+            { personId1: currentPerson },
+            { personId2: currentPerson }
+          ],
+          isApproved: true
+        });
+
+        personRelationships.forEach((rel: any) => {
+          const otherId = rel.personId1.toString() === currentPerson ? 
+                          rel.personId2.toString() : 
+                          rel.personId1.toString();
+          
+          connectedPeople.add(otherId);
+          
+          if (!visited.has(otherId)) {
+            visited.add(otherId);
+            queue.push(otherId);
+          }
+        });
+      }
+
+      // Fetch ALL relationships between any of the connected people
+      const allFamilyRelationships = await Relationship.find({
+        personId1: { $in: Array.from(connectedPeople) },
+        personId2: { $in: Array.from(connectedPeople) },
         isApproved: true
-      });
+      })
+      .populate('personId1', 'firstName lastName profilePicture gothiram nativePlace')
+      .populate('personId2', 'firstName lastName profilePicture gothiram nativePlace')
+      .populate('createdBy', 'firstName lastName')
+      .sort({ createdAt: -1 });
 
-      personRelationships.forEach((rel: any) => {
-        const otherId = rel.personId1.toString() === currentPerson ? 
-                        rel.personId2.toString() : 
-                        rel.personId1.toString();
-        
-        connectedPeople.add(otherId);
-        
-        if (!visited.has(otherId)) {
-          visited.add(otherId);
-          queue.push(otherId);
-        }
-      });
+      return NextResponse.json({ relationships: allFamilyRelationships });
+    } else {
+      // Fetch only direct relationships where user is involved
+      const directRelationships = await Relationship.find({
+        $or: [
+          { personId1: targetUserId },
+          { personId2: targetUserId }
+        ]
+      })
+      .populate('personId1', 'firstName lastName profilePicture gothiram nativePlace')
+      .populate('personId2', 'firstName lastName profilePicture gothiram nativePlace')
+      .populate('createdBy', 'firstName lastName')
+      .sort({ createdAt: -1 });
+
+      return NextResponse.json({ relationships: directRelationships });
     }
-
-    // Now fetch ALL relationships between any of the connected people
-    const allFamilyRelationships = await Relationship.find({
-      personId1: { $in: Array.from(connectedPeople) },
-      personId2: { $in: Array.from(connectedPeople) },
-      isApproved: true
-    })
-    .populate('personId1', 'firstName lastName profilePicture gothiram nativePlace')
-    .populate('personId2', 'firstName lastName profilePicture gothiram nativePlace')
-    .populate('createdBy', 'firstName lastName')
-    .sort({ createdAt: -1 });
-
-    return NextResponse.json({ relationships: allFamilyRelationships });
 
   } catch (error) {
     console.error("Relationships fetch error:", error);
