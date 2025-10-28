@@ -99,7 +99,9 @@ export default function RegisterPage() {
       // Redirect to OTP verification page
       setTimeout(() => {
         router.push(
-          `/auth/verify-otp?userId=${data.userId}&identifier=${data.identifier}&type=${data.type}`
+          `/auth/verify-otp?userId=${
+            data.userId
+          }&identifier=${encodeURIComponent(data.identifier)}&type=${data.type}`
         );
       }, 2000);
     } catch (error) {
