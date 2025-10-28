@@ -72,12 +72,6 @@ const UserSchema = new Schema<IUser>({
     type: String,
     lowercase: true,
     trim: true,
-    validate: {
-      validator: function(v: string) {
-        return !v || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v);
-      },
-      message: 'Please enter a valid email address'
-    }
   },
   mobile: {
     type: String,
