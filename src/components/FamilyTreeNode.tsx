@@ -1,4 +1,5 @@
 // components/FamilyTreeNode.tsx
+import { useState } from "react";
 import { Handle, Position } from "@xyflow/react";
 
 interface FamilyNodeData {
@@ -28,6 +29,7 @@ export default function FamilyTreeNode({ data }: FamilyTreeNodeProps) {
     onClick,
   } = data;
 
+  const [imageError, setImageError] = useState(false);
   const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
 
   return (
@@ -83,11 +85,12 @@ export default function FamilyTreeNode({ data }: FamilyTreeNodeProps) {
             }
           `}
           >
-            {profilePicture ? (
+            {profilePicture && !imageError ? (
               <img
                 src={profilePicture}
                 alt={label}
                 className="w-12 h-12 rounded-full object-cover"
+                onError={() => setImageError(true)}
               />
             ) : (
               initials
