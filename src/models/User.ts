@@ -127,8 +127,8 @@ const UserSchema = new Schema<IUser>({
   timeOfBirth: String,
   height: {
     type: Number,
-    min: [100, 'Height must be at least 100cm'],
-    max: [250, 'Height cannot exceed 250cm']
+    min: [100, 'Height must be at least 100 cm'],
+    max: [250, 'Height cannot exceed 250 cm']
   },
   rasi: String,
   natchathiram: String,
