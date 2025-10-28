@@ -28,7 +28,7 @@ export function Loader({
   // Page loader (full screen with logo)
   if (variant === 'page') {
     return (
-      
+
       <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA] flex items-center justify-center">
         <div className="text-center">
           <div className={cn(sizeMap[size].logo, 'mx-auto mb-4 animate-pulse')}>
@@ -112,6 +112,7 @@ export function AdminLoader({ text = 'Loading...', size = 'lg' }: { text?: strin
     </div>
   );
 }
+
 
 export default Loader;
 
