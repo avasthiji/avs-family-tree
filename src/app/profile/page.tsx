@@ -54,7 +54,13 @@ export default function ProfilePage() {
   const [userData, setUserData] = useState<any>(null);
   const [originalUserData, setOriginalUserData] = useState<any>(null);
   const [gothirams, setGothirams] = useState<
-    Array<{ _id: string; name: string }>
+    Array<{ _id: string; name: string; tamilName: string }>
+  >([]);
+  const [rasiList, setRasiList] = useState<
+    Array<{ _id: string; name: string; tamilName: string }>
+  >([]);
+  const [nakshatramList, setNakshatramList] = useState<
+    Array<{ _id: string; name: string; tamilName: string }>
   >([]);
 
   useEffect(() => {
@@ -71,24 +77,52 @@ export default function ProfilePage() {
 
   const fetchUserProfile = async () => {
     try {
-      const [profileRes, gothiramRes] = await Promise.all([
-        fetch("/api/users/profile"),
-        fetch("/api/gothiram"),
-      ]);
+      const [profileRes, gothiramRes, rasiRes, nakshatramRes] =
+        await Promise.all([
+          fetch("/api/users/profile"),
+          fetch("/api/gothiram"),
+          fetch("/api/rasi"),
+          fetch("/api/nakshatram"),
+        ]);
 
       if (profileRes.ok) {
         const data = await profileRes.json();
         // Store both current and original data
         setUserData(data.user);
         setOriginalUserData(JSON.parse(JSON.stringify(data.user))); // Deep copy
+      } else {
+        console.error("Profile API failed:", profileRes.status);
+        // Set empty userData to prevent infinite loading
+        setUserData({});
       }
 
       if (gothiramRes.ok) {
         const data = await gothiramRes.json();
-        setGothirams(data.gothirams);
+        console.log("Gothiram data:", data.gothirams);
+        setGothirams(data.gothirams || []);
+      } else {
+        console.error("Gothiram API failed:", gothiramRes.status);
+      }
+
+      if (rasiRes.ok) {
+        const data = await rasiRes.json();
+        console.log("Rasi data:", data.rasi);
+        setRasiList(data.rasi || []);
+      } else {
+        console.error("Rasi API failed:", rasiRes.status);
+      }
+
+      if (nakshatramRes.ok) {
+        const data = await nakshatramRes.json();
+        console.log("Nakshatram data:", data.nakshatram);
+        setNakshatramList(data.nakshatram || []);
+      } else {
+        console.error("Nakshatram API failed:", nakshatramRes.status);
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
+      // Set empty userData to prevent infinite loading
+      setUserData({});
     }
   };
 
@@ -532,28 +566,51 @@ export default function ProfilePage() {
                 <div className="grid md:grid-cols-3 gap-6">
                   <div>
                     <Label>Rasi</Label>
-                    <Input
+                    <Select
                       value={userData?.rasi || ""}
-                      onChange={(e) =>
-                        setUserData({ ...userData, rasi: e.target.value })
+                      onValueChange={(value) =>
+                        setUserData({ ...userData, rasi: value })
                       }
                       disabled={!editing}
-                      className="mt-1"
-                    />
+                    >
+                      <SelectTrigger className="mt-1 w-full">
+                        <SelectValue placeholder="Select rasi" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {rasiList.map((rasi) => (
+                          <SelectItem key={rasi._id} value={rasi.name}>
+                            {rasi.name}
+                            {/* {rasi.tamilName && ` (${rasi.tamilName})`} */}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label>Natchathiram</Label>
-                    <Input
+                    <Select
                       value={userData?.natchathiram || ""}
-                      onChange={(e) =>
-                        setUserData({
-                          ...userData,
-                          natchathiram: e.target.value,
-                        })
+                      onValueChange={(value) =>
+                        setUserData({ ...userData, natchathiram: value })
                       }
                       disabled={!editing}
-                      className="mt-1"
-                    />
+                    >
+                      <SelectTrigger className="mt-1 w-full">
+                        <SelectValue placeholder="Select natchathiram" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {nakshatramList.map((nakshatram) => (
+                          <SelectItem
+                            key={nakshatram._id}
+                            value={nakshatram.name}
+                          >
+                            {nakshatram.name}
+                            {/* {nakshatram.tamilName &&
+                              ` (${nakshatram.tamilName})`} */}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label>Gothiram</Label>
@@ -571,6 +628,7 @@ export default function ProfilePage() {
                         {gothirams.map((gothiram) => (
                           <SelectItem key={gothiram._id} value={gothiram.name}>
                             {gothiram.name}
+                            {/* {gothiram.tamilName && ` (${gothiram.tamilName})`} */}
                           </SelectItem>
                         ))}
                       </SelectContent>

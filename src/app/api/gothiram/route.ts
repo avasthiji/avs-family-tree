@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     const gothirams = await Gothiram.find({ isActive: true })
       .sort({ name: 1 })
-      .select('name');
+      .select('name tamilName');
 
     return NextResponse.json({ gothirams });
 

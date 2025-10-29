@@ -57,6 +57,7 @@ interface SearchBarProps {
 interface GothiramOption {
   _id: string;
   name: string;
+  tamilName: string;
 }
 
 export default function SearchBar({
@@ -160,7 +161,7 @@ export default function SearchBar({
     if (onSearchChange) {
       onSearchChange();
     }
-    
+
     setLoading(true);
     try {
       const endpoint = isAdmin ? "/api/admin/search" : "/api/search";
@@ -188,7 +189,7 @@ export default function SearchBar({
     if (onSearchChange) {
       onSearchChange();
     }
-    
+
     setLoading(true);
     try {
       const endpoint = isAdmin ? "/api/admin/search" : "/api/search";
@@ -424,6 +425,7 @@ export default function SearchBar({
                       {gothiramOptions.map((gothiram) => (
                         <SelectItem key={gothiram._id} value={gothiram.name}>
                           {gothiram.name}
+                          {/* ({gothiram.tamilName}) */}
                         </SelectItem>
                       ))}
                     </SelectContent>
