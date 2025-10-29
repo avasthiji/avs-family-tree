@@ -894,7 +894,7 @@ export default function AdminUsersPage() {
                                           </DropdownMenuItem>
                                         </DropdownMenuContent>
                                       </DropdownMenu>
-                                      {/* <Button
+                                      <Button
                                         size="sm"
                                         variant="outline"
                                         onClick={() =>
@@ -906,7 +906,7 @@ export default function AdminUsersPage() {
                                         className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
                                       >
                                         <Trash2 className="h-4 w-4" />
-                                      </Button> */}
+                                      </Button>
                                     </>
                                   )}
                                 </div>
