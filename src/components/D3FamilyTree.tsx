@@ -35,7 +35,6 @@ interface RelationshipData {
   createdBy?: Person;
   createdAt?: string;
   updatedAt?: string;
-  
 }
 
 interface FamilyTreeViewProps {
@@ -44,7 +43,6 @@ interface FamilyTreeViewProps {
   currentUserName: string;
   onNodeClick?: (userId: string) => void;
 }
- 
 
 const nodeTypes = {
   custom: FamilyTreeNode as any,
@@ -75,10 +73,13 @@ export default function D3FamilyTree({
   currentUserName,
   onNodeClick,
 }: FamilyTreeViewProps) {
-
   const [direction, setDirection] = useState<"TB" | "LR">("TB");
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+  const [generationLevels, setGenerationLevels] = useState<{
+    min: number;
+    max: number;
+  }>({ min: 0, max: 0 });
 
   // Helper to get full name
   const getFullName = (person: Person) =>
@@ -96,6 +97,8 @@ export default function D3FamilyTree({
     const spouses = new Map<string, string[]>();
     const siblings = new Map<string, string[]>();
     const extended = new Map<string, Array<{ id: string; type: string }>>();
+    // Store relationship types for edge labels
+    const relationshipTypes = new Map<string, string>(); // key: "id1-id2", value: relationType
 
     // Add current user if not in relationships
     if (!people.has(currentUserId)) {
@@ -127,14 +130,14 @@ export default function D3FamilyTree({
         // p2 is the parent (Father/Mother/GrandFather/GrandMother) of p1
         if (!parents.has(p1._id)) parents.set(p1._id, []);
         if (!parents.get(p1._id)!.includes(p2._id)) {
-
           parents.get(p1._id)!.push(p2._id);
         }
         if (!children.has(p2._id)) children.set(p2._id, []);
         if (!children.get(p2._id)!.includes(p1._id)) {
-          
           children.get(p2._id)!.push(p1._id);
         }
+        // Store the relationship type from parent to child perspective
+        relationshipTypes.set(`${p2._id}-${p1._id}`, relType);
       } else if (CHILD_RELATIONS.includes(relType)) {
         // p2 is the child (Son/Daughter) of p1
         if (!children.has(p1._id)) children.set(p1._id, []);
@@ -145,6 +148,8 @@ export default function D3FamilyTree({
         if (!parents.get(p2._id)!.includes(p1._id)) {
           parents.get(p2._id)!.push(p1._id);
         }
+        // Store the relationship type from parent to child perspective
+        relationshipTypes.set(`${p1._id}-${p2._id}`, relType);
       } else if (SIBLING_RELATIONS.includes(relType)) {
         // p2 is sibling (Brother/Sister) of p1 - bidirectional
         if (!siblings.has(p1._id)) siblings.set(p1._id, []);
@@ -155,6 +160,9 @@ export default function D3FamilyTree({
         if (!siblings.get(p2._id)!.includes(p1._id)) {
           siblings.get(p2._id)!.push(p1._id);
         }
+        // Store relationship type for edges (bidirectional)
+        relationshipTypes.set(`${p1._id}-${p2._id}`, relType);
+        relationshipTypes.set(`${p2._id}-${p1._id}`, relType);
       } else if (SPOUSE_RELATIONS.includes(relType)) {
         // p2 is spouse of p1 - bidirectional
         if (!spouses.has(p1._id)) spouses.set(p1._id, []);
@@ -165,6 +173,9 @@ export default function D3FamilyTree({
         if (!spouses.get(p2._id)!.includes(p1._id)) {
           spouses.get(p2._id)!.push(p1._id);
         }
+        // Store relationship type for edges (bidirectional)
+        relationshipTypes.set(`${p1._id}-${p2._id}`, relType);
+        relationshipTypes.set(`${p2._id}-${p1._id}`, relType);
       } else if (EXTENDED_RELATIONS.includes(relType)) {
         // Extended family - store with type for reference
         if (!extended.has(p1._id)) extended.set(p1._id, []);
@@ -172,16 +183,34 @@ export default function D3FamilyTree({
 
         if (!extended.has(p2._id)) extended.set(p2._id, []);
         extended.get(p2._id)!.push({ id: p1._id, type: relType });
+        // Store relationship type for edges (bidirectional)
+        relationshipTypes.set(`${p1._id}-${p2._id}`, relType);
+        relationshipTypes.set(`${p2._id}-${p1._id}`, relType);
       }
     });
 
-    return { people, parents, children, spouses, siblings, extended };
+    return {
+      people,
+      parents,
+      children,
+      spouses,
+      siblings,
+      extended,
+      relationshipTypes,
+    };
   }, [relationships, currentUserId, currentUserName]);
 
   // Generate nodes and edges for React Flow
   const generateTreeElements = useCallback(() => {
-    const { people, parents, children, spouses, siblings, extended } =
-      buildFamilyStructure();
+    const {
+      people,
+      parents,
+      children,
+      spouses,
+      siblings,
+      extended,
+      relationshipTypes,
+    } = buildFamilyStructure();
     const nodes: Node[] = [];
     const edges: Edge[] = [];
     const nodePositions = new Map<
@@ -194,60 +223,63 @@ export default function D3FamilyTree({
     const nodeWidth = 200;
     const nodeHeight = 160;
     const horizontalSpacing = 280;
-    const verticalSpacing = 220;
+    const verticalSpacing = 250; // Increased spacing between generations
 
     // Assign levels to all nodes using BFS from current user
+    // Priority order: Parents/Children first (direct lineage), then spouses, then siblings
     const assignLevels = () => {
-      const queue: { id: string; level: number }[] = [
-        { id: currentUserId, level: 0 },
+      const queue: { id: string; level: number; priority: number }[] = [
+        { id: currentUserId, level: 0, priority: 0 },
       ];
       visited.add(currentUserId);
       nodePositions.set(currentUserId, { x: 0, y: 0, level: 0 });
 
       while (queue.length > 0) {
+        // Sort queue by priority (lower is higher priority)
+        queue.sort((a, b) => a.priority - b.priority);
         const { id, level } = queue.shift()!;
 
-        // Add spouses at the same level
-        const personSpouses = spouses.get(id) || [];
-        personSpouses.forEach((spouseId) => {
-          if (!visited.has(spouseId)) {
-            visited.add(spouseId);
-            nodePositions.set(spouseId, { x: 0, y: 0, level });
-            queue.push({ id: spouseId, level });
-          }
-        });
-
-        // Add siblings at the same level
-        const personSiblings = siblings.get(id) || [];
-        personSiblings.forEach((siblingId) => {
-          if (!visited.has(siblingId)) {
-            visited.add(siblingId);
-            nodePositions.set(siblingId, { x: 0, y: 0, level });
-            queue.push({ id: siblingId, level });
-          }
-        });
-
-        // Add parents at level - 1
+        // PRIORITY 1: Add parents at level - 1 (direct lineage upward)
         const personParents = parents.get(id) || [];
         personParents.forEach((parentId) => {
           if (!visited.has(parentId)) {
             visited.add(parentId);
             nodePositions.set(parentId, { x: 0, y: 0, level: level - 1 });
-            queue.push({ id: parentId, level: level - 1 });
+            queue.push({ id: parentId, level: level - 1, priority: 0 });
           }
         });
 
-        // Add children at level + 1
+        // PRIORITY 2: Add children at level + 1 (direct lineage downward)
         const personChildren = children.get(id) || [];
         personChildren.forEach((childId) => {
           if (!visited.has(childId)) {
             visited.add(childId);
             nodePositions.set(childId, { x: 0, y: 0, level: level + 1 });
-            queue.push({ id: childId, level: level + 1 });
+            queue.push({ id: childId, level: level + 1, priority: 0 });
           }
         });
 
-        // Add extended family at appropriate levels
+        // PRIORITY 3: Add spouses at the same level (same generation)
+        const personSpouses = spouses.get(id) || [];
+        personSpouses.forEach((spouseId) => {
+          if (!visited.has(spouseId)) {
+            visited.add(spouseId);
+            nodePositions.set(spouseId, { x: 0, y: 0, level });
+            queue.push({ id: spouseId, level, priority: 1 });
+          }
+        });
+
+        // PRIORITY 4: Add siblings at the same level (same generation)
+        const personSiblings = siblings.get(id) || [];
+        personSiblings.forEach((siblingId) => {
+          if (!visited.has(siblingId)) {
+            visited.add(siblingId);
+            nodePositions.set(siblingId, { x: 0, y: 0, level });
+            queue.push({ id: siblingId, level, priority: 2 });
+          }
+        });
+
+        // PRIORITY 5: Add extended family at appropriate levels
         const personExtended = extended.get(id) || [];
         personExtended.forEach(({ id: extendedId, type }) => {
           if (!visited.has(extendedId)) {
@@ -255,19 +287,19 @@ export default function D3FamilyTree({
             // Determine level based on relationship type
             let extendedLevel = level;
             if (type === "Uncle" || type === "Aunt") {
-              extendedLevel = level - 1; // Same level as parents
+              extendedLevel = level - 1; // Same generation as parents
             } else if (type === "Nephew" || type === "Niece") {
-              extendedLevel = level + 1; // Same level as children
+              extendedLevel = level + 1; // Same generation as children
             } else if (type === "Cousin") {
-              extendedLevel = level; // Same level as siblings
+              extendedLevel = level; // Same generation as siblings
             }
             nodePositions.set(extendedId, { x: 0, y: 0, level: extendedLevel });
-            queue.push({ id: extendedId, level: extendedLevel });
+            queue.push({ id: extendedId, level: extendedLevel, priority: 3 });
           }
         });
       }
 
-      // Handle any disconnected nodes
+      // Handle any disconnected nodes - place them at level 0
       people.forEach((_, id) => {
         if (!visited.has(id)) {
           nodePositions.set(id, { x: 0, y: 0, level: 0 });
@@ -413,16 +445,20 @@ export default function D3FamilyTree({
     children.forEach((childIds, parentId) => {
       childIds.forEach((childId) => {
         if (nodePositions.has(parentId) && nodePositions.has(childId)) {
+          // Get the actual relationship type
+          const relType =
+            relationshipTypes.get(`${parentId}-${childId}`) || "child";
+
           edges.push({
             id: `parent-child-${parentId}-${childId}`,
             source: parentId,
             sourceHandle: "bottom",
-              target: childId,
+            target: childId,
             targetHandle: "top",
-              type: "smoothstep",
+            type: "smoothstep",
             style: { stroke: "#10b981", strokeWidth: 2 },
             animated: false,
-            label: "child",
+            label: relType,
             labelStyle: { fontSize: 10, fill: "#10b981" },
             labelBgStyle: { fill: "#fff", fillOpacity: 0.8 },
           });
@@ -441,11 +477,17 @@ export default function D3FamilyTree({
             const person2Pos = nodePositions.get(spouseId);
             const isLeftToRight = person1Pos!.x < person2Pos!.x;
 
+            // Get the actual relationship type
+            const source = isLeftToRight ? personId : spouseId;
+            const target = isLeftToRight ? spouseId : personId;
+            const relType =
+              relationshipTypes.get(`${source}-${target}`) || "Spouse";
+
             edges.push({
               id: `spouse-${personId}-${spouseId}`,
-              source: isLeftToRight ? personId : spouseId,
+              source,
               sourceHandle: "right",
-              target: isLeftToRight ? spouseId : personId,
+              target,
               targetHandle: "left",
               type: "straight",
               style: {
@@ -454,7 +496,7 @@ export default function D3FamilyTree({
                 strokeDasharray: "5,5",
               },
               animated: false,
-              label: "spouse",
+              label: relType,
               labelStyle: { fontSize: 10, fill: "#ec4899" },
               labelBgStyle: { fill: "#fff", fillOpacity: 0.8 },
             });
@@ -475,11 +517,17 @@ export default function D3FamilyTree({
             // Determine which node is on the left/right based on x position
             const isLeftToRight = personPos!.x < siblingPos!.x;
 
+            // Get the actual relationship type
+            const source = isLeftToRight ? personId : siblingId;
+            const target = isLeftToRight ? siblingId : personId;
+            const relType =
+              relationshipTypes.get(`${source}-${target}`) || "Sibling";
+
             edges.push({
               id: `sibling-${personId}-${siblingId}`,
-              source: isLeftToRight ? personId : siblingId,
+              source,
               sourceHandle: "right",
-              target: isLeftToRight ? siblingId : personId,
+              target,
               targetHandle: "left",
               type: "straight",
               style: {
@@ -488,12 +536,12 @@ export default function D3FamilyTree({
                 strokeDasharray: "3,3",
               },
               animated: false,
-              label: "sibling",
+              label: relType,
               labelStyle: { fontSize: 10, fill: "#f59e0b" },
               labelBgStyle: { fill: "#fff", fillOpacity: 0.8 },
-        });
-      }
-    }
+            });
+          }
+        }
       });
     });
 
@@ -512,11 +560,16 @@ export default function D3FamilyTree({
             if (isSameLevel) {
               // Same level - use left/right handles
               const isLeftToRight = person1Pos!.x < person2Pos!.x;
+              const source = isLeftToRight ? personId : extendedId;
+              const target = isLeftToRight ? extendedId : personId;
+              const relType =
+                relationshipTypes.get(`${source}-${target}`) || type;
+
               edges.push({
                 id: `extended-${personId}-${extendedId}`,
-                source: isLeftToRight ? personId : extendedId,
+                source,
                 sourceHandle: "right",
-                target: isLeftToRight ? extendedId : personId,
+                target,
                 targetHandle: "left",
                 type: "straight",
                 style: {
@@ -524,7 +577,7 @@ export default function D3FamilyTree({
                   strokeWidth: 1,
                   strokeDasharray: "5,2",
                 },
-                label: type.toLowerCase(),
+                label: relType,
                 labelStyle: { fontSize: 10, fill: "#8b5cf6" },
                 labelBgStyle: { fill: "#fff", fillOpacity: 0.8 },
                 animated: false,
@@ -532,11 +585,16 @@ export default function D3FamilyTree({
             } else {
               // Different levels - use top/bottom handles
               const isTopToBottom = person1Pos!.level < person2Pos!.level;
+              const source = isTopToBottom ? personId : extendedId;
+              const target = isTopToBottom ? extendedId : personId;
+              const relType =
+                relationshipTypes.get(`${source}-${target}`) || type;
+
               edges.push({
                 id: `extended-${personId}-${extendedId}`,
-                source: isTopToBottom ? personId : extendedId,
+                source,
                 sourceHandle: "bottom",
-                target: isTopToBottom ? extendedId : personId,
+                target,
                 targetHandle: "top",
                 type: "smoothstep",
                 style: {
@@ -544,7 +602,7 @@ export default function D3FamilyTree({
                   strokeWidth: 1,
                   strokeDasharray: "5,2",
                 },
-                label: type.toLowerCase(),
+                label: relType,
                 labelStyle: { fontSize: 10, fill: "#8b5cf6" },
                 labelBgStyle: { fill: "#fff", fillOpacity: 0.8 },
                 animated: false,
@@ -562,6 +620,19 @@ export default function D3FamilyTree({
     const { nodes: newNodes, edges: newEdges } = generateTreeElements();
     setNodes(newNodes);
     setEdges(newEdges);
+
+    // Calculate generation levels for display
+    if (newNodes.length > 0) {
+      const levels = newNodes.map((node) => {
+        const pos = node.position;
+        // Calculate level from y position (each level is verticalSpacing apart)
+        return Math.round(pos.y / 250);
+      });
+      setGenerationLevels({
+        min: Math.min(...levels),
+        max: Math.max(...levels),
+      });
+    }
   }, [relationships, direction, generateTreeElements]);
 
   return (

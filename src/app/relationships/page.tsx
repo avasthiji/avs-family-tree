@@ -247,6 +247,37 @@ export default function RelationshipsPage() {
   const getOtherPerson = (r: RelationshipData) =>
     r.personId1._id === session?.user.id ? r.personId2 : r.personId1;
 
+  // Get the correct relationship label from current user's perspective
+  const getRelationshipLabel = (r: RelationshipData) => {
+    // If current user is personId1, the relationType is correct as-is
+    if (r.personId1._id === session?.user.id) {
+      return r.relationType;
+    }
+
+    // If current user is personId2, we need to show the inverse relationship
+    const inverseMap: Record<string, string> = {
+      Father: "Son/Daughter",
+      Mother: "Son/Daughter",
+      Son: "Father/Mother",
+      Daughter: "Father/Mother",
+      Spouse: "Spouse",
+      Brother: "Brother/Sister",
+      Sister: "Brother/Sister",
+      "Older Sibling": "Younger Sibling",
+      "Younger Sibling": "Older Sibling",
+      "Grand Father": "Grandchild",
+      "Grand Mother": "Grandchild",
+      Uncle: "Nephew/Niece",
+      Aunt: "Nephew/Niece",
+      Nephew: "Uncle/Aunt",
+      Niece: "Uncle/Aunt",
+      Cousin: "Cousin",
+      Other: "Other",
+    };
+
+    return inverseMap[r.relationType] || r.relationType;
+  };
+
   const handleViewProfile = (userId: string) => {
     setProfileUserId(userId);
     setProfileModalOpen(true);
@@ -535,7 +566,7 @@ export default function RelationshipsPage() {
                               variant="outline"
                               className="border-[#E63946] text-[#E63946]"
                             >
-                              {rel.relationType}
+                              {getRelationshipLabel(rel)}
                             </Badge>
                             {rel.isApproved ? (
                               <CheckCircle className="h-4 w-4 text-green-500" />
