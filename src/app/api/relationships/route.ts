@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import Relationship from "@/models/Relationship";
 import User from "@/models/User";
+import { getInverseRelationshipType } from "@/lib/utils";
 
 export const runtime = 'nodejs';
 
@@ -154,7 +155,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if relationship already exists
+    // Check if relationship already exists in either direction
     const existingRelationship = await Relationship.findOne({
       $or: [
         { personId1: session.user.id, personId2: personId2 },
@@ -169,7 +170,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create relationship
+    // Get inverse relationship type
+    const inverseRelationType = getInverseRelationshipType(relationType);
+
+    // Create forward relationship (person1 -> person2)
     const relationship = new Relationship({
       personId1: session.user.id,
       personId2: personId2,
@@ -180,6 +184,18 @@ export async function POST(request: NextRequest) {
     });
 
     await relationship.save();
+
+    // Create reverse relationship (person2 -> person1)
+    const reverseRelationship = new Relationship({
+      personId1: personId2,
+      personId2: session.user.id,
+      relationType: inverseRelationType,
+      description, // Use same description for both
+      createdBy: session.user.id,
+      isApproved: session.user.role === 'admin' // Auto-approve if admin
+    });
+
+    await reverseRelationship.save();
 
     // Populate before returning
     await relationship.populate('personId1', 'firstName lastName profilePicture gothiram nativePlace');

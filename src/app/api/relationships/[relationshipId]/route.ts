@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import Relationship from "@/models/Relationship";
+import { getInverseRelationshipType } from "@/lib/utils";
 
 export const runtime = 'nodejs';
 
@@ -46,7 +47,17 @@ export async function DELETE(
       );
     }
 
+    // Find and delete the reverse relationship as well
+    const reverseRelationship = await Relationship.findOne({
+      personId1: relationship.personId2,
+      personId2: relationship.personId1
+    });
+
+    // Delete both relationships
     await Relationship.findByIdAndDelete(relationshipId);
+    if (reverseRelationship) {
+      await Relationship.findByIdAndDelete(reverseRelationship._id);
+    }
 
     return NextResponse.json({ 
       message: "Relationship deleted successfully" 
@@ -114,6 +125,26 @@ export async function PUT(
     relationship.updatedBy = session.user.id;
 
     await relationship.save();
+
+    // Find and update the reverse relationship if relationType changed
+    if (relationType) {
+      const inverseRelationType = getInverseRelationshipType(relationType);
+      
+      // Find the reverse relationship
+      const reverseRelationship = await Relationship.findOne({
+        personId1: relationship.personId2,
+        personId2: relationship.personId1
+      });
+
+      if (reverseRelationship) {
+        reverseRelationship.relationType = inverseRelationType;
+        if (description !== undefined) {
+          reverseRelationship.description = description;
+        }
+        reverseRelationship.updatedBy = session.user.id;
+        await reverseRelationship.save();
+      }
+    }
 
     // Populate before returning
     await relationship.populate('personId1', 'firstName lastName profilePicture gothiram nativePlace');

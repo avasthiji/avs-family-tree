@@ -99,6 +99,8 @@ export default function D3FamilyTree({
     const extended = new Map<string, Array<{ id: string; type: string }>>();
     // Store relationship types for edge labels
     const relationshipTypes = new Map<string, string>(); // key: "id1-id2", value: relationType
+    // Store all relationships from the current user's perspective for edge labels
+    const userPerspectiveRelationships = new Map<string, string>(); // key: "otherPersonId", value: relationType from current user's perspective
     // Store generation distance for each parent-child pair
     const generationDistance = new Map<string, number>(); // key: "parentId-childId", value: distance (1 for parent, 2 for grandparent)
 
@@ -123,6 +125,16 @@ export default function D3FamilyTree({
       people.set(p2._id, p2);
 
       const relType = rel.relationType;
+
+      // Store relationship from current user's perspective for edge labels
+      if (p1._id === currentUserId) {
+        // This relationship is from current user's perspective
+        userPerspectiveRelationships.set(p2._id, relType);
+      } else if (p2._id === currentUserId) {
+        // This relationship is from the other person's perspective, we need the inverse
+        // But we'll handle this by finding the relationship where current user is personId1
+        // For now, we'll process all relationships and prefer the one where current user is personId1
+      }
 
       // Handle different relationship types based on the semantics:
       // The relationship type describes what personId2 is to personId1
@@ -210,6 +222,7 @@ export default function D3FamilyTree({
       extended,
       relationshipTypes,
       generationDistance,
+      userPerspectiveRelationships,
     };
   }, [relationships, currentUserId, currentUserName]);
 
@@ -224,6 +237,7 @@ export default function D3FamilyTree({
       extended,
       relationshipTypes,
       generationDistance,
+      userPerspectiveRelationships,
     } = buildFamilyStructure();
     const nodes: Node[] = [];
     const edges: Edge[] = [];
@@ -471,9 +485,18 @@ export default function D3FamilyTree({
     children.forEach((childIds, parentId) => {
       childIds.forEach((childId) => {
         if (nodePositions.has(parentId) && nodePositions.has(childId)) {
-          // Get the actual relationship type
-          const relType =
-            relationshipTypes.get(`${parentId}-${childId}`) || "child";
+          // Get the relationship type from current user's perspective
+          let relType = "child";
+          if (parentId === currentUserId) {
+            // Current user is the parent, get relationship type from their perspective
+            relType = userPerspectiveRelationships.get(childId) || relationshipTypes.get(`${parentId}-${childId}`) || "child";
+          } else if (childId === currentUserId) {
+            // Current user is the child, get relationship type from their perspective (should be parent type)
+            relType = userPerspectiveRelationships.get(parentId) || "parent";
+          } else {
+            // Neither is current user, use stored relationship type
+            relType = relationshipTypes.get(`${parentId}-${childId}`) || "child";
+          }
 
           edges.push({
             id: `parent-child-${parentId}-${childId}`,
@@ -503,11 +526,19 @@ export default function D3FamilyTree({
             const person2Pos = nodePositions.get(spouseId);
             const isLeftToRight = person1Pos!.x < person2Pos!.x;
 
-            // Get the actual relationship type
+            // Determine source and target
             const source = isLeftToRight ? personId : spouseId;
             const target = isLeftToRight ? spouseId : personId;
-            const relType =
-              relationshipTypes.get(`${source}-${target}`) || "Spouse";
+
+            // Get the relationship type from current user's perspective
+            let relType = "Spouse";
+            if (personId === currentUserId) {
+              relType = userPerspectiveRelationships.get(spouseId) || "Spouse";
+            } else if (spouseId === currentUserId) {
+              relType = userPerspectiveRelationships.get(personId) || "Spouse";
+            } else {
+              relType = relationshipTypes.get(`${source}-${target}`) || "Spouse";
+            }
 
             edges.push({
               id: `spouse-${personId}-${spouseId}`,
@@ -543,11 +574,19 @@ export default function D3FamilyTree({
             // Determine which node is on the left/right based on x position
             const isLeftToRight = personPos!.x < siblingPos!.x;
 
-            // Get the actual relationship type
+            // Determine source and target
             const source = isLeftToRight ? personId : siblingId;
             const target = isLeftToRight ? siblingId : personId;
-            const relType =
-              relationshipTypes.get(`${source}-${target}`) || "Sibling";
+
+            // Get the relationship type from current user's perspective
+            let relType = "Sibling";
+            if (personId === currentUserId) {
+              relType = userPerspectiveRelationships.get(siblingId) || "Sibling";
+            } else if (siblingId === currentUserId) {
+              relType = userPerspectiveRelationships.get(personId) || "Sibling";
+            } else {
+              relType = relationshipTypes.get(`${source}-${target}`) || "Sibling";
+            }
 
             edges.push({
               id: `sibling-${personId}-${siblingId}`,
@@ -588,8 +627,16 @@ export default function D3FamilyTree({
               const isLeftToRight = person1Pos!.x < person2Pos!.x;
               const source = isLeftToRight ? personId : extendedId;
               const target = isLeftToRight ? extendedId : personId;
-              const relType =
-                relationshipTypes.get(`${source}-${target}`) || type;
+
+              // Get the relationship type from current user's perspective
+              let relType = type;
+              if (personId === currentUserId) {
+                relType = userPerspectiveRelationships.get(extendedId) || type;
+              } else if (extendedId === currentUserId) {
+                relType = userPerspectiveRelationships.get(personId) || type;
+              } else {
+                relType = relationshipTypes.get(`${source}-${target}`) || type;
+              }
 
               edges.push({
                 id: `extended-${personId}-${extendedId}`,
@@ -613,8 +660,16 @@ export default function D3FamilyTree({
               const isTopToBottom = person1Pos!.level < person2Pos!.level;
               const source = isTopToBottom ? personId : extendedId;
               const target = isTopToBottom ? extendedId : personId;
-              const relType =
-                relationshipTypes.get(`${source}-${target}`) || type;
+
+              // Get the relationship type from current user's perspective
+              let relType = type;
+              if (personId === currentUserId) {
+                relType = userPerspectiveRelationships.get(extendedId) || type;
+              } else if (extendedId === currentUserId) {
+                relType = userPerspectiveRelationships.get(personId) || type;
+              } else {
+                relType = relationshipTypes.get(`${source}-${target}`) || type;
+              }
 
               edges.push({
                 id: `extended-${personId}-${extendedId}`,
