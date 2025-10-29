@@ -54,7 +54,10 @@ import {
   User as UserIcon,
   ChevronDown,
   X,
+  Trash2,
+  AlertCircle,
 } from "lucide-react";
+import UserDetailsModal from "@/components/UserDetailsModal";
 
 interface User {
   _id: string;
@@ -71,6 +74,12 @@ interface User {
   gothiram?: string;
   nativePlace?: string;
   city?: string;
+  approvedBy?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
+  deletedAt?: string | null;
 }
 
 interface Pagination {
@@ -103,6 +112,8 @@ export default function AdminUsersPage() {
     approved: 0,
     pending: 0,
   });
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -475,6 +486,34 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    if (!confirm(`Are you sure you want to delete ${userName}? This will remove them from all relationships.`))
+      return;
+
+    try {
+      const response = await fetch(`/api/admin/users/${userId}/delete`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        toast.success("User deleted successfully and removed from all relationships");
+        fetchUsers();
+        fetchUserCounts();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to delete user");
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error("An error occurred while deleting the user");
+    }
+  };
+
+  const handleApprovedByClick = (userId: string) => {
+    setSelectedUserId(userId);
+    setIsUserModalOpen(true);
+  };
+
   if (status === "loading" || initialLoading) {
     return <AdminLoader text="Loading users..." />;
   }
@@ -654,10 +693,10 @@ export default function AdminUsersPage() {
                             </TableHead>
                             <TableHead>Name</TableHead>
                             <TableHead>Contact</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Verification</TableHead>
-                            <TableHead>Location</TableHead>
                             <TableHead>Status</TableHead>
+                            {(statusFilter === "all" || statusFilter === "approved") && (
+                              <TableHead>Approved By</TableHead>
+                            )}
                             <TableHead>Joined</TableHead>
                             <TableHead>Actions</TableHead>
                           </TableRow>
@@ -700,6 +739,11 @@ export default function AdminUsersPage() {
                                       <span className="text-xs">
                                         {user.email}
                                       </span>
+                                      {user.isEmailVerified ? (
+                                        <CheckCircle className="h-3 w-3 text-green-600" />
+                                      ) : (
+                                        <AlertCircle className="h-3 w-3 text-yellow-600" />
+                                      )}
                                     </div>
                                   )}
                                   {user.mobile && (
@@ -708,68 +752,6 @@ export default function AdminUsersPage() {
                                       <span className="text-xs">
                                         {user.mobile}
                                       </span>
-                                    </div>
-                                  )}
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                {user.role === "admin" && (
-                                  <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0">
-                                    <Crown className="w-3 h-3 mr-1" />
-                                    Admin
-                                  </Badge>
-                                )}
-                                {user.role === "matchmaker" &&
-                                  MATRIMONIAL_ENABLED && (
-                                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
-                                      <Heart className="w-3 h-3 mr-1" />
-                                      Matchmaker
-                                    </Badge>
-                                  )}
-                                {(user.role === "user" ||
-                                  (user.role === "matchmaker" &&
-                                    !MATRIMONIAL_ENABLED)) && (
-                                  <Badge variant="outline">User</Badge>
-                                )}
-                              </TableCell>
-                              <TableCell>
-                                <div className="flex gap-1 flex-wrap">
-                                  {user.isEmailVerified && (
-                                    <Badge
-                                      variant="outline"
-                                      className="text-xs text-green-700 border-green-300"
-                                    >
-                                      Email ✓
-                                    </Badge>
-                                  )}
-                                  {/* {user.isMobileVerified && (
-                                    <Badge variant="outline" className="text-xs text-green-700 border-green-300">
-                                      Mobile ✓
-                                    </Badge>
-                                  )} */}
-                                  {MATRIMONIAL_ENABLED &&
-                                    user.enableMarriageFlag && (
-                                      <Badge
-                                        variant="outline"
-                                        className="text-xs text-purple-700 border-purple-300"
-                                      >
-                                        Matrimony
-                                      </Badge>
-                                    )}
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <div className="text-xs text-gray-600">
-                                  {user.city && (
-                                    <div className="flex items-center gap-1">
-                                      <Building2 className="h-3 w-3" />
-                                      {user.city}
-                                    </div>
-                                  )}
-                                  {user.nativePlace && (
-                                    <div className="flex items-center gap-1">
-                                      <MapPin className="h-3 w-3" />
-                                      {user.nativePlace}
                                     </div>
                                   )}
                                 </div>
@@ -787,6 +769,20 @@ export default function AdminUsersPage() {
                                   </Badge>
                                 )}
                               </TableCell>
+                              {(statusFilter === "all" || statusFilter === "approved") && (
+                                <TableCell>
+                                  {user.approvedBy ? (
+                                    <button
+                                      onClick={() => handleApprovedByClick(user.approvedBy!._id)}
+                                      className="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium cursor-pointer"
+                                    >
+                                      {user.approvedBy.firstName} {user.approvedBy.lastName}
+                                    </button>
+                                  ) : (
+                                    <span className="text-gray-400 text-sm">N/A</span>
+                                  )}
+                                </TableCell>
+                              )}
                               <TableCell>
                                 <div className="flex items-center gap-1 text-xs text-gray-600">
                                   <Calendar className="h-3 w-3" />
@@ -797,14 +793,15 @@ export default function AdminUsersPage() {
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-2">
-                                  {!user.isApprovedByAdmin && (
+                                  {user._id !== session?.user.id && (
                                     <>
                                       <Button
                                         size="sm"
                                         onClick={() =>
                                           handleApproveUser(user._id)
                                         }
-                                        className="bg-green-600 hover:bg-green-700 text-white"
+                                        disabled={user.isApprovedByAdmin}
+                                        className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
                                         <CheckCircle className="h-4 w-4" />
                                       </Button>
@@ -814,62 +811,103 @@ export default function AdminUsersPage() {
                                         onClick={() =>
                                           handleRejectUser(user._id)
                                         }
-                                        className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
+                                        disabled={user.isApprovedByAdmin}
+                                        className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
                                         <XCircle className="h-4 w-4" />
                                       </Button>
                                     </>
                                   )}
                                   {user._id !== session?.user.id && (
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="border-gray-300"
-                                        >
-                                          <Shield className="h-4 w-4 mr-1" />
-                                          Role
-                                          <ChevronDown className="h-3 w-3 ml-1" />
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent align="end">
-                                        <DropdownMenuItem
-                                          onClick={() =>
-                                            handleChangeRole(user._id, "admin")
-                                          }
-                                          disabled={user.role === "admin"}
-                                        >
-                                          <Crown className="h-4 w-4 mr-2 text-orange-500" />
-                                          Make Admin
-                                        </DropdownMenuItem>
-                                        {MATRIMONIAL_ENABLED && (
+                                    <>
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="border-gray-300"
+                                          >
+                                            {user.role === "admin" && (
+                                              <>
+                                                <Crown className="h-4 w-4 mr-1 text-orange-500" />
+                                                Admin
+                                              </>
+                                            )}
+                                            {user.role === "matchmaker" && (
+                                              <>
+                                                <Heart className="h-4 w-4 mr-1 text-purple-500" />
+                                                Matchmaker
+                                              </>
+                                            )}
+                                            {user.role === "user" && (
+                                              <>
+                                                <UserIcon className="h-4 w-4 mr-1 text-gray-500" />
+                                                User
+                                              </>
+                                            )}
+                                            <ChevronDown className="h-3 w-3 ml-1" />
+                                          </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
                                           <DropdownMenuItem
                                             onClick={() =>
-                                              handleChangeRole(
-                                                user._id,
-                                                "matchmaker"
-                                              )
+                                              handleChangeRole(user._id, "admin")
                                             }
-                                            disabled={
-                                              user.role === "matchmaker"
-                                            }
+                                            disabled={user.role === "admin"}
                                           >
-                                            <Heart className="h-4 w-4 mr-2 text-purple-500" />
-                                            Make Matchmaker
+                                            <Crown className="h-4 w-4 mr-2 text-orange-500" />
+                                            Admin
+                                            {user.role === "admin" && (
+                                              <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
+                                            )}
                                           </DropdownMenuItem>
-                                        )}
-                                        <DropdownMenuItem
-                                          onClick={() =>
-                                            handleChangeRole(user._id, "user")
-                                          }
-                                          disabled={user.role === "user"}
-                                        >
-                                          <UserIcon className="h-4 w-4 mr-2 text-gray-500" />
-                                          Make User
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
+                                          {MATRIMONIAL_ENABLED && (
+                                            <DropdownMenuItem
+                                              onClick={() =>
+                                                handleChangeRole(
+                                                  user._id,
+                                                  "matchmaker"
+                                                )
+                                              }
+                                              disabled={
+                                                user.role === "matchmaker"
+                                              }
+                                            >
+                                              <Heart className="h-4 w-4 mr-2 text-purple-500" />
+                                              Matchmaker
+                                              {user.role === "matchmaker" && (
+                                                <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
+                                              )}
+                                            </DropdownMenuItem>
+                                          )}
+                                          <DropdownMenuItem
+                                            onClick={() =>
+                                              handleChangeRole(user._id, "user")
+                                            }
+                                            disabled={user.role === "user"}
+                                          >
+                                            <UserIcon className="h-4 w-4 mr-2 text-gray-500" />
+                                            User
+                                            {user.role === "user" && (
+                                              <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
+                                            )}
+                                          </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() =>
+                                          handleDeleteUser(
+                                            user._id,
+                                            `${user.firstName} ${user.lastName}`
+                                          )
+                                        }
+                                        className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </>
                                   )}
                                 </div>
                               </TableCell>
@@ -967,6 +1005,14 @@ export default function AdminUsersPage() {
           </TabsContent>
         </Tabs>
       </div>
+      <UserDetailsModal
+        userId={selectedUserId}
+        isOpen={isUserModalOpen}
+        onClose={() => {
+          setIsUserModalOpen(false);
+          setSelectedUserId(null);
+        }}
+      />
     </div>
   );
 }

@@ -99,6 +99,8 @@ export default function D3FamilyTree({
     const extended = new Map<string, Array<{ id: string; type: string }>>();
     // Store relationship types for edge labels
     const relationshipTypes = new Map<string, string>(); // key: "id1-id2", value: relationType
+    // Store generation distance for each parent-child pair
+    const generationDistance = new Map<string, number>(); // key: "parentId-childId", value: distance (1 for parent, 2 for grandparent)
 
     // Add current user if not in relationships
     if (!people.has(currentUserId)) {
@@ -128,6 +130,10 @@ export default function D3FamilyTree({
 
       if (PARENT_RELATIONS.includes(relType)) {
         // p2 is the parent (Father/Mother/GrandFather/GrandMother) of p1
+        // We need to track the generation distance
+        const isGrandParent = relType === "Grand Father" || relType === "Grand Mother";
+        const distance = isGrandParent ? 2 : 1;
+        
         if (!parents.has(p1._id)) parents.set(p1._id, []);
         if (!parents.get(p1._id)!.includes(p2._id)) {
           parents.get(p1._id)!.push(p2._id);
@@ -138,6 +144,9 @@ export default function D3FamilyTree({
         }
         // Store the relationship type from parent to child perspective
         relationshipTypes.set(`${p2._id}-${p1._id}`, relType);
+        
+        // Store generation distance for this specific parent-child pair
+        generationDistance.set(`${p2._id}-${p1._id}`, distance);
       } else if (CHILD_RELATIONS.includes(relType)) {
         // p2 is the child (Son/Daughter) of p1
         if (!children.has(p1._id)) children.set(p1._id, []);
@@ -150,6 +159,9 @@ export default function D3FamilyTree({
         }
         // Store the relationship type from parent to child perspective
         relationshipTypes.set(`${p1._id}-${p2._id}`, relType);
+        
+        // Store generation distance for this parent-child pair (distance is always 1 for child relations)
+        generationDistance.set(`${p1._id}-${p2._id}`, 1);
       } else if (SIBLING_RELATIONS.includes(relType)) {
         // p2 is sibling (Brother/Sister) of p1 - bidirectional
         if (!siblings.has(p1._id)) siblings.set(p1._id, []);
@@ -197,6 +209,7 @@ export default function D3FamilyTree({
       siblings,
       extended,
       relationshipTypes,
+      generationDistance,
     };
   }, [relationships, currentUserId, currentUserName]);
 
@@ -210,6 +223,7 @@ export default function D3FamilyTree({
       siblings,
       extended,
       relationshipTypes,
+      generationDistance,
     } = buildFamilyStructure();
     const nodes: Node[] = [];
     const edges: Edge[] = [];
@@ -226,7 +240,7 @@ export default function D3FamilyTree({
     const verticalSpacing = 250; // Increased spacing between generations
 
     // Assign levels to all nodes using BFS from current user
-    // Priority order: Parents/Children first (direct lineage), then spouses, then siblings
+    // This ensures proper hierarchical generation levels
     const assignLevels = () => {
       const queue: { id: string; level: number; priority: number }[] = [
         { id: currentUserId, level: 0, priority: 0 },
@@ -240,22 +254,34 @@ export default function D3FamilyTree({
         const { id, level } = queue.shift()!;
 
         // PRIORITY 1: Add parents at level - 1 (direct lineage upward)
+        // These will recursively add grandparents at level -2, etc.
         const personParents = parents.get(id) || [];
         personParents.forEach((parentId) => {
           if (!visited.has(parentId)) {
             visited.add(parentId);
-            nodePositions.set(parentId, { x: 0, y: 0, level: level - 1 });
-            queue.push({ id: parentId, level: level - 1, priority: 0 });
+            
+            // Check the generation distance for this specific parent-child pair
+            const distance = generationDistance.get(`${parentId}-${id}`) || 1;
+            const parentLevel = level - distance;
+            
+            nodePositions.set(parentId, { x: 0, y: 0, level: parentLevel });
+            queue.push({ id: parentId, level: parentLevel, priority: 0 });
           }
         });
 
         // PRIORITY 2: Add children at level + 1 (direct lineage downward)
+        // These will recursively add grandchildren at level +2, etc.
         const personChildren = children.get(id) || [];
         personChildren.forEach((childId) => {
           if (!visited.has(childId)) {
             visited.add(childId);
-            nodePositions.set(childId, { x: 0, y: 0, level: level + 1 });
-            queue.push({ id: childId, level: level + 1, priority: 0 });
+            
+            // Check the generation distance for this specific parent-child pair
+            const distance = generationDistance.get(`${id}-${childId}`) || 1;
+            const childLevel = level + distance;
+            
+            nodePositions.set(childId, { x: 0, y: 0, level: childLevel });
+            queue.push({ id: childId, level: childLevel, priority: 0 });
           }
         });
 

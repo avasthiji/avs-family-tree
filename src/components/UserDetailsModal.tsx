@@ -111,15 +111,18 @@ export default function UserDetailsModal({
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return "N/A";
     try {
-      return new Date(dateString).toLocaleDateString("en-US", {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "N/A";
+      return date.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
       });
     } catch {
-      return dateString;
+      return "N/A";
     }
   };
 
@@ -127,9 +130,11 @@ export default function UserDetailsModal({
     return `${firstName?.[0] || ""}${lastName?.[0] || ""}`.toUpperCase();
   };
 
-  const getAge = (dobString: string) => {
+  const getAge = (dobString: string | null | undefined) => {
+    if (!dobString) return "N/A";
     try {
       const dob = new Date(dobString);
+      if (isNaN(dob.getTime())) return "N/A";
       const today = new Date();
       let age = today.getFullYear() - dob.getFullYear();
       const monthDiff = today.getMonth() - dob.getMonth();
@@ -143,6 +148,16 @@ export default function UserDetailsModal({
     } catch {
       return "N/A";
     }
+  };
+
+  const displayValue = (value: string | null | undefined, suffix: string = "") => {
+    if (!value) return "N/A";
+    return `${value}${suffix}`;
+  };
+
+  const displayNumber = (value: number | null | undefined, suffix: string = "") => {
+    if (value === null || value === undefined) return "N/A";
+    return `${value}${suffix}`;
   };
 
   if (!isOpen) return null;
@@ -207,11 +222,16 @@ export default function UserDetailsModal({
                     <div className="flex items-center space-x-4 text-gray-600 mb-4">
                       <span className="flex items-center">
                         <User className="h-4 w-4 mr-1" />
-                        {userProfile.gender} • Age {getAge(userProfile.dob)}
+                        {displayValue(userProfile.gender)} • Age {getAge(userProfile.dob)}
                       </span>
                       <span className="flex items-center">
                         <MapPin className="h-4 w-4 mr-1" />
-                        {userProfile.city}, {userProfile.state}
+                        {(() => {
+                          const city = userProfile.city || "";
+                          const state = userProfile.state || "";
+                          const location = [city, state].filter(Boolean).join(", ");
+                          return location || "N/A";
+                        })()}
                       </span>
                     </div>
 
@@ -240,7 +260,7 @@ export default function UserDetailsModal({
                     <div>
                       <span className="text-sm text-gray-600">Email</span>
                       <div className="flex items-center space-x-2">
-                        <span>{userProfile.email}</span>
+                        <span>{displayValue(userProfile.email)}</span>
                         <Badge
                           variant={
                             userProfile.isEmailVerified
@@ -262,7 +282,7 @@ export default function UserDetailsModal({
                     <div>
                       <span className="text-sm text-gray-600">Mobile</span>
                       <div className="flex items-center space-x-2">
-                        <span>{userProfile.mobile}</span>
+                        <span>{displayValue(userProfile.mobile)}</span>
                         <Badge
                           variant={
                             userProfile.isMobileVerified
@@ -282,7 +302,7 @@ export default function UserDetailsModal({
                   <div className="flex items-center space-x-3">
                     <Phone className="h-4 w-4 text-gray-500" />
                     <span className="text-sm text-gray-600">
-                      Primary Phone: {userProfile.primaryPhone}
+                      Primary Phone: {displayValue(userProfile.primaryPhone)}
                     </span>
                   </div>
                 </CardContent>
@@ -313,7 +333,7 @@ export default function UserDetailsModal({
                       <span className="text-sm text-gray-600">
                         Place of Birth
                       </span>
-                      <div>{userProfile.placeOfBirth}</div>
+                      <div>{displayValue(userProfile.placeOfBirth)}</div>
                     </div>
                   </div>
 
@@ -323,7 +343,7 @@ export default function UserDetailsModal({
                       <span className="text-sm text-gray-600">
                         Time of Birth
                       </span>
-                      <div>{userProfile.timeOfBirth}</div>
+                      <div>{displayValue(userProfile.timeOfBirth)}</div>
                     </div>
                   </div>
 
@@ -331,7 +351,7 @@ export default function UserDetailsModal({
                     <Users className="h-4 w-4 text-gray-500" />
                     <div>
                       <span className="text-sm text-gray-600">Height</span>
-                      <div>{userProfile.height} cm</div>
+                      <div>{displayNumber(userProfile.height, " cm")}</div>
                     </div>
                   </div>
                 </CardContent>
@@ -350,24 +370,24 @@ export default function UserDetailsModal({
                     <span className="text-sm text-gray-600">
                       Rasi (Zodiac):
                     </span>
-                    <Badge variant="outline">{userProfile.rasi}</Badge>
+                    <Badge variant="outline">{displayValue(userProfile.rasi)}</Badge>
                   </div>
 
                   <div className="flex items-center space-x-3">
                     <span className="text-sm text-gray-600">
                       Natchathiram (Star):
                     </span>
-                    <Badge variant="outline">{userProfile.natchathiram}</Badge>
+                    <Badge variant="outline">{displayValue(userProfile.natchathiram)}</Badge>
                   </div>
 
                   <div className="flex items-center space-x-3">
                     <span className="text-sm text-gray-600">Gothiram:</span>
-                    <Badge variant="outline">{userProfile.gothiram}</Badge>
+                    <Badge variant="outline">{displayValue(userProfile.gothiram)}</Badge>
                   </div>
 
                   <div className="flex items-center space-x-3">
                     <span className="text-sm text-gray-600">Kuladeivam:</span>
-                    <Badge variant="outline">{userProfile.kuladeivam}</Badge>
+                    <Badge variant="outline">{displayValue(userProfile.kuladeivam)}</Badge>
                   </div>
                 </CardContent>
               </Card>
@@ -387,7 +407,7 @@ export default function UserDetailsModal({
                       <span className="text-sm text-gray-600">
                         Qualification
                       </span>
-                      <div>{userProfile.qualification}</div>
+                      <div>{displayValue(userProfile.qualification)}</div>
                     </div>
                   </div>
 
@@ -397,7 +417,7 @@ export default function UserDetailsModal({
                       <span className="text-sm text-gray-600">
                         Job Description
                       </span>
-                      <div>{userProfile.jobDesc}</div>
+                      <div>{displayValue(userProfile.jobDesc)}</div>
                     </div>
                   </div>
 
@@ -405,7 +425,7 @@ export default function UserDetailsModal({
                     <DollarSign className="h-4 w-4 text-gray-500" />
                     <div>
                       <span className="text-sm text-gray-600">Salary</span>
-                      <div>{userProfile.salary}</div>
+                      <div>{displayValue(userProfile.salary)}</div>
                     </div>
                   </div>
 
@@ -413,7 +433,7 @@ export default function UserDetailsModal({
                     <MapPin className="h-4 w-4 text-gray-500" />
                     <div>
                       <span className="text-sm text-gray-600">Work Place</span>
-                      <div>{userProfile.workPlace}</div>
+                      <div>{displayValue(userProfile.workPlace)}</div>
                     </div>
                   </div>
                 </CardContent>
@@ -433,7 +453,7 @@ export default function UserDetailsModal({
                   <MapPin className="h-4 w-4 text-gray-500" />
                   <div>
                     <span className="text-sm text-gray-600">Address</span>
-                    <div>{userProfile.address1}</div>
+                    <div>{displayValue(userProfile.address1)}</div>
                   </div>
                 </div>
 
@@ -442,8 +462,13 @@ export default function UserDetailsModal({
                   <div>
                     <span className="text-sm text-gray-600">Location</span>
                     <div>
-                      {userProfile.city}, {userProfile.state}{" "}
-                      {userProfile.postalCode}
+                      {(() => {
+                        const city = userProfile.city || "";
+                        const state = userProfile.state || "";
+                        const postalCode = userProfile.postalCode || "";
+                        const location = [city, state, postalCode].filter(Boolean).join(", ");
+                        return location || "N/A";
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -452,7 +477,7 @@ export default function UserDetailsModal({
                   <MapPin className="h-4 w-4 text-gray-500" />
                   <div>
                     <span className="text-sm text-gray-600">Native Place</span>
-                    <div>{userProfile.nativePlace}</div>
+                    <div>{displayValue(userProfile.nativePlace)}</div>
                   </div>
                 </div>
 
@@ -463,7 +488,12 @@ export default function UserDetailsModal({
                       Country & Citizenship
                     </span>
                     <div>
-                      {userProfile.country} • {userProfile.citizenship}
+                      {(() => {
+                        const country = userProfile.country || "";
+                        const citizenship = userProfile.citizenship || "";
+                        const result = [country, citizenship].filter(Boolean).join(" • ");
+                        return result || "N/A";
+                      })()}
                     </div>
                   </div>
                 </div>

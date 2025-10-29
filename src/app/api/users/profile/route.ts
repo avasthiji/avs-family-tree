@@ -22,17 +22,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId') || session.user.id;
 
-    // Determine what fields to select based on user role and requested user
-    let selectFields = '-password';
-    const isAdmin = session.user.role === 'admin';
-    const isOwnProfile = userId === session.user.id;
-
-    // Non-admin users viewing other profiles get limited info (no sensitive contact details)
-    if (!isAdmin && !isOwnProfile) {
-      selectFields = 'firstName lastName profilePicture gothiram nativePlace city state country workPlace jobDesc qualification gender dob height rasi natchathiram kuladeivam bioDesc partnerDesc enableMarriageFlag role isApprovedByAdmin isEmailVerified isMobileVerified';
-    }
-
-    const user = await User.findById(userId).select(selectFields);
+    // Return all fields except password for complete profile display
+    // In a family tree context, showing full profile details is appropriate
+    const user = await User.findById(userId).select('-password');
     
     if (!user) {
       return NextResponse.json(
@@ -41,7 +33,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ user });
+    // Convert to plain object to ensure all fields are included
+    const userObject = user.toObject({ 
+      virtuals: false, 
+      versionKey: false,
+      transform: (_doc: unknown, ret: Record<string, unknown>) => {
+        delete ret.password;
+        return ret;
+      }
+    });
+
+    return NextResponse.json({ user: userObject });
 
   } catch (error) {
     console.error("Profile fetch error:", error);

@@ -53,6 +53,7 @@ export interface IUser extends Document {
   updatedAt: Date;
   createdBy?: mongoose.Types.ObjectId;
   updatedBy?: mongoose.Types.ObjectId;
+  deletedAt?: Date;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -172,6 +173,10 @@ const UserSchema = new Schema<IUser>({
   updatedBy: {
     type: Schema.Types.ObjectId,
     ref: 'User'
+  },
+  deletedAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true

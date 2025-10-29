@@ -29,10 +29,12 @@ export async function GET(request: NextRequest) {
     // Filter by status
     if (status === 'approved') {
       query.isApprovedByAdmin = true;
+      query.deletedAt = null; // Exclude deleted users
     } else if (status === 'pending') {
       query.isApprovedByAdmin = false;
+      query.deletedAt = null; // Exclude deleted users
     }
-    // 'all' means no filter
+    // For 'all', don't filter by deletedAt - show all users including deleted ones
 
     // Search functionality
     if (search) {
@@ -70,7 +72,8 @@ export async function GET(request: NextRequest) {
 
     const [users, totalCount] = await Promise.all([
       User.find(query)
-        .select('firstName lastName email mobile role isEmailVerified isMobileVerified isApprovedByAdmin enableMarriageFlag createdAt gothiram nativePlace city')
+        .select('firstName lastName email mobile role isEmailVerified isMobileVerified isApprovedByAdmin enableMarriageFlag createdAt gothiram nativePlace city approvedBy')
+        .populate('approvedBy', 'firstName lastName')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit),
