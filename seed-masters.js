@@ -1,4 +1,4 @@
-// Seed script for Rasi, Nakshatram, and Gothiram master data
+// Seed script for Rasi, Nakshatram, Gothiram, and Kuladeivam master data
 require("dotenv").config();
 const mongoose = require("mongoose");
 
@@ -28,7 +28,15 @@ const GothiramSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
     tamilName: { type: String, required: true },
-    godOfWorship: String,
+    isActive: { type: Boolean, default: true },
+  },
+  { timestamps: true }
+);
+
+const KuladeivamSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, unique: true },
+    tamilName: { type: String, required: false, default: "" },
     templeLocation: String,
     isActive: { type: Boolean, default: true },
   },
@@ -41,6 +49,8 @@ const Nakshatram =
   mongoose.models.Nakshatram || mongoose.model("Nakshatram", NakshatramSchema);
 const Gothiram =
   mongoose.models.Gothiram || mongoose.model("Gothiram", GothiramSchema);
+const Kuladeivam =
+  mongoose.models.Kuladeivam || mongoose.model("Kuladeivam", KuladeivamSchema);
 
 // Rasi Data (12 Zodiac Signs)
 const rasiData = [
@@ -108,206 +118,87 @@ const nakshatramData = [
   { name: "Revathi", tamilName: "ரேவதி" },
 ];
 
-// Gothiram Data (33 Gotras)
+// Gothiram Data (33 Gotras) - Without God of Worship
 const gothiramData = [
-  {
-    name: "Alatudaiyan",
-    tamilName: "ஆலத்துடையான்",
-    godOfWorship: "Arulmigu Mangayee Amman",
-    templeLocation: "Alattulaianpatti",
-  },
-  {
-    name: "Ethumaludaiyan",
-    tamilName: "எதுமலுடையான்",
-    godOfWorship: "Arulmigu Neelavanathi Amman",
-    templeLocation: "Edhumalai",
-  },
-  {
-    name: "Gunakathudaiyan",
-    tamilName: "குணகேள்காத்துடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Kalappalan (Valamudaiyan)",
-    tamilName: "களப்பாளர் (வளமுடையான்)",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Kalathudaiyan",
-    tamilName: "காளத்துடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Kaarudaiyan",
-    tamilName: "காருடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Koondudaiyan",
-    tamilName: "கோனுடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Konnakudaiyan",
-    tamilName: "கொன்னக்குடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Koothudaiyan",
-    tamilName: "கூத்துடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Koottudaiyan",
-    tamilName: "கோட்டுடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Kuruvaludaiyan (Kuruvarludaiyan)",
-    tamilName: "குருவருளுடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Marudhudaiyan",
-    tamilName: "மருதுடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Mathudaiyan",
-    tamilName: "மாத்துடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
+  { name: "Alatudaiyan", tamilName: "ஆலத்துடையான்" },
+  { name: "Ethumaludaiyan", tamilName: "எதுமலுடையான்" },
+  { name: "Gunakathudaiyan", tamilName: "குணகேள்காத்துடையான்" },
+  { name: "Kalappalan (Valamudaiyan)", tamilName: "களப்பாளர் (வளமுடையான்)" },
+  { name: "Kalathudaiyan", tamilName: "காளத்துடையான்" },
+  { name: "Kaarudaiyan", tamilName: "காருடையான்" },
+  { name: "Koondudaiyan", tamilName: "கோனுடையான்" },
+  { name: "Konnakudaiyan", tamilName: "கொன்னக்குடையான்" },
+  { name: "Koothudaiyan", tamilName: "கூத்துடையான்" },
+  { name: "Koottudaiyan", tamilName: "கோட்டுடையான்" },
+  { name: "Kuruvaludaiyan (Kuruvarludaiyan)", tamilName: "குருவருளுடையான்" },
+  { name: "Marudhudaiyan", tamilName: "மருதுடையான்" },
+  { name: "Mathudaiyan", tamilName: "மாத்துடையான்" },
   {
     name: "Mirathudaiyan (Kuruvaludaiyan)",
     tamilName: "மிரட்டுடையான் (குருவலுடையான்)",
-    godOfWorship: "",
-    templeLocation: "",
   },
-  {
-    name: "Murugathudaiyan",
-    tamilName: "முருகத்துடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Nalludaiyan",
-    tamilName: "நல்லுடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Nathamudaiyan",
-    tamilName: "நத்தமுடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Nimaludaiyan",
-    tamilName: "நிம்மலுடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Panaiyadaiyan",
-    tamilName: "பனையடியான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Pavaludaiyan",
-    tamilName: "பாவலுடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Pundiludaiyan",
-    tamilName: "பூண்டிலுடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Samayamanthiri",
-    tamilName: "சமயமந்திரி",
-    godOfWorship: "",
-    templeLocation: "",
-  },
+  { name: "Murugathudaiyan", tamilName: "முருகத்துடையான்" },
+  { name: "Nalludaiyan", tamilName: "நல்லுடையான்" },
+  { name: "Nathamudaiyan", tamilName: "நத்தமுடையான்" },
+  { name: "Nimaludaiyan", tamilName: "நிம்மலுடையான்" },
+  { name: "Panaiyadaiyan", tamilName: "பனையடியான்" },
+  { name: "Pavaludaiyan", tamilName: "பாவலுடையான்" },
+  { name: "Pundiludaiyan", tamilName: "பூண்டிலுடையான்" },
+  { name: "Samayamanthiri", tamilName: "சமயமந்திரி" },
   {
     name: "Sannamangalathudaiyan (Pethaan)",
     tamilName: "சன்னமங்கலத்துடையான் (பேதான்)",
-    godOfWorship: "",
-    templeLocation: "",
   },
-  {
-    name: "Sathudaiyan",
-    tamilName: "சாத்துடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Siruthalanudaiyan",
-    tamilName: "சிறுதலனுடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Thettumangalathudaiyan",
-    tamilName: "தெத்தமங்கலத்துடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Thevangudaiyan",
-    tamilName: "தேவங்குடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Thirusangudaiyan",
-    tamilName: "திருச்சங்குடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
+  { name: "Sathudaiyan", tamilName: "சாத்துடையான்" },
+  { name: "Siruthalanudaiyan", tamilName: "சிறுதலனுடையான்" },
+  { name: "Thettumangalathudaiyan", tamilName: "தெத்தமங்கலத்துடையான்" },
+  { name: "Thevangudaiyan", tamilName: "தேவங்குடையான்" },
+  { name: "Thirusangudaiyan", tamilName: "திருச்சங்குடையான்" },
   {
     name: "Valavuthiranailathambe (Valavudaiyan)",
     tamilName: "வளவுதிரனைலத்தம்பே",
-    godOfWorship: "",
-    templeLocation: "",
   },
-  {
-    name: "Velanchakravarthi",
-    tamilName: "சக்கரவர்த்தி",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Vennavaludaiyan",
-    tamilName: "வெண்ணாவலுடையான்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Vilvarayan",
-    tamilName: "வில்வராயன்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
-  {
-    name: "Vivarayan",
-    tamilName: "விவராயன்",
-    godOfWorship: "",
-    templeLocation: "",
-  },
+  { name: "Velanchakravarthi", tamilName: "சக்கரவர்த்தி" },
+  { name: "Vennavaludaiyan", tamilName: "வெண்ணாவலுடையான்" },
+  { name: "Vilvarayan", tamilName: "வில்வராயன்" },
+  { name: "Vivarayan", tamilName: "விவராயன்" },
+];
+
+// Kuladeivam Data (Gods of Worship) - Separate from Gothiram
+const kuladeivamData = [
+  { name: "Arulmigu Mangayee Amman", tamilName: "" },
+  { name: "Arulmigu Neelavanathi Amman", tamilName: "" },
+  { name: "Arulmigu Sellaye Amman", tamilName: "" },
+  { name: "Arulmigu Aadyakalam Katha Amman", tamilName: "" },
+  { name: "Arulmigu Ellai Amman", tamilName: "" },
+  { name: "Arulmigu Anagalaparameswari", tamilName: "" },
+  { name: "Arulmigu Periyandasamy Kovil Muthaiyan", tamilName: "" },
+  { name: "Arulmigu Sellaye Amman", tamilName: "" },
+  { name: "Arulmigu Papathi Amman", tamilName: "" },
+  { name: "Arulmigu Karrupu", tamilName: "" },
+  { name: "Arulmigu Sellandi Amman", tamilName: "" },
+  { name: "Arulmigu Thaichi Amman", tamilName: "" },
+  { name: "Arulmigu Venkatachalapathy", tamilName: "" },
+  { name: "Arulmigu Periyakovil Deivangal", tamilName: "" },
+  { name: "Arulmigu Sellayee Amman", tamilName: "" },
+  { name: "Arulmigu Thayumanavar Samy", tamilName: "" },
+  { name: "Arulmigu Papathi Amman", tamilName: "" },
+  { name: "Arulmigu Meenakshi Amman", tamilName: "" },
+  { name: "Arulmigu Aalai Muthaiyan", tamilName: "" },
+  { name: "Arulmigu Ayyanar", tamilName: "" },
+  { name: "Arulmigu Ayyanar", tamilName: "" },
+  { name: "Arulmigu Elayee Amman", tamilName: "" },
+  { name: "Arulmigu Aravayi Amman", tamilName: "" },
+  { name: "Arulmigu Puthu Karruppannaswamy", tamilName: "" },
+  { name: "Arulmigu Srirangam Aranganathar", tamilName: "" },
+  { name: "Arulmigu Aeramveeli Amman", tamilName: "" },
+  { name: "Arulmigu Vellankarruppu", tamilName: "" },
+  { name: "Arulmigu Pachai Amman", tamilName: "" },
+  { name: "Arulmigu Venkatachalapathi", tamilName: "" },
+  { name: "Arulmigu Karruppanaswamy", tamilName: "" },
+  { name: "Arulmigu Arapalisvara", tamilName: "" },
+  { name: "Arulmigu Irrani Amman", tamilName: "" },
+  { name: "Arulmigu Venkatachalapathy", tamilName: "" },
 ];
 
 // Seed function
@@ -363,6 +254,21 @@ async function seedMasterData() {
       `✅ Gothiram seeding completed: ${gothiramData.length} entries\n`
     );
 
+    // Seed Kuladeivam
+    console.log("🕉️  Seeding Kuladeivam (Gods of Worship)...");
+    const kuladeivamResult = await Kuladeivam.insertMany(kuladeivamData, {
+      ordered: false,
+    }).catch((err) => {
+      if (err.code === 11000) {
+        console.log(
+          "⚠️  Some Kuladeivam entries already exist, skipping duplicates..."
+        );
+      }
+    });
+    console.log(
+      `✅ Kuladeivam seeding completed: ${kuladeivamData.length} entries\n`
+    );
+
     // Summary
     console.log("═══════════════════════════════════════");
     console.log("✨ Master Data Seeding Summary");
@@ -370,6 +276,7 @@ async function seedMasterData() {
     console.log(`📊 Rasi: ${rasiData.length} entries`);
     console.log(`⭐ Nakshatram: ${nakshatramData.length} entries`);
     console.log(`🏛️  Gothiram: ${gothiramData.length} entries`);
+    console.log(`🕉️  Kuladeivam: ${kuladeivamData.length} entries`);
     console.log("═══════════════════════════════════════");
     console.log("🎉 All master data seeded successfully!\n");
 
@@ -377,11 +284,13 @@ async function seedMasterData() {
     const rasiCount = await Rasi.countDocuments();
     const nakshatramCount = await Nakshatram.countDocuments();
     const gothiramCount = await Gothiram.countDocuments();
+    const kuladeivamCount = await Kuladeivam.countDocuments();
 
     console.log("📈 Current Database Counts:");
     console.log(`   Rasi: ${rasiCount}`);
     console.log(`   Nakshatram: ${nakshatramCount}`);
-    console.log(`   Gothiram: ${gothiramCount}\n`);
+    console.log(`   Gothiram: ${gothiramCount}`);
+    console.log(`   Kuladeivam: ${kuladeivamCount}\n`);
   } catch (error) {
     console.error("❌ Error seeding data:", error.message);
     process.exit(1);

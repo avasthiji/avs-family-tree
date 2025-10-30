@@ -4,8 +4,6 @@ export interface IGothiram extends Document {
   _id: mongoose.Types.ObjectId;
   name: string; // English name
   tamilName: string; // Tamil name
-  godOfWorship?: string; // God associated with this Gothiram
-  templeLocation?: string; // Temple location
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -25,16 +23,6 @@ const GothiramSchema = new Schema<IGothiram>({
     required: [true, 'Tamil name is required'],
     trim: true,
     maxlength: [100, 'Tamil name cannot exceed 100 characters']
-  },
-  godOfWorship: {
-    type: String,
-    trim: true,
-    maxlength: [200, 'God of worship cannot exceed 200 characters']
-  },
-  templeLocation: {
-    type: String,
-    trim: true,
-    maxlength: [200, 'Temple location cannot exceed 200 characters']
   },
   isActive: {
     type: Boolean,

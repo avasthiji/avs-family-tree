@@ -64,6 +64,13 @@ export default function ProfilePage() {
   const [nakshatramList, setNakshatramList] = useState<
     Array<{ _id: string; name: string; tamilName: string }>
   >([]);
+  const [kuladeivamList, setKuladeivamList] = useState<
+    Array<{
+      _id: string;
+      name: string;
+      tamilName?: string;
+    }>
+  >([]);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -79,12 +86,13 @@ export default function ProfilePage() {
 
   const fetchUserProfile = async () => {
     try {
-      const [profileRes, gothiramRes, rasiRes, nakshatramRes] =
+      const [profileRes, gothiramRes, rasiRes, nakshatramRes, kuladeivamRes] =
         await Promise.all([
           fetch("/api/users/profile"),
           fetch("/api/gothiram"),
           fetch("/api/rasi"),
           fetch("/api/nakshatram"),
+          fetch("/api/kuladeivam"),
         ]);
 
       if (profileRes.ok) {
@@ -120,6 +128,14 @@ export default function ProfilePage() {
         setNakshatramList(data.nakshatram || []);
       } else {
         console.error("Nakshatram API failed:", nakshatramRes.status);
+      }
+
+      if (kuladeivamRes.ok) {
+        const data = await kuladeivamRes.json();
+        console.log("Kuladeivam data:", data.kuladeivam);
+        setKuladeivamList(data.kuladeivam || []);
+      } else {
+        console.error("Kuladeivam API failed:", kuladeivamRes.status);
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -687,67 +703,84 @@ export default function ProfilePage() {
                       <Download className="h-4 w-4" />
                     </a>
                   </Label>
-                  <Input
+                  <Select
                     value={userData?.kuladeivam || ""}
-                    onChange={(e) =>
-                      setUserData({ ...userData, kuladeivam: e.target.value })
+                    onValueChange={(value) =>
+                      setUserData({ ...userData, kuladeivam: value })
                     }
                     disabled={!editing}
-                    className="mt-1"
-                  />
+                  >
+                    <SelectTrigger className="mt-1 w-full">
+                      <SelectValue placeholder="Select kuladeivam" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {kuladeivamList.map((kuladeivam) => (
+                        <SelectItem
+                          key={kuladeivam._id}
+                          value={kuladeivam.name}
+                        >
+                          {kuladeivam.name}
+                          {/* {kuladeivam.tamilName && ` (${kuladeivam.tamilName})`} */}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                
+
                 {/* Matrimony Section */}
-                
-                  <div className="border-t pt-6 mt-6">
-                    <h4 className="font-semibold text-sm text-gray-700 mb-4">
-                      Matrimony Profile
-                    </h4>
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id="enableMarriageFlag"
-                          checked={userData?.enableMarriageFlag || false}
-                          onChange={(e) =>
+
+                <div className="border-t pt-6 mt-6">
+                  <h4 className="font-semibold text-sm text-gray-700 mb-4">
+                    Matrimony Profile
+                  </h4>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="enableMarriageFlag"
+                        checked={userData?.enableMarriageFlag || false}
+                        onChange={(e) =>
+                          setUserData({
+                            ...userData,
+                            enableMarriageFlag: e.target.checked,
+                          })
+                        }
+                        disabled={!editing}
+                        className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+                      />
+                      <Label
+                        htmlFor="enableMarriageFlag"
+                        className="cursor-pointer text-sm font-medium"
+                      >
+                        Enable Matrimony Profile
+                      </Label>
+                    </div>
+
+                    {userData?.enableMarriageFlag && (
+                      <div>
+                        <Label
+                          htmlFor="matchmakerSearch"
+                          className="text-sm font-medium"
+                        >
+                          Select Matchmaker (Optional)
+                        </Label>
+                        <MatchmakerSearch
+                          value={userData?.matchMakerId}
+                          onChange={(matchmakerId) =>
                             setUserData({
                               ...userData,
-                              enableMarriageFlag: e.target.checked,
+                              matchMakerId: matchmakerId,
                             })
                           }
                           disabled={!editing}
-                          className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
                         />
-                        <Label
-                          htmlFor="enableMarriageFlag"
-                          className="cursor-pointer text-sm font-medium"
-                        >
-                          Enable Matrimony Profile
-                        </Label>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Choose someone who can help with your matrimony search
+                        </p>
                       </div>
-                      
-                      {userData?.enableMarriageFlag && (
-                        <div>
-                          <Label htmlFor="matchmakerSearch" className="text-sm font-medium">
-                            Select Matchmaker (Optional)
-                          </Label>
-                          <MatchmakerSearch
-                            value={userData?.matchMakerId}
-                            onChange={(matchmakerId) =>
-                              setUserData({
-                                ...userData,
-                                matchMakerId: matchmakerId,
-                              })
-                            }
-                            disabled={!editing}
-                          />
-                          <p className="text-xs text-gray-500 mt-1">
-                            Choose someone who can help with your matrimony search
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
