@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Users, Heart, TreePine, Globe, Shield, Star, ArrowRight, CheckCircle, Calendar, Award, TrendingUp } from 'lucide-react';
+import { Users, Heart, TreePine, Globe, Shield, Star, ArrowRight, CheckCircle, Calendar, Award, TrendingUp, Cloud, Lock } from 'lucide-react';
 import Logo from '@/components/Logo';
 import Link from 'next/link';
 
@@ -29,8 +29,17 @@ export default function Home() {
                   Events
                 </a>
               )}
-              <a href="/about" className="text-gray-600 hover:text-red-500 transition-colors text-sm font-medium">
-                About
+              <a href="/mission" className="text-gray-600 hover:text-red-500 transition-colors text-sm font-medium">
+                AVS Mission
+              </a>
+              <a href="/history" className="text-gray-600 hover:text-red-500 transition-colors text-sm font-medium">
+                AVS History
+              </a>
+              <a href="/roles" className="text-gray-600 hover:text-red-500 transition-colors text-sm font-medium">
+                Roles & Responsibility
+              </a>
+              <a href="/contact" className="text-gray-600 hover:text-red-500 transition-colors text-sm font-medium">
+                Contact Us
               </a>
             </div>
             <div className="flex items-center space-x-4">
@@ -51,36 +60,28 @@ export default function Home() {
       </nav>
 
       {/* Hero Section - Compact */}
-      <section className="pt-20 pb-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-red-50 via-orange-50 to-white">
+      <section className="pt-20 pb-6 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-red-50 via-orange-50 to-white">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 items-stretch">
             {/* Left Content */}
             <div>
               <div className="inline-block px-4 py-2 bg-red-100 text-red-600 rounded-full text-sm font-medium mb-4">
                 அகில இந்திய வேளாளர் சங்கம்
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+              <h1 className="text-4xl md:text-5xl font-bold mb-3 leading-tight">
                 <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
                   Connect Your Roots,
                 </span>
                 <br />
                 Build Your Future
               </h1>
-              <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+              <p className="text-base text-gray-600 mb-4 leading-relaxed">
                 Discover your heritage, preserve your family legacy, and build lasting relationships within the AVS community worldwide.
               </p>
-              <div className="flex flex-wrap gap-3 mb-6">
-                <button className="px-6 py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-lg font-medium hover:shadow-lg transition-all flex items-center">
-                  Join Our Community
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </button>
-                <button className="px-6 py-3 border-2 border-teal-500 text-teal-600 rounded-lg font-medium hover:bg-teal-50 transition-colors">
-                  Learn More
-                </button>
-              </div>
+              
               
               {/* Quick Stats */}
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-4 gap-3">
                 <div>
                   <div className="text-2xl font-bold text-red-500">500+</div>
                   <div className="text-xs text-gray-600">Families</div>
@@ -100,6 +101,12 @@ export default function Home() {
                   </div>
                 )}
               </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <a href="/mission" className="px-3 py-1.5 text-xs rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-50">AVS Mission</a>
+                <a href="/history" className="px-3 py-1.5 text-xs rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-50">AVS History</a>
+                <a href="/roles" className="px-3 py-1.5 text-xs rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-50">Roles & Responsibility</a>
+                <a href="/contact" className="px-3 py-1.5 text-xs rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-gray-50">Contact Us</a>
+              </div>
             </div>
 
             {/* Right Visual */}
@@ -108,7 +115,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-3xl"></div>
                 <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
                   <Logo size="lg" className="mb-4 animate-pulse" />
-                  <h3 className="text-2xl font-bold mb-2">Your Legacy Awaits</h3>
+                  <h3 className="text-2xl font-bold mb-2">Arunadu Vellalar Sangam - USA</h3>
                   <p className="text-center text-white/90">Start building your family tree today</p>
                 </div>
               </div>
@@ -141,64 +148,92 @@ export default function Home() {
       </section>
 
       {/* Features - Compact Grid */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
+            
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               Powerful Features for Your Family
             </h2>
             <p className="text-gray-600">Everything you need to connect, discover, and preserve</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-3">
             <div className="bg-gradient-to-br from-red-50 to-orange-50 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 border border-red-100">
               <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl flex items-center justify-center mb-4">
-                  <Logo size="md" className="rounded-xl" />
+                <TreePine className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-gray-900">Family Tree</h3>
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">Digital Family Tree</h3>
               <p className="text-sm text-gray-600">Build and visualize your complete family lineage</p>
             </div>
 
-            {MATRIMONIAL_ENABLED && (
-              <div className="bg-gradient-to-br from-pink-50 to-red-50 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 border border-pink-100">
-                <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-red-500 rounded-xl flex items-center justify-center mb-4">
-                  <Heart className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2 text-gray-900">Matrimony</h3>
-                <p className="text-sm text-gray-600">Find compatible matches within AVS community</p>
+            <div className="bg-gradient-to-br from-pink-50 to-red-50 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 border border-pink-100">
+              <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-red-500 rounded-xl flex items-center justify-center mb-4">
+                <Heart className="h-6 w-6 text-white" />
               </div>
-            )}
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">AVS Matrimony</h3>
+              <p className="text-sm text-gray-600">Find compatible matches within AVS community</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 border border-yellow-100">
+              <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-xl flex items-center justify-center mb-4">
+                <Star className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">AVS Kuladeivam in USA</h3>
+              <p className="text-sm text-gray-600">Preserve and practice our ancestral worship in the USA</p>
+            </div>
 
             <div className="bg-gradient-to-br from-purple-50 to-blue-50 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 border border-purple-100">
               <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center mb-4">
                 <Globe className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-gray-900">Cultural Heritage</h3>
-              <p className="text-sm text-gray-600">Preserve traditions for future generations</p>
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">AWS Technology Stack</h3>
+              <p className="text-sm text-gray-600">Modern cloud-native platform for scale and reliability</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-slate-50 to-gray-50 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 border border-gray-100">
+              <div className="w-12 h-12 bg-gradient-to-r from-gray-700 to-gray-900 rounded-xl flex items-center justify-center mb-4">
+                <Lock className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">Privacy Control</h3>
+              <p className="text-sm text-gray-600">Granular visibility and member-only access controls</p>
             </div>
 
             <div className="bg-gradient-to-br from-teal-50 to-green-50 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 border border-teal-100">
               <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-green-500 rounded-xl flex items-center justify-center mb-4">
-                <Users className="h-6 w-6 text-white" />
+                <Cloud className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-gray-900">Community</h3>
-              <p className="text-sm text-gray-600">Connect with relatives worldwide</p>
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">Cloud Enabled Security</h3>
+              <p className="text-sm text-gray-600">Secure-by-design infrastructure and encrypted data</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Benefits - Two Column Layout */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
+          <div className="grid lg:grid-cols-2 gap-6 items-stretch">
             {/* Left - Benefits List */}
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                Why Choose AVS Family Tree?
-              </h2>
-              
-              <div className="space-y-4">
+            <div className="h-full">
+              <div className="bg-white rounded-3xl p-6 md:p-8 shadow-2xl border border-gray-100 h-full">
+                <div className="flex items-center gap-4 mb-5">
+                  <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl flex items-center justify-center">
+                    <Logo size="lg" className="rounded-xl" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 leading-tight">AVS</p>
+                    <p className="text-base font-semibold text-gray-800 leading-tight">Arunadu Vellalar Sangam - USA</p>
+                  </div>
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                  Why Choose AVS Family Tree?
+                </h2>
+                <p className="text-sm text-gray-600 mb-5">
+                  Connecting AVS (Arunadu Vellalar Sangam - USA) families worldwide, preserving heritage, and building lasting relationships
+                </p>
+
+                <div className="space-y-4">
                 <div className="flex items-start gap-4 bg-white p-4 rounded-xl shadow-sm">
                   <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Shield className="h-5 w-5 text-red-600" />
@@ -238,31 +273,35 @@ export default function Home() {
                     <p className="text-sm text-gray-600">Join thousands of families already connected</p>
                   </div>
                 </div>
+                </div>
+                {/* Compact tags to balance height */}
+                <div className="mt-6 flex flex-wrap gap-2">
+                  <span className="px-2.5 py-1 text-xs rounded-full bg-gray-50 border border-gray-200 text-gray-700">Privacy-first</span>
+                  <span className="px-2.5 py-1 text-xs rounded-full bg-gray-50 border border-gray-200 text-gray-700">Admin Approved</span>
+                  <span className="px-2.5 py-1 text-xs rounded-full bg-gray-50 border border-gray-200 text-gray-700">Community-run</span>
+                </div>
               </div>
             </div>
 
-            {/* Right - Testimonial/Stats Card */}
-            <div className="bg-gradient-to-br from-red-500 to-orange-500 rounded-3xl p-8 text-white shadow-2xl">
-              <div className="mb-6">
-                <Award className="h-12 w-12 mb-4" />
-                <h3 className="text-2xl font-bold mb-2">Trusted by Thousands</h3>
-                <p className="text-white/90">Join the fastest-growing AVS community platform</p>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
-                  <div className="text-3xl font-bold mb-1">98%</div>
-                  <div className="text-sm text-white/90">Satisfaction Rate</div>
+            {/* Right - Informational Content */}
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-2xl border border-gray-100 h-full">
+              <div className="space-y-6 text-gray-800">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">AVS EST Chapter USA</h3>
+                  <p className="text-sm text-gray-700">The AVS EST Chapter USA aims to unite members of the Arayiyamman Vellalar community across the United States under one collaborative and cultural platform. Its mission is to preserve our shared heritage, promote educational and social growth, and create opportunities for networking, mentoring, and community service among AVS families settled in North America.</p>
                 </div>
-                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
-                  <div className="text-3xl font-bold mb-1">24/7</div>
-                  <div className="text-sm text-white/90">Support Available</div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">AVS Family Tree</h3>
+                  <p className="text-sm text-gray-700">The AVS Family Tree initiative is dedicated to preserving our lineage, recording ancestral connections, and strengthening the bond among generations. By building a verified digital genealogy, we ensure that every descendant remains connected to their roots, understanding both the legacy and values of the AVS community that bind us together as one extended family.</p>
                 </div>
-              </div>
-
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
-                <p className="text-sm italic mb-2">"AVS Family Tree helped me discover relatives I never knew existed. The platform is intuitive and the community is welcoming."</p>
-                <p className="text-sm font-semibold">- Priya R., Chennai</p>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">AVS Matrimony</h3>
+                  <p className="text-sm text-gray-700">AVS Matrimony strives to support families in finding compatible life partners within the community by upholding cultural values and mutual respect. Beyond matchmaking, it focuses on nurturing lifelong relationships built on trust, tradition, and shared aspirations, fostering unity among global AVS families.</p>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Kuladeivam in USA</h3>
+                  <p className="text-sm text-gray-700">The Kuladeivam in USA initiative seeks to preserve and promote worship of our ancestral deity and temple traditions in a respectful and organized manner. It provides a sacred space for AVS families abroad to participate in rituals, festivals, and spiritual gatherings, ensuring that our divine heritage continues to guide our community across generations and geographies.</p>
+                </div>
               </div>
             </div>
           </div>
