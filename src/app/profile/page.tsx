@@ -40,9 +40,11 @@ import {
   X,
   Shield,
   CheckCircle,
+  Download,
 } from "lucide-react";
 import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
+import MatchmakerSearch from "@/components/MatchmakerSearch";
 import { MATRIMONIAL_ENABLED } from "@/lib/features";
 import { toast } from "sonner";
 
@@ -565,7 +567,19 @@ export default function ProfilePage() {
               <CardContent className="space-y-6">
                 <div className="grid md:grid-cols-3 gap-6">
                   <div>
-                    <Label>Rasi</Label>
+                    <Label className="flex items-center gap-2">
+                      Rasi
+                      <a
+                        href="/culturals_pdf/Rasi.pdf"
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-gray-900"
+                        aria-label="Download Rasi file"
+                      >
+                        <Download className="h-4 w-4" />
+                      </a>
+                    </Label>
                     <Select
                       value={userData?.rasi || ""}
                       onValueChange={(value) =>
@@ -587,7 +601,19 @@ export default function ProfilePage() {
                     </Select>
                   </div>
                   <div>
-                    <Label>Natchathiram</Label>
+                    <Label className="flex items-center gap-2">
+                      Natchathiram
+                      <a
+                        href="/culturals_pdf/Nakshathiram%20List.pdf"
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-gray-900"
+                        aria-label="Download Natchathiram file"
+                      >
+                        <Download className="h-4 w-4" />
+                      </a>
+                    </Label>
                     <Select
                       value={userData?.natchathiram || ""}
                       onValueChange={(value) =>
@@ -613,7 +639,19 @@ export default function ProfilePage() {
                     </Select>
                   </div>
                   <div>
-                    <Label>Gothiram</Label>
+                    <Label className="flex items-center gap-2">
+                      Gothiram
+                      <a
+                        href="/culturals_pdf/Gothiram.pdf"
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-gray-900"
+                        aria-label="Download Gothiram file"
+                      >
+                        <Download className="h-4 w-4" />
+                      </a>
+                    </Label>
                     <Select
                       value={userData?.gothiram || ""}
                       onValueChange={(value) =>
@@ -636,7 +674,19 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <div>
-                  <Label>Kuladeivam</Label>
+                  <Label className="flex items-center gap-2">
+                    Kuladeivam
+                    <a
+                      href="/culturals_pdf/Gowthram_God_of_Worship_List.pdf"
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-500 hover:text-gray-900"
+                      aria-label="Download Kuladeivam file"
+                    >
+                      <Download className="h-4 w-4" />
+                    </a>
+                  </Label>
                   <Input
                     value={userData?.kuladeivam || ""}
                     onChange={(e) =>
@@ -646,6 +696,58 @@ export default function ProfilePage() {
                     className="mt-1"
                   />
                 </div>
+                
+                {/* Matrimony Section */}
+                
+                  <div className="border-t pt-6 mt-6">
+                    <h4 className="font-semibold text-sm text-gray-700 mb-4">
+                      Matrimony Profile
+                    </h4>
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="enableMarriageFlag"
+                          checked={userData?.enableMarriageFlag || false}
+                          onChange={(e) =>
+                            setUserData({
+                              ...userData,
+                              enableMarriageFlag: e.target.checked,
+                            })
+                          }
+                          disabled={!editing}
+                          className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+                        />
+                        <Label
+                          htmlFor="enableMarriageFlag"
+                          className="cursor-pointer text-sm font-medium"
+                        >
+                          Enable Matrimony Profile
+                        </Label>
+                      </div>
+                      
+                      {userData?.enableMarriageFlag && (
+                        <div>
+                          <Label htmlFor="matchmakerSearch" className="text-sm font-medium">
+                            Select Matchmaker (Optional)
+                          </Label>
+                          <MatchmakerSearch
+                            value={userData?.matchMakerId}
+                            onChange={(matchmakerId) =>
+                              setUserData({
+                                ...userData,
+                                matchMakerId: matchmakerId,
+                              })
+                            }
+                            disabled={!editing}
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Choose someone who can help with your matrimony search
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
               </CardContent>
             </Card>
           </TabsContent>

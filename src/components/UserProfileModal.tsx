@@ -74,6 +74,18 @@ interface UserData {
   bioDesc?: string;
   partnerDesc?: string;
   enableMarriageFlag?: boolean;
+  matchMakerId?: string;
+  matchMaker?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    gothiram?: string;
+    nativePlace?: string;
+    city?: string;
+    profilePicture?: string;
+    primaryPhone?: string;
+    secondaryPhone?: string;
+  };
   role?: string;
   isApprovedByAdmin?: boolean;
   isEmailVerified?: boolean;
@@ -266,10 +278,10 @@ export default function UserProfileModal({
                 <TreePine className="h-4 w-4 mr-2" />
                 Family Tree
               </TabsTrigger>
-              <TabsTrigger value="add-relationship">
+              {/* <TabsTrigger value="add-relationship">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Relationship
-              </TabsTrigger>
+              </TabsTrigger> */}
             </TabsList>
 
             {/* Profile Tab */}
@@ -492,14 +504,15 @@ export default function UserProfileModal({
                     </div>
                   )}
 
-                  {/* Cultural */}
+                  {/* Cultural/Astrological */}
                   {(userData?.gothiram ||
                     userData?.rasi ||
                     userData?.natchathiram ||
-                    userData?.kuladeivam) && (
+                    userData?.kuladeivam ||
+                    userData?.enableMarriageFlag !== undefined) && (
                     <div>
                       <h4 className="font-semibold text-sm text-gray-700 mb-3">
-                        Cultural Information
+                        Astrological Details
                       </h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         {userData?.gothiram && (
@@ -543,6 +556,142 @@ export default function UserProfileModal({
                               <p className="font-medium">
                                 {userData.kuladeivam}
                               </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Matrimony Status and Matchmaker Details */}
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Heart className="h-4 w-4 text-pink-500" />
+                          <span className="text-sm text-gray-600">Matrimony Status:</span>
+                          <Badge 
+                            variant={userData.enableMarriageFlag ? "default" : "secondary"}
+                            className={userData.enableMarriageFlag ? "bg-pink-100 text-pink-800" : ""}
+                          >
+                            {userData.enableMarriageFlag ? "Active" : "Inactive"}
+                          </Badge>
+                        </div>
+
+                        {/* Matchmaker Details - Only show if matrimony is enabled */}
+                        {userData.enableMarriageFlag && userData.matchMaker && (
+                          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p className="text-sm font-medium text-gray-700 mb-2">
+                              Matchmaker
+                            </p>
+                            <div className="flex items-center space-x-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={userData.matchMaker.profilePicture} />
+                                <AvatarFallback className="text-xs">
+                                  {userData.matchMaker.firstName[0]}
+                                  {userData.matchMaker.lastName[0]}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium text-gray-900">
+                                  {userData.matchMaker.firstName} {userData.matchMaker.lastName}
+                                </p>
+                                <div className="flex items-center gap-2 text-xs text-gray-600">
+                                  {userData.matchMaker.gothiram && (
+                                    <span className="flex items-center gap-1">
+                                      <User className="h-3 w-3" />
+                                      {userData.matchMaker.gothiram}
+                                    </span>
+                                  )}
+                                  {(userData.matchMaker.nativePlace || userData.matchMaker.city) && (
+                                    <span className="flex items-center gap-1">
+                                      <MapPin className="h-3 w-3" />
+                                      {userData.matchMaker.nativePlace || userData.matchMaker.city}
+                                    </span>
+                                  )}
+                                </div>
+                                {(userData.matchMaker.primaryPhone || userData.matchMaker.secondaryPhone) && (
+                                  <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
+                                    {userData.matchMaker.primaryPhone && (
+                                      <span className="flex items-center gap-1">
+                                        <Phone className="h-3 w-3" />
+                                        {userData.matchMaker.primaryPhone}
+                                      </span>
+                                    )}
+                                    {userData.matchMaker.secondaryPhone && (
+                                      <span className="flex items-center gap-1">
+                                        <Phone className="h-3 w-3" />
+                                        {userData.matchMaker.secondaryPhone}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Matrimony Information */}
+                  {userData?.enableMarriageFlag && (
+                    <div>
+                      <h4 className="font-semibold text-sm text-gray-700 mb-3">
+                        Matrimony Information
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Heart className="h-5 w-5 text-pink-500" />
+                          <span className="text-sm font-medium text-pink-700">
+                            Matrimony Profile Active
+                          </span>
+                        </div>
+                        
+                        {userData?.matchMaker && (
+                          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p className="text-sm font-medium text-gray-700 mb-2">
+                              Matchmaker
+                            </p>
+                            <div className="flex items-center space-x-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={userData.matchMaker.profilePicture} />
+                                <AvatarFallback className="avs-gradient text-white text-xs">
+                                  {userData.matchMaker.firstName[0]}
+                                  {userData.matchMaker.lastName[0]}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium text-gray-900">
+                                  {userData.matchMaker.firstName} {userData.matchMaker.lastName}
+                                </p>
+                                <div className="flex items-center gap-2 text-xs text-gray-600">
+                                  {userData.matchMaker.gothiram && (
+                                    <span className="flex items-center gap-1">
+                                      <User className="h-3 w-3" />
+                                      {userData.matchMaker.gothiram}
+                                    </span>
+                                  )}
+                                  {(userData.matchMaker.nativePlace || userData.matchMaker.city) && (
+                                    <span className="flex items-center gap-1">
+                                      <MapPin className="h-3 w-3" />
+                                      {userData.matchMaker.nativePlace || userData.matchMaker.city}
+                                    </span>
+                                  )}
+                                </div>
+                                {(userData.matchMaker.primaryPhone || userData.matchMaker.secondaryPhone) && (
+                                  <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
+                                    {userData.matchMaker.primaryPhone && (
+                                      <span className="flex items-center gap-1">
+                                        <Phone className="h-3 w-3" />
+                                        {userData.matchMaker.primaryPhone}
+                                      </span>
+                                    )}
+                                    {userData.matchMaker.secondaryPhone && (
+                                      <span className="flex items-center gap-1">
+                                        <Phone className="h-3 w-3" />
+                                        {userData.matchMaker.secondaryPhone}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         )}

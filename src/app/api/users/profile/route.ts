@@ -24,7 +24,9 @@ export async function GET(request: NextRequest) {
 
     // Return all fields except password for complete profile display
     // In a family tree context, showing full profile details is appropriate
-    const user = await User.findById(userId).select('-password');
+    const user = await User.findById(userId)
+      .select('-password')
+      .populate('matchMakerId', 'firstName lastName gothiram nativePlace city profilePicture');
     
     if (!user) {
       return NextResponse.json(
@@ -39,6 +41,11 @@ export async function GET(request: NextRequest) {
       versionKey: false,
       transform: (_doc: unknown, ret: Record<string, unknown>) => {
         delete ret.password;
+        // Rename matchMakerId to matchMaker for frontend consistency
+        if (ret.matchMakerId) {
+          ret.matchMaker = ret.matchMakerId;
+          delete ret.matchMakerId;
+        }
         return ret;
       }
     });
@@ -85,7 +92,7 @@ export async function PUT(request: NextRequest) {
       'qualification', 'jobDesc', 'salary', 'bioDesc', 'partnerDesc',
       'workPlace', 'nativePlace', 'address1', 'address2', 'city', 'state',
       'country', 'postalCode', 'citizenship', 'kuladeivam', 'enableMarriageFlag',
-      'profilePicture'
+      'matchMakerId', 'profilePicture'
     ];
 
     allowedFields.forEach(field => {

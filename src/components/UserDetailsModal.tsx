@@ -63,6 +63,18 @@ interface UserProfile {
   citizenship: string;
   kuladeivam: string;
   enableMarriageFlag: boolean;
+  matchMakerId?: string;
+  matchMaker?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    gothiram?: string;
+    nativePlace?: string;
+    city?: string;
+    profilePicture?: string;
+    primaryPhone?: string;
+    secondaryPhone?: string;
+  };
   profilePicture: string;
   createdAt: string;
   updatedAt: string;
@@ -388,6 +400,73 @@ export default function UserDetailsModal({
                   <div className="flex items-center space-x-3">
                     <span className="text-sm text-gray-600">Kuladeivam:</span>
                     <Badge variant="outline">{displayValue(userProfile.kuladeivam)}</Badge>
+                  </div>
+
+                  {/* Matrimony Status */}
+                  <div className="pt-4 border-t border-gray-200">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <Heart className="h-4 w-4 text-pink-500" />
+                      <span className="text-sm text-gray-600">Matrimony Status:</span>
+                      <Badge 
+                        variant={userProfile.enableMarriageFlag ? "default" : "secondary"}
+                        className={userProfile.enableMarriageFlag ? "bg-pink-100 text-pink-800" : ""}
+                      >
+                        {userProfile.enableMarriageFlag ? "Active" : "Inactive"}
+                      </Badge>
+                    </div>
+
+                    {/* Matchmaker Details - Only show if matrimony is enabled */}
+                    {userProfile.enableMarriageFlag && userProfile.matchMaker && (
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm font-medium text-gray-700 mb-2">
+                          Matchmaker
+                        </p>
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={userProfile.matchMaker.profilePicture} />
+                            <AvatarFallback className="text-xs">
+                              {userProfile.matchMaker.firstName[0]}
+                              {userProfile.matchMaker.lastName[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              {userProfile.matchMaker.firstName} {userProfile.matchMaker.lastName}
+                            </p>
+                            <div className="flex items-center gap-2 text-xs text-gray-600">
+                              {userProfile.matchMaker.gothiram && (
+                                <span className="flex items-center gap-1">
+                                  <User className="h-3 w-3" />
+                                  {userProfile.matchMaker.gothiram}
+                                </span>
+                              )}
+                              {(userProfile.matchMaker.nativePlace || userProfile.matchMaker.city) && (
+                                <span className="flex items-center gap-1">
+                                  <MapPin className="h-3 w-3" />
+                                  {userProfile.matchMaker.nativePlace || userProfile.matchMaker.city}
+                                </span>
+                              )}
+                            </div>
+                            {(userProfile.matchMaker.primaryPhone || userProfile.matchMaker.secondaryPhone) && (
+                              <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
+                                {userProfile.matchMaker.primaryPhone && (
+                                  <span className="flex items-center gap-1">
+                                    <Phone className="h-3 w-3" />
+                                    {userProfile.matchMaker.primaryPhone}
+                                  </span>
+                                )}
+                                {userProfile.matchMaker.secondaryPhone && (
+                                  <span className="flex items-center gap-1">
+                                    <Phone className="h-3 w-3" />
+                                    {userProfile.matchMaker.secondaryPhone}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

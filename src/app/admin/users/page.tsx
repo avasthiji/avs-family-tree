@@ -694,6 +694,7 @@ export default function AdminUsersPage() {
                             <TableHead>Name</TableHead>
                             <TableHead>Contact</TableHead>
                             <TableHead>Status</TableHead>
+                            {/* <TableHead>Role</TableHead> */}
                             {(statusFilter === "all" || statusFilter === "approved") && (
                               <TableHead>Approved By</TableHead>
                             )}
@@ -769,6 +770,28 @@ export default function AdminUsersPage() {
                                   </Badge>
                                 )}
                               </TableCell>
+                              {/* <TableCell>
+                                <div className="flex items-center gap-2">
+                                  {user.role === "admin" && (
+                                    <>
+                                      <Crown className="h-4 w-4 text-orange-500" />
+                                      <span className="text-sm font-medium text-orange-700">Admin</span>
+                                    </>
+                                  )}
+                                  {user.role === "matchmaker" && (
+                                    <>
+                                      <Heart className="h-4 w-4 text-purple-500" />
+                                      <span className="text-sm font-medium text-purple-700">Matchmaker</span>
+                                    </>
+                                  )}
+                                  {user.role === "user" && (
+                                    <>
+                                      <UserIcon className="h-4 w-4 text-gray-500" />
+                                      <span className="text-sm font-medium text-gray-700">User</span>
+                                    </>
+                                  )}
+                                </div>
+                              </TableCell> */}
                               {(statusFilter === "all" || statusFilter === "approved") && (
                                 <TableCell>
                                   {user.approvedBy ? (
@@ -861,25 +884,6 @@ export default function AdminUsersPage() {
                                               <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
                                             )}
                                           </DropdownMenuItem>
-                                          {MATRIMONIAL_ENABLED && (
-                                            <DropdownMenuItem
-                                              onClick={() =>
-                                                handleChangeRole(
-                                                  user._id,
-                                                  "matchmaker"
-                                                )
-                                              }
-                                              disabled={
-                                                user.role === "matchmaker"
-                                              }
-                                            >
-                                              <Heart className="h-4 w-4 mr-2 text-purple-500" />
-                                              Matchmaker
-                                              {user.role === "matchmaker" && (
-                                                <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
-                                              )}
-                                            </DropdownMenuItem>
-                                          )}
                                           <DropdownMenuItem
                                             onClick={() =>
                                               handleChangeRole(user._id, "user")
