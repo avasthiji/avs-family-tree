@@ -30,7 +30,7 @@ export default function MissionPage() {
     },
     {
       icon: Globe,
-      title: 'Cultural Unity',
+      title: 'Astrological Unity',
       description: 'Promote our Kuladeivam traditions and spiritual practices in the United States.',
     },
   ];

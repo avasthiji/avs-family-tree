@@ -251,7 +251,7 @@ export default function ProfilePage() {
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
               <TabsTrigger value="contact">Contact</TabsTrigger>
               <TabsTrigger value="professional">Professional</TabsTrigger>
-              <TabsTrigger value="cultural">Cultural</TabsTrigger>
+              <TabsTrigger value="cultural">Astrology</TabsTrigger>
               <TabsTrigger value="about">About Me</TabsTrigger>
             </TabsList>
             {!editing ? (
@@ -324,6 +324,22 @@ export default function ProfilePage() {
                     }
                     onChange={(e) =>
                       setUserData({ ...userData, dob: e.target.value })
+                    }
+                    disabled={!editing}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label>Date of Death</Label>
+                  <Input
+                    type="date"
+                    value={
+                      userData?.deathday
+                        ? new Date(userData.deathday).toISOString().split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) =>
+                      setUserData({ ...userData, deathday: e.target.value })
                     }
                     disabled={!editing}
                     className="mt-1"
@@ -571,11 +587,11 @@ export default function ProfilePage() {
             </Card>
           </TabsContent>
 
-          {/* Cultural Information */}
+          {/* Astrological Information */}
           <TabsContent value="cultural">
             <Card className="avs-card border-0 shadow-lg">
               <CardHeader>
-                <CardTitle>Cultural & Astrological Information</CardTitle>
+                <CardTitle>Astrological Information</CardTitle>
                 <CardDescription>
                   Traditional AVS community details
                 </CardDescription>
@@ -757,27 +773,52 @@ export default function ProfilePage() {
                     </div>
 
                     {userData?.enableMarriageFlag && (
-                      <div>
-                        <Label
-                          htmlFor="matchmakerSearch"
-                          className="text-sm font-medium"
-                        >
-                          Select Matchmaker (Optional)
-                        </Label>
-                        <MatchmakerSearch
-                          value={userData?.matchMakerId}
-                          onChange={(matchmakerId) =>
-                            setUserData({
-                              ...userData,
-                              matchMakerId: matchmakerId,
-                            })
-                          }
-                          disabled={!editing}
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Choose someone who can help with your matrimony search
-                        </p>
-                      </div>
+                      <>
+                        <div>
+                          <Label
+                            htmlFor="matchmakerSearch"
+                            className="text-sm font-medium"
+                          >
+                            Select Matchmaker (Optional)
+                          </Label>
+                          <MatchmakerSearch
+                            value={userData?.matchMakerId}
+                            onChange={(matchmakerId) =>
+                              setUserData({
+                                ...userData,
+                                matchMakerId: matchmakerId,
+                              })
+                            }
+                            disabled={!editing}
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Choose someone who can help with your matrimony search
+                          </p>
+                        </div>
+                        <div>
+                          <Label htmlFor="partnerDesc" className="text-sm font-medium">
+                            Partner Description
+                          </Label>
+                          <Textarea
+                            id="partnerDesc"
+                            value={userData?.partnerDesc || ""}
+                            onChange={(e) =>
+                              setUserData({
+                                ...userData,
+                                partnerDesc: e.target.value,
+                              })
+                            }
+                            disabled={!editing}
+                            className="mt-1"
+                            placeholder="Describe your ideal partner..."
+                            rows={5}
+                            maxLength={500}
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            {(userData?.partnerDesc || "").length}/500 characters
+                          </p>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
@@ -813,28 +854,7 @@ export default function ProfilePage() {
                   </p>
                 </div>
                 {MATRIMONIAL_ENABLED && (
-                  <>
-                    <div>
-                      <Label>Partner Description</Label>
-                      <Textarea
-                        value={userData?.partnerDesc || ""}
-                        onChange={(e) =>
-                          setUserData({
-                            ...userData,
-                            partnerDesc: e.target.value,
-                          })
-                        }
-                        disabled={!editing}
-                        className="mt-1"
-                        placeholder="Describe your ideal partner..."
-                        rows={5}
-                        maxLength={500}
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        {(userData?.partnerDesc || "").length}/500 characters
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         id="enableMarriageFlag"
@@ -856,7 +876,6 @@ export default function ProfilePage() {
                         matrimony matches)
                       </Label>
                     </div>
-                  </>
                 )}
               </CardContent>
             </Card>

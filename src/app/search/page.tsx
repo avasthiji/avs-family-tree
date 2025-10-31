@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import SearchBar from "@/components/SearchBar";
-import UserProfileModal from "@/components/UserProfileModal";
+import UserDetailsModal from "@/components/UserDetailsModal";
 import { Loader } from "@/components/ui/loader";
 import Link from "next/link";
 import {
@@ -57,6 +57,20 @@ function SearchPageContent() {
   const [selectedUser, setSelectedUser] = useState<SearchResult | null>(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Listen for node clicks from the modal's family tree tab
+    const handleUserProfileNodeClick = (event: CustomEvent) => {
+      const { userId } = event.detail;
+      setProfileUserId(userId);
+      setProfileModalOpen(true);
+    };
+
+    window.addEventListener('userProfileNodeClick', handleUserProfileNodeClick as EventListener);
+    return () => {
+      window.removeEventListener('userProfileNodeClick', handleUserProfileNodeClick as EventListener);
+    };
+  }, []);
   useEffect(() => {
     if (status === "loading") return;
 
@@ -294,11 +308,14 @@ function SearchPageContent() {
           </Card>
         )}
 
-        {/* User Profile Modal */}
-        <UserProfileModal
+        {/* User Profile Details Modal */}
+        <UserDetailsModal
           userId={profileUserId}
-          open={profileModalOpen}
-          onOpenChange={setProfileModalOpen}
+          isOpen={profileModalOpen}
+          onClose={() => {
+            setProfileModalOpen(false);
+            setProfileUserId(null);
+          }}
         />
       </div>
     </div>

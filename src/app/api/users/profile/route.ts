@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest) {
 
     // Update allowed fields
     const allowedFields = [
-      'gender', 'dob', 'placeOfBirth', 'timeOfBirth', 'height',
+      'gender', 'dob', 'deathday', 'placeOfBirth', 'timeOfBirth', 'height',
       'rasi', 'natchathiram', 'gothiram', 'primaryPhone', 'secondaryPhone',
       'qualification', 'jobDesc', 'salary', 'bioDesc', 'partnerDesc',
       'workPlace', 'nativePlace', 'address1', 'address2', 'city', 'state',

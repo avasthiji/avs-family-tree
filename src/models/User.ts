@@ -17,6 +17,7 @@ export interface IUser extends Document {
   // Profile Details
   gender?: 'Male' | 'Female' | 'Other';
   dob?: Date;
+  deathday?: Date;
   placeOfBirth?: string;
   timeOfBirth?: string;
   height?: number;
@@ -118,6 +119,7 @@ const UserSchema = new Schema<IUser>({
     enum: ['Male', 'Female', 'Other']
   },
   dob: Date,
+  deathday: Date,
   placeOfBirth: String,
   timeOfBirth: String,
   height: {

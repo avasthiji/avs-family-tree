@@ -76,6 +76,20 @@ export default function FamilyTreePage() {
     clickedCards.forEach((card) => card.classList.remove("card-clicked"));
   };
 
+  useEffect(() => {
+    // Listen for node clicks from the modal's family tree tab
+    const handleUserProfileNodeClick = (event: CustomEvent) => {
+      const { userId } = event.detail;
+      setSelectedUserId(userId);
+      setIsModalOpen(true);
+    };
+
+    window.addEventListener('userProfileNodeClick', handleUserProfileNodeClick as EventListener);
+    return () => {
+      window.removeEventListener('userProfileNodeClick', handleUserProfileNodeClick as EventListener);
+    };
+  }, []);
+
   if (status === "loading" || loading) {
     return <Loader variant="page" text="Loading family tree..." size="lg" />;
   }

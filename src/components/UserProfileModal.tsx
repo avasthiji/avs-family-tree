@@ -67,6 +67,7 @@ interface UserData {
   profilePicture?: string;
   gender?: string;
   dob?: string;
+  deathday?: string;
   height?: number;
   rasi?: string;
   natchathiram?: string;
@@ -341,6 +342,19 @@ export default function UserProfileModal({
                           </div>
                         </div>
                       )}
+                      {userData?.deathday && (
+                        <div className="flex items-start gap-2">
+                          <User className="h-5 w-5 text-gray-400 mt-0.5" />
+                          <div>
+                            <p className="text-sm text-gray-600">
+                              Date of Death
+                            </p>
+                            <p className="font-medium">
+                              {new Date(userData.deathday).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                       {userData?.height && (
                         <div className="flex items-start gap-2">
                           <User className="h-5 w-5 text-gray-400 mt-0.5" />
@@ -504,7 +518,7 @@ export default function UserProfileModal({
                     </div>
                   )}
 
-                  {/* Cultural/Astrological */}
+                  {/* Astrological */}
                   {(userData?.gothiram ||
                     userData?.rasi ||
                     userData?.natchathiram ||

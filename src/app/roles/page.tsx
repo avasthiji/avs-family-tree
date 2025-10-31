@@ -43,10 +43,10 @@ export default function RolesPage() {
     },
     {
       icon: Globe,
-      title: 'Cultural Coordinators',
+      title: 'Astrological Coordinators',
       responsibilities: [
         'Organize Kuladeivam worship programs',
-        'Plan cultural events and festivals',
+        'Plan astrological events and festivals',
         'Preserve and promote traditions',
         'Coordinate spiritual gatherings',
       ],
