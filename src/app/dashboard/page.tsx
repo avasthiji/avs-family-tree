@@ -128,15 +128,6 @@ export default function DashboardPage() {
           </Alert>
         )}
 
-        {!user.isMobileVerified && (
-          <Alert className="mb-6 border-yellow-200 bg-yellow-50">
-            <Shield className="h-4 w-4" />
-            <AlertDescription className="text-yellow-800">
-              Your mobile number is not verified. Please verify your mobile
-              number for better security.
-            </AlertDescription>
-          </Alert>
-        )}
 
         {/* Quick Actions */}
         <div
@@ -316,21 +307,6 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Recent Activity */}
-        <Card className="avs-card border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Your latest interactions with the AVS community
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-gray-500">
-              <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No recent activity yet. Start exploring the community!</p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* User Profile Details Modal */}
