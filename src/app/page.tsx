@@ -319,13 +319,17 @@ export default function Home() {
               Join thousands of families preserving their heritage and building connections
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
-              <button className="px-6 py-3 bg-white text-red-500 rounded-lg font-medium hover:shadow-lg transition-all flex items-center">
-                Get Started Free
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </button>
-              <button className="px-6 py-3 border-2 border-white text-white rounded-lg font-medium hover:bg-white/10 transition-all">
-                Watch Demo
-              </button>
+              <Link href="/auth/register">
+                <button className="px-6 py-3 bg-white text-red-500 rounded-lg font-medium hover:shadow-lg transition-all flex items-center">
+                  Get Started Free
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </button>
+              </Link>
+              <Link href="https://www.youtube.com/@USAAVS" target="_blank" rel="noopener noreferrer">
+                <button className="px-6 py-3 bg-white text-red-500 rounded-lg font-medium hover:shadow-lg transition-all flex items-center">
+                  Watch Demo
+                </button>
+              </Link>
             </div>
           </div>
         </div>
