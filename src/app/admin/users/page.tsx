@@ -26,6 +26,7 @@ import { AdminLoader } from "@/components/ui/loader";
 import AppHeader from "@/components/AppHeader";
 import { MATRIMONIAL_ENABLED } from "@/lib/features";
 import { toast } from "sonner";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,6 +57,7 @@ import {
   X,
   Trash2,
   AlertCircle,
+  ArrowLeft,
 } from "lucide-react";
 import UserDetailsModal from "@/components/UserDetailsModal";
 
@@ -523,6 +525,15 @@ export default function AdminUsersPage() {
       <AppHeader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Link href="/admin/dashboard">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Admin Dashboard
+            </Button>
+          </Link>
+        </div>
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">

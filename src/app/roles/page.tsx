@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Shield, Award, Heart, Globe, Settings } from 'lucide-react';
+import { Users, Shield, Award, Heart, Globe, Settings, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import Logo from '@/components/Logo';
 import Link from 'next/link';
@@ -137,6 +137,15 @@ export default function RolesPage() {
 
       {/* Content */}
       <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        {/* Back Button */}
+        <div className="max-w-5xl mx-auto mb-6">
+          <Link href="/">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
+          </Link>
+        </div>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
