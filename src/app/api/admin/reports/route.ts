@@ -4,17 +4,14 @@ import connectDB from "@/lib/db";
 import User from "@/models/User";
 import Relationship from "@/models/Relationship";
 
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
-    
+
     if (!session || session.user.role !== "admin") {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await connectDB();
@@ -29,12 +26,16 @@ export async function GET(request: NextRequest) {
       activeMatrimony,
       totalRelationships,
     ] = await Promise.all([
-      User.countDocuments(),
-      User.countDocuments({ isApprovedByAdmin: true }),
-      User.countDocuments({ isApprovedByAdmin: false }),
-      User.countDocuments({ gender: 'Male' }),
-      User.countDocuments({ gender: 'Female' }),
-      User.countDocuments({ enableMarriageFlag: true, isApprovedByAdmin: true }),
+      User.countDocuments({ deletedAt: null }),
+      User.countDocuments({ isApprovedByAdmin: true, deletedAt: null }),
+      User.countDocuments({ isApprovedByAdmin: false, deletedAt: null }),
+      User.countDocuments({ gender: "Male", deletedAt: null }),
+      User.countDocuments({ gender: "Female", deletedAt: null }),
+      User.countDocuments({
+        enableMarriageFlag: true,
+        isApprovedByAdmin: true,
+        deletedAt: null,
+      }),
       Relationship.countDocuments(),
     ]);
 
@@ -47,9 +48,8 @@ export async function GET(request: NextRequest) {
         femaleUsers,
         activeMatrimony,
         totalRelationships,
-      }
+      },
     });
-
   } catch (error) {
     console.error("Reports fetch error:", error);
     return NextResponse.json(
@@ -58,4 +58,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

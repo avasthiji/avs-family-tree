@@ -11,6 +11,7 @@ import {
   Search,
   X,
   User,
+  Mail,
   MapPin,
   Filter,
   Loader2,
@@ -77,6 +78,7 @@ export default function SearchBar({
   // Advanced Search State - Make Advanced Search default
   const [showAdvanced, setShowAdvanced] = useState(true);
   const [advancedName, setAdvancedName] = useState("");
+  const [advancedEmail, setAdvancedEmail] = useState("");
   const [advancedNativePlace, setAdvancedNativePlace] = useState("");
   const [advancedGothiram, setAdvancedGothiram] = useState("");
   const [gothiramOptions, setGothiramOptions] = useState<GothiramOption[]>([]);
@@ -137,6 +139,7 @@ export default function SearchBar({
       const delayDebounceFn = setTimeout(() => {
         if (
           advancedName.trim().length >= 2 ||
+          advancedEmail.trim().length >= 2 ||
           advancedNativePlace.trim().length >= 2 ||
           advancedGothiram
         ) {
@@ -150,6 +153,7 @@ export default function SearchBar({
     }
   }, [
     advancedName,
+    advancedEmail,
     advancedNativePlace,
     advancedGothiram,
     status,
@@ -195,6 +199,7 @@ export default function SearchBar({
       const endpoint = isAdmin ? "/api/admin/search" : "/api/search";
       const params = new URLSearchParams({
         ...(advancedName && { name: advancedName }),
+        ...(advancedEmail && { email: advancedEmail }),
         ...(advancedNativePlace && { nativePlace: advancedNativePlace }),
         ...(advancedGothiram &&
           advancedGothiram !== "__none__" && { gothiram: advancedGothiram }),
@@ -223,6 +228,7 @@ export default function SearchBar({
 
   const handleClearAdvanced = () => {
     setAdvancedName("");
+    setAdvancedEmail("");
     setAdvancedNativePlace("");
     setAdvancedGothiram("");
     setResults([]);
@@ -350,7 +356,7 @@ export default function SearchBar({
             /* Advanced Search */
             <div className="space-y-4">
               {/* Search Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                 {/* Name Field */}
                 <div>
                   <Label
@@ -368,6 +374,33 @@ export default function SearchBar({
                     onChange={(e) => setAdvancedName(e.target.value)}
                     onFocus={() =>
                       (advancedName.length >= 2 ||
+                        advancedEmail.length >= 2 ||
+                        advancedNativePlace.length >= 2 ||
+                        advancedGothiram) &&
+                      setShowResults(true)
+                    }
+                    className="h-11 border-gray-200 focus:border-[#E63946]"
+                  />
+                </div>
+
+                {/* Email Field */}
+                <div>
+                  <Label
+                    htmlFor="advancedEmail"
+                    className="text-sm font-medium text-gray-700 mb-2 flex items-center"
+                  >
+                    <Mail className="h-4 w-4 mr-2 text-[#E63946]" />
+                    Email
+                  </Label>
+                  <Input
+                    id="advancedEmail"
+                    type="email"
+                    placeholder="Enter email..."
+                    value={advancedEmail}
+                    onChange={(e) => setAdvancedEmail(e.target.value)}
+                    onFocus={() =>
+                      (advancedName.length >= 2 ||
+                        advancedEmail.length >= 2 ||
                         advancedNativePlace.length >= 2 ||
                         advancedGothiram) &&
                       setShowResults(true)
@@ -393,6 +426,7 @@ export default function SearchBar({
                     onChange={(e) => setAdvancedNativePlace(e.target.value)}
                     onFocus={() =>
                       (advancedName.length >= 2 ||
+                        advancedEmail.length >= 2 ||
                         advancedNativePlace.length >= 2 ||
                         advancedGothiram) &&
                       setShowResults(true)
@@ -462,7 +496,10 @@ export default function SearchBar({
                     variant="outline"
                     onClick={handleClearAdvanced}
                     disabled={
-                      !advancedName && !advancedNativePlace && !advancedGothiram
+                      !advancedName &&
+                      !advancedEmail &&
+                      !advancedNativePlace &&
+                      !advancedGothiram
                     }
                     className="h-11 px-6"
                   >
@@ -474,6 +511,7 @@ export default function SearchBar({
                     onClick={() => {
                       if (
                         advancedName.length >= 2 ||
+                        advancedEmail.length >= 2 ||
                         advancedNativePlace.length >= 2 ||
                         advancedGothiram
                       ) {
@@ -481,7 +519,10 @@ export default function SearchBar({
                       }
                     }}
                     disabled={
-                      !advancedName && !advancedNativePlace && !advancedGothiram
+                      !advancedName &&
+                      !advancedEmail &&
+                      !advancedNativePlace &&
+                      !advancedGothiram
                     }
                     className="h-11 px-8 avs-button-primary"
                   >
@@ -516,6 +557,7 @@ export default function SearchBar({
         ((query.length >= 2 && !showAdvanced) ||
           (showAdvanced &&
             (advancedName.length >= 2 ||
+              advancedEmail.length >= 2 ||
               advancedNativePlace.length >= 2 ||
               (advancedGothiram && advancedGothiram !== "__none__")))) && (
           <Card className="absolute top-full mt-2 w-full max-h-96 overflow-y-auto z-50 shadow-xl">
@@ -627,6 +669,13 @@ export default function SearchBar({
             )}
           </Card>
         )}
+
+      {/* User Details Modal */}
+      <UserDetailsModal
+        userId={selectedUserId}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

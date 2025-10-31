@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     // Verify user exists and is verified
     const user = await User.findById(tokenData.userId);
-    if (!user) {
+    if (!user || user.deletedAt) {
       return NextResponse.json(
         { error: "User not found" },
         { status: 404 }

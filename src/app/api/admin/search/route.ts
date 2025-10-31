@@ -23,22 +23,25 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    let mongoQuery: any = {};
+    let mongoQuery: any = {
+      deletedAt: null // Always exclude deleted users
+    };
 
     // Filter by approval status for admin
     if (status === 'approved') {
       mongoQuery.isApprovedByAdmin = true;
     }
-    // 'all' or no status means no filter (includes both approved and pending)
+    // 'all' or no status means no filter (includes both approved and pending, but not deleted)
 
     if (isAdvanced) {
       // Advanced Search - AND logic for multiple fields
       const name = searchParams.get('name');
+      const email = searchParams.get('email');
       const nativePlace = searchParams.get('nativePlace');
       const gothiram = searchParams.get('gothiram');
 
       // Check if at least one field is provided
-      if (!name && !nativePlace && !gothiram) {
+      if (!name && !email && !nativePlace && !gothiram) {
         return NextResponse.json({ users: [] });
       }
 
@@ -77,6 +80,12 @@ export async function GET(request: NextRequest) {
         
         advancedConditions.push({
           $or: nameConditions
+        });
+      }
+
+      if (email && email.trim().length >= 2) {
+        advancedConditions.push({
+          email: { $regex: email.trim(), $options: 'i' }
         });
       }
 

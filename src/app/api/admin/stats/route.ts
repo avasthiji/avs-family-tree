@@ -28,10 +28,10 @@ export async function GET(request: NextRequest) {
       totalRelationships,
       totalEvents
     ] = await Promise.all([
-      User.countDocuments(),
-      User.countDocuments({ isApprovedByAdmin: false }),
-      User.countDocuments({ isApprovedByAdmin: true }),
-      User.countDocuments({ enableMarriageFlag: true, isApprovedByAdmin: true }),
+      User.countDocuments({ deletedAt: null }),
+      User.countDocuments({ isApprovedByAdmin: false, deletedAt: null }),
+      User.countDocuments({ isApprovedByAdmin: true, deletedAt: null }),
+      User.countDocuments({ enableMarriageFlag: true, isApprovedByAdmin: true, deletedAt: null }),
       Relationship.countDocuments(),
       Event.countDocuments()
     ]);

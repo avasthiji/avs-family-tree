@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    const users = await User.find({ isApprovedByAdmin: false })
+    const users = await User.find({ isApprovedByAdmin: false, deletedAt: null })
       .select('firstName lastName email mobile isEmailVerified isMobileVerified createdAt')
       .sort({ createdAt: -1 })
       .limit(50);

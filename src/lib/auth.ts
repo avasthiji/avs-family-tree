@@ -37,10 +37,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
 
           const user = await User.findOne({
-            $or: searchConditions
+            $or: searchConditions,
+            deletedAt: null // Exclude deleted users
           });
 
           if (!user) {
+            return null;
+          }
+
+          // Check if user has been deleted
+          if (user.deletedAt) {
             return null;
           }
 
