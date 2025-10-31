@@ -1,9 +1,12 @@
 import React from 'react';
 import { Calendar, MapPin, Users, Clock } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import Logo from '@/components/Logo';
 import Link from 'next/link';
 
 export default function EventsPage() {
+  const EVENT_ENABLED = true;
+  
   const upcomingEvents = [
     {
       id: 1,
@@ -62,9 +65,38 @@ export default function EventsPage() {
                 AVS Family Tree
               </span>
             </Link>
-            <Link href="/">
-              <button className="text-sm text-gray-600 hover:text-red-500">Back to Home</button>
-            </Link>
+            <div className="hidden md:flex items-center space-x-6">
+              {EVENT_ENABLED && (
+                <a href="/events" className="text-gray-600 hover:text-red-500 transition-colors text-sm font-medium">
+                  Events
+                </a>
+              )}
+              <a href="/mission" className="text-gray-600 hover:text-red-500 transition-colors text-sm font-medium">
+                AVS Mission
+              </a>
+              <a href="/history" className="text-gray-600 hover:text-red-500 transition-colors text-sm font-medium">
+                AVS History
+              </a>
+              <a href="/roles" className="text-gray-600 hover:text-red-500 transition-colors text-sm font-medium">
+                Roles & Responsibility
+              </a>
+              <a href="/contact" className="text-gray-600 hover:text-red-500 transition-colors text-sm font-medium">
+                Contact Us
+              </a>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/auth/login">
+                <Button
+                  variant="outline"
+                  className="border-[#E63946] text-[#E63946] hover:bg-[#E63946] hover:text-white"
+                >
+                  Login
+                </Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button className="avs-button-primary">Sign Up</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
