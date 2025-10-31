@@ -76,8 +76,10 @@ export async function GET(request: NextRequest) {
       }
 
       if (email && email.trim().length >= 2) {
+        // Escape special regex characters in email
+        const escapedEmail = email.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         advancedConditions.push({
-          email: { $regex: email.trim(), $options: "i" },
+          email: { $regex: escapedEmail, $options: "i" },
         });
       }
 

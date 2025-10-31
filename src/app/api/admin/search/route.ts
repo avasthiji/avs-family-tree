@@ -84,8 +84,10 @@ export async function GET(request: NextRequest) {
       }
 
       if (email && email.trim().length >= 2) {
+        // Escape special regex characters in email
+        const escapedEmail = email.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         advancedConditions.push({
-          email: { $regex: email.trim(), $options: 'i' }
+          email: { $regex: escapedEmail, $options: 'i' }
         });
       }
 
@@ -151,7 +153,10 @@ export async function GET(request: NextRequest) {
       }
 
       if (!filter || filter === 'all' || filter === 'email') {
-        searchConditions.push({ email: { $regex: searchQuery, $options: 'i' } });
+        // Escape special regex characters for email search (+ . * etc have special meaning in regex)
+        // This allows searching for emails like "amit+22@gmail.com"
+        const escapedEmailQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        searchConditions.push({ email: { $regex: escapedEmailQuery, $options: 'i' } });
       }
 
       if (!filter || filter === 'all' || filter === 'mobile') {

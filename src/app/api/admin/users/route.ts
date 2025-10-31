@@ -40,6 +40,8 @@ export async function GET(request: NextRequest) {
     // Search functionality
     if (search) {
       const searchTerms = search.trim().split(/\s+/);
+      // Escape special regex characters for email/mobile search
+      const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       
       if (searchTerms.length > 1) {
         // Multi-word search (e.g., "amit sharma")
@@ -54,17 +56,17 @@ export async function GET(request: NextRequest) {
               ]
             }))
           },
-          // Also check email and mobile
-          { email: { $regex: search, $options: 'i' } },
-          { mobile: { $regex: search, $options: 'i' } }
+          // Also check email and mobile (with escaped regex for special chars)
+          { email: { $regex: escapedSearch, $options: 'i' } },
+          { mobile: { $regex: escapedSearch, $options: 'i' } }
         ];
       } else {
         // Single word search
         query.$or = [
           { firstName: { $regex: search, $options: 'i' } },
           { lastName: { $regex: search, $options: 'i' } },
-          { email: { $regex: search, $options: 'i' } },
-          { mobile: { $regex: search, $options: 'i' } }
+          { email: { $regex: escapedSearch, $options: 'i' } },
+          { mobile: { $regex: escapedSearch, $options: 'i' } }
         ];
       }
     }
