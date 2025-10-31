@@ -587,7 +587,7 @@ export default function ProfilePage() {
                       Rasi
                       <a
                         href="/culturals_pdf/Rasi.pdf"
-                        download
+                        download="Rasi.pdf"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-gray-500 hover:text-gray-900"
@@ -621,7 +621,7 @@ export default function ProfilePage() {
                       Natchathiram
                       <a
                         href="/culturals_pdf/Nakshathiram%20List.pdf"
-                        download
+                        download="Natchathiram.pdf"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-gray-500 hover:text-gray-900"
@@ -659,7 +659,7 @@ export default function ProfilePage() {
                       Gothiram
                       <a
                         href="/culturals_pdf/Gothiram.pdf"
-                        download
+                        download="Gothiram.pdf"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-gray-500 hover:text-gray-900"
@@ -694,7 +694,7 @@ export default function ProfilePage() {
                     Kuladeivam
                     <a
                       href="/culturals_pdf/Gowthram_God_of_Worship_List.pdf"
-                      download
+                      download="Kuladeivam.pdf"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-gray-500 hover:text-gray-900"
