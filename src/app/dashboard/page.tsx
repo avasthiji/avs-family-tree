@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
-import UserProfileModal from "@/components/UserProfileModal";
+import UserDetailsModal from "@/components/UserDetailsModal";
 import AppHeader from "@/components/AppHeader";
 import { MATRIMONIAL_ENABLED, EVENT_ENABLED } from "@/lib/features";
 
@@ -56,6 +56,20 @@ export default function DashboardPage() {
     setProfileUserId(userId);
     setProfileModalOpen(true);
   };
+
+  useEffect(() => {
+    // Listen for node clicks from the modal's family tree tab
+    const handleUserProfileNodeClick = (event: CustomEvent) => {
+      const { userId } = event.detail;
+      setProfileUserId(userId);
+      setProfileModalOpen(true);
+    };
+
+    window.addEventListener('userProfileNodeClick', handleUserProfileNodeClick as EventListener);
+    return () => {
+      window.removeEventListener('userProfileNodeClick', handleUserProfileNodeClick as EventListener);
+    };
+  }, []);
 
   if (status === "loading") {
     return <Loader variant="page" text="Loading..." size="lg" />;
@@ -319,11 +333,14 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* User Profile Modal */}
-      <UserProfileModal
+      {/* User Profile Details Modal */}
+      <UserDetailsModal
         userId={profileUserId}
-        open={profileModalOpen}
-        onOpenChange={setProfileModalOpen}
+        isOpen={profileModalOpen}
+        onClose={() => {
+          setProfileModalOpen(false);
+          setProfileUserId(null);
+        }}
       />
     </div>
   );

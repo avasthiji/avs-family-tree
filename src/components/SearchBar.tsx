@@ -28,7 +28,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { env } from "@/lib/env";
-import UserDetailsModal from "@/components/UserDetailsModal";
 
 interface SearchResult {
   _id: string;
@@ -83,9 +82,6 @@ export default function SearchBar({
   const [advancedGothiram, setAdvancedGothiram] = useState("");
   const [gothiramOptions, setGothiramOptions] = useState<GothiramOption[]>([]);
 
-  // User Details Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   // Load Gothiram options
   useEffect(() => {
@@ -236,12 +232,15 @@ export default function SearchBar({
   };
 
   const handleSelectUser = (user: SearchResult) => {
-    // Open the modal with selected user
-    setSelectedUserId(user._id);
-    setIsModalOpen(true);
-    setShowResults(false); // Close search results popup
-
-    // Still call the callback if provided
+    // Close search results popup
+    setShowResults(false);
+    
+    // Open the User Profile Details modal (same as clicking "View")
+    if (onViewProfile) {
+      onViewProfile(user._id);
+    }
+    
+    // Also call onSelectUser callback if provided (for showing details card)
     if (onSelectUser) {
       onSelectUser(user);
     }
@@ -643,8 +642,6 @@ export default function SearchBar({
                           variant="outline"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedUserId(user._id);
-                            setIsModalOpen(true);
                             setShowResults(false); // Close search results popup
                             if (onViewProfile) {
                               onViewProfile(user._id);
@@ -653,7 +650,7 @@ export default function SearchBar({
                           className="h-7 px-2"
                         >
                           <Eye className="h-3 w-3 mr-1" />
-                          View
+                          View Full Profile
                         </Button>
                       </div>
                     </div>
@@ -670,12 +667,6 @@ export default function SearchBar({
           </Card>
         )}
 
-      {/* User Details Modal */}
-      <UserDetailsModal
-        userId={selectedUserId}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
     </div>
   );
 }

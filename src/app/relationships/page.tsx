@@ -32,7 +32,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import SearchBar from "@/components/SearchBar";
-import UserProfileModal from "@/components/UserProfileModal";
+import UserDetailsModal from "@/components/UserDetailsModal";
 import { AdminLoader } from "@/components/ui/loader";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -282,6 +282,20 @@ export default function RelationshipsPage() {
     setProfileUserId(userId);
     setProfileModalOpen(true);
   };
+
+  useEffect(() => {
+    // Listen for node clicks from the modal's family tree tab
+    const handleUserProfileNodeClick = (event: CustomEvent) => {
+      const { userId } = event.detail;
+      setProfileUserId(userId);
+      setProfileModalOpen(true);
+    };
+
+    window.addEventListener('userProfileNodeClick', handleUserProfileNodeClick as EventListener);
+    return () => {
+      window.removeEventListener('userProfileNodeClick', handleUserProfileNodeClick as EventListener);
+    };
+  }, []);
 
   if (status === "loading" || loading)
     return <AdminLoader text="Loading your relationships..." />;
@@ -686,11 +700,14 @@ export default function RelationshipsPage() {
           </DialogContent>
         </Dialog>
 
-        {/* User Profile Modal */}
-        <UserProfileModal
+        {/* User Profile Details Modal */}
+        <UserDetailsModal
           userId={profileUserId}
-          open={profileModalOpen}
-          onOpenChange={setProfileModalOpen}
+          isOpen={profileModalOpen}
+          onClose={() => {
+            setProfileModalOpen(false);
+            setProfileUserId(null);
+          }}
         />
       </main>
     </div>
