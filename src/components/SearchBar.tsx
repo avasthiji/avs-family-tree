@@ -166,7 +166,7 @@ export default function SearchBar({
     try {
       const endpoint = isAdmin ? "/api/admin/search" : "/api/search";
       const params = new URLSearchParams({
-        q: query,
+        q: query.trim(),
         filter,
         ...(isAdmin && { status }),
       });
@@ -194,11 +194,11 @@ export default function SearchBar({
     try {
       const endpoint = isAdmin ? "/api/admin/search" : "/api/search";
       const params = new URLSearchParams({
-        ...(advancedName && { name: advancedName }),
-        ...(advancedEmail && { email: advancedEmail }),
-        ...(advancedNativePlace && { nativePlace: advancedNativePlace }),
+        ...(advancedName && { name: advancedName.trim() }),
+        ...(advancedEmail && { email: advancedEmail.trim() }),
+        ...(advancedNativePlace && { nativePlace: advancedNativePlace.trim() }),
         ...(advancedGothiram &&
-          advancedGothiram !== "__none__" && { gothiram: advancedGothiram }),
+          advancedGothiram !== "__none__" && { gothiram: advancedGothiram.trim() }),
         advanced: "true",
         ...(isAdmin && { status }),
       });

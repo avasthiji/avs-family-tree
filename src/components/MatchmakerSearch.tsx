@@ -67,7 +67,8 @@ export default function MatchmakerSearch({
   };
 
   const searchUsers = async (query: string) => {
-    if (query.length < 2) {
+    const trimmedQuery = query.trim();
+    if (trimmedQuery.length < 2) {
       setSearchResults([]);
       setShowResults(false);
       return;
@@ -76,7 +77,7 @@ export default function MatchmakerSearch({
     setIsSearching(true);
     try {
       const response = await fetch(
-        `/api/search?q=${encodeURIComponent(query)}&filter=name&limit=10`
+        `/api/search?q=${encodeURIComponent(trimmedQuery)}&filter=name&limit=10`
       );
       if (response.ok) {
         const data = await response.json();
@@ -107,7 +108,7 @@ export default function MatchmakerSearch({
 
     // Set new timeout for search
     searchTimeoutRef.current = setTimeout(() => {
-      searchUsers(query);
+      searchUsers(query.trim());
     }, 300);
   };
 

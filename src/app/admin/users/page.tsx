@@ -145,7 +145,7 @@ export default function AdminUsersPage() {
       });
 
       if (searchQuery) {
-        params.append("search", searchQuery);
+        params.append("search", searchQuery.trim());
       }
 
       const response = await fetch(`/api/admin/users?${params}`);
