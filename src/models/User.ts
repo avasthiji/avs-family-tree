@@ -12,7 +12,7 @@ export interface IUser extends Document {
   isApprovedByAdmin: boolean;
   approvedBy?: mongoose.Types.ObjectId;
   approvedAt?: Date;
-  role: 'user' | 'admin' | 'matchmaker';
+  role: 'user' | 'admin' | 'matchmaker' | 'profileEndorser' | 'avsMatchMaker';
   
   // Profile Details
   gender?: 'Male' | 'Female' | 'Other';
@@ -109,7 +109,7 @@ const UserSchema = new Schema<IUser>({
   approvedAt: Date,
   role: {
     type: String,
-    enum: ['user', 'admin', 'matchmaker'],
+    enum: ['user', 'admin', 'matchmaker', 'profileEndorser', 'avsMatchMaker'],
     default: 'user'
   },
   
@@ -202,4 +202,9 @@ UserSchema.pre('validate', function(next) {
   }
 });
 
-export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+// Delete existing model to ensure fresh schema with updated enum
+if (mongoose.models.User) {
+  delete mongoose.models.User;
+}
+
+export default mongoose.model<IUser>('User', UserSchema);

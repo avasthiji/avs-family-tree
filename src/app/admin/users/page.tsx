@@ -26,6 +26,7 @@ import { AdminLoader } from "@/components/ui/loader";
 import AppHeader from "@/components/AppHeader";
 import { MATRIMONIAL_ENABLED } from "@/lib/features";
 import { toast } from "sonner";
+import { hasAdminPrivileges, getRoleDisplayName } from "@/lib/roles";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -125,7 +126,7 @@ export default function AdminUsersPage() {
       return;
     }
 
-    if (session.user.role !== "admin") {
+    if (!hasAdminPrivileges(session.user.role)) {
       router.push("/dashboard");
       return;
     }
@@ -864,19 +865,31 @@ export default function AdminUsersPage() {
                                             {user.role === "admin" && (
                                               <>
                                                 <Crown className="h-4 w-4 mr-1 text-orange-500" />
-                                                Admin
+                                                {getRoleDisplayName(user.role)}
+                                              </>
+                                            )}
+                                            {user.role === "profileEndorser" && (
+                                              <>
+                                                <Shield className="h-4 w-4 mr-1 text-orange-500" />
+                                                {getRoleDisplayName(user.role)}
                                               </>
                                             )}
                                             {user.role === "matchmaker" && (
                                               <>
                                                 <Heart className="h-4 w-4 mr-1 text-purple-500" />
-                                                Matchmaker
+                                                {getRoleDisplayName(user.role)}
+                                              </>
+                                            )}
+                                            {user.role === "avsMatchMaker" && (
+                                              <>
+                                                <Heart className="h-4 w-4 mr-1 text-blue-500" />
+                                                {getRoleDisplayName(user.role)}
                                               </>
                                             )}
                                             {user.role === "user" && (
                                               <>
                                                 <UserIcon className="h-4 w-4 mr-1 text-gray-500" />
-                                                User
+                                                {getRoleDisplayName(user.role)}
                                               </>
                                             )}
                                             <ChevronDown className="h-3 w-3 ml-1" />
@@ -890,8 +903,44 @@ export default function AdminUsersPage() {
                                             disabled={user.role === "admin"}
                                           >
                                             <Crown className="h-4 w-4 mr-2 text-orange-500" />
-                                            Admin
+                                            {getRoleDisplayName("admin")}
                                             {user.role === "admin" && (
+                                              <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
+                                            )}
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem
+                                            onClick={() =>
+                                              handleChangeRole(user._id, "profileEndorser")
+                                            }
+                                            disabled={user.role === "profileEndorser"}
+                                          >
+                                            <Shield className="h-4 w-4 mr-2 text-orange-500" />
+                                            {getRoleDisplayName("profileEndorser")}
+                                            {user.role === "profileEndorser" && (
+                                              <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
+                                            )}
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem
+                                            onClick={() =>
+                                              handleChangeRole(user._id, "matchmaker")
+                                            }
+                                            disabled={user.role === "matchmaker"}
+                                          >
+                                            <Heart className="h-4 w-4 mr-2 text-purple-500" />
+                                            {getRoleDisplayName("matchmaker")}
+                                            {user.role === "matchmaker" && (
+                                              <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
+                                            )}
+                                          </DropdownMenuItem>
+                                          <DropdownMenuItem
+                                            onClick={() =>
+                                              handleChangeRole(user._id, "avsMatchMaker")
+                                            }
+                                            disabled={user.role === "avsMatchMaker"}
+                                          >
+                                            <Heart className="h-4 w-4 mr-2 text-blue-500" />
+                                            {getRoleDisplayName("avsMatchMaker")}
+                                            {user.role === "avsMatchMaker" && (
                                               <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
                                             )}
                                           </DropdownMenuItem>
@@ -902,7 +951,7 @@ export default function AdminUsersPage() {
                                             disabled={user.role === "user"}
                                           >
                                             <UserIcon className="h-4 w-4 mr-2 text-gray-500" />
-                                            User
+                                            {getRoleDisplayName("user")}
                                             {user.role === "user" && (
                                               <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
                                             )}

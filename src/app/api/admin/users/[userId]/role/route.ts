@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
+import { hasAdminPrivileges } from "@/lib/roles";
 
 export const runtime = 'nodejs';
 
@@ -12,7 +13,7 @@ export async function POST(
   try {
     const session = await auth();
     
-    if (!session || session.user.role !== "admin") {
+    if (!session || !hasAdminPrivileges(session.user.role)) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -24,9 +25,9 @@ export async function POST(
     const { role } = await request.json();
 
     // Validate role
-    if (!['user', 'admin', 'matchmaker'].includes(role)) {
+    if (!['user', 'admin', 'matchmaker', 'profileEndorser', 'avsMatchMaker'].includes(role)) {
       return NextResponse.json(
-        { error: "Invalid role. Must be 'user', 'admin', or 'matchmaker'" },
+        { error: "Invalid role. Must be 'user', 'admin', 'matchmaker', 'profileEndorser', or 'avsMatchMaker'" },
         { status: 400 }
       );
     }

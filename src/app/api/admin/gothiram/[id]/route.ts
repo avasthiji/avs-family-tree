@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import Gothiram from "@/models/Gothiram";
+import { hasAdminPrivileges } from "@/lib/roles";
 
 export const runtime = 'nodejs';
 
@@ -13,7 +14,7 @@ export async function PUT(
   try {
     const session = await auth();
     
-    if (!session || session.user.role !== "admin") {
+    if (!session || !hasAdminPrivileges(session.user.role)) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -80,7 +81,7 @@ export async function DELETE(
   try {
     const session = await auth();
     
-    if (!session || session.user.role !== "admin") {
+    if (!session || !hasAdminPrivileges(session.user.role)) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }

@@ -41,6 +41,9 @@ export default function MatchmakerSearch({
   useEffect(() => {
     if (value && !selectedMatchmaker) {
       fetchMatchmakerDetails(value);
+    } else if (!value && selectedMatchmaker) {
+      // Clear selected matchmaker if value is cleared
+      setSelectedMatchmaker(null);
     }
   }, [value]);
 

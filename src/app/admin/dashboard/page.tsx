@@ -25,6 +25,7 @@ import SearchBar from "@/components/SearchBar";
 import UserDetailsModal from "@/components/UserDetailsModal";
 import AppHeader from "@/components/AppHeader";
 import { MATRIMONIAL_ENABLED, EVENT_ENABLED } from "@/lib/features";
+import { hasAdminPrivileges } from "@/lib/roles";
 import {
   Users,
   UserCheck,
@@ -121,7 +122,7 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    if (session.user.role !== "admin") {
+    if (!hasAdminPrivileges(session.user.role)) {
       router.push("/dashboard");
       return;
     }

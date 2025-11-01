@@ -30,6 +30,7 @@ import {
   TrendingUp,
   TreePine,
 } from "lucide-react";
+import { hasAdminPrivileges, getRoleDisplayName } from "@/lib/roles";
 
 export default function AppHeader() {
   const { data: session } = useSession();
@@ -42,8 +43,10 @@ export default function AppHeader() {
   if (!session?.user) return null;
 
   const user = session.user;
-  const isAdmin = user.role === "admin";
+  const isAdmin = hasAdminPrivileges(user.role);
+  const isProfileEndorser = user.role === "profileEndorser";
   const isMatchmaker = user.role === "matchmaker";
+  const isAvsMatchMaker = user.role === "avsMatchMaker";
 
   const getInitials = (firstName: string, lastName?: string) => {
     return `${firstName.charAt(0)}${lastName?.charAt(0) || ""}`.toUpperCase();
@@ -83,7 +86,7 @@ export default function AppHeader() {
 
           {/* Right Side - Profile & Actions */}
           <div className="flex items-center space-x-4">
-            {/* Mode Switcher for Admin */}
+            {/* Mode Switcher for Admin/ProfileEndorser */}
             {isAdmin && (
               <div className="hidden md:flex items-center gap-2 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-1 border border-gray-200">
                 <button
@@ -112,16 +115,28 @@ export default function AppHeader() {
             )}
 
             {/* Role Badge */}
-            {isAdmin && (
+            {user.role === "admin" && (
               <Badge className="hidden sm:flex items-center gap-1 bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 shadow-md px-3 py-1">
                 <Crown className="w-3 h-3" />
                 Administrator
+              </Badge>
+            )}
+            {isProfileEndorser && (
+              <Badge className="hidden sm:flex items-center gap-1 bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 shadow-md px-3 py-1">
+                <Shield className="w-3 h-3" />
+                {getRoleDisplayName(user.role)}
               </Badge>
             )}
             {isMatchmaker && (
               <Badge className="hidden sm:flex items-center gap-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-md px-3 py-1">
                 <Heart className="w-3 h-3" />
                 Matchmaker
+              </Badge>
+            )}
+            {isAvsMatchMaker && (
+              <Badge className="hidden sm:flex items-center gap-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-0 shadow-md px-3 py-1">
+                <Heart className="w-3 h-3" />
+                {getRoleDisplayName(user.role)}
               </Badge>
             )}
 

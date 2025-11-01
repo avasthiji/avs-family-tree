@@ -4,6 +4,7 @@ import connectDB from "@/lib/db";
 import User from "@/models/User";
 import { sendEmail } from "@/lib/email";
 import { SUPPORT_EMAIL } from "@/lib/constants";
+import { hasAdminPrivileges } from "@/lib/roles";
 
 export const runtime = 'nodejs';
 
@@ -14,7 +15,7 @@ export async function POST(
   try {
     const session = await auth();
     
-    if (!session || session.user.role !== "admin") {
+    if (!session || !hasAdminPrivileges(session.user.role)) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }

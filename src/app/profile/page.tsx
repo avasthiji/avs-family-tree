@@ -98,9 +98,14 @@ export default function ProfilePage() {
 
       if (profileRes.ok) {
         const data = await profileRes.json();
+        // Convert matchMaker back to matchMakerId for state consistency
+        const userData = { ...data.user };
+        if (userData.matchMaker && !userData.matchMakerId) {
+          userData.matchMakerId = userData.matchMaker._id || userData.matchMaker;
+        }
         // Store both current and original data
-        setUserData(data.user);
-        setOriginalUserData(JSON.parse(JSON.stringify(data.user))); // Deep copy
+        setUserData(userData);
+        setOriginalUserData(JSON.parse(JSON.stringify(userData))); // Deep copy
       } else {
         console.error("Profile API failed:", profileRes.status);
         // Set empty userData to prevent infinite loading
@@ -149,12 +154,18 @@ export default function ProfilePage() {
     setLoading(true);
 
     try {
+      // Prepare the data to send, ensuring matchMakerId is included even if undefined
+      const dataToSend = {
+        ...userData,
+        matchMakerId: userData?.matchMakerId || undefined,
+      };
+      
       const response = await fetch("/api/users/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify(dataToSend),
       });
 
       if (!response.ok) {

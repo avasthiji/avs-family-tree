@@ -95,11 +95,36 @@ export async function PUT(request: NextRequest) {
       'matchMakerId', 'profilePicture'
     ];
 
+    const oldMatchMakerId = user.matchMakerId?.toString();
+
     allowedFields.forEach(field => {
       if (body[field] !== undefined) {
-        user[field] = body[field];
+        // Handle empty string, null, or undefined as undefined for matchMakerId
+        if (field === 'matchMakerId') {
+          if (body[field] === '' || body[field] === null || body[field] === undefined) {
+            user[field] = undefined;
+          } else {
+            user[field] = body[field];
+          }
+        } else {
+          user[field] = body[field];
+        }
       }
     });
+
+    // Update matchmaker's role if matchMakerId changed to a new value
+    const newMatchMakerId = user.matchMakerId?.toString();
+    if (newMatchMakerId && newMatchMakerId !== oldMatchMakerId) {
+      const matchmakerUser = await User.findById(newMatchMakerId);
+      if (matchmakerUser && matchmakerUser.role !== 'admin' && matchmakerUser.role !== 'profileEndorser') {
+        // Only update to matchmaker if not already admin or profileEndorser
+        if (matchmakerUser.role !== 'matchmaker') {
+          matchmakerUser.role = 'matchmaker';
+          matchmakerUser.updatedBy = session.user.id;
+          await matchmakerUser.save();
+        }
+      }
+    }
 
     user.updatedBy = session.user.id;
     await user.save();
