@@ -5,6 +5,7 @@ import User from "@/models/User";
 import { sendEmail } from "@/lib/email";
 import { SUPPORT_EMAIL } from "@/lib/constants";
 import { hasAdminPrivileges } from "@/lib/roles";
+import mongoose from "mongoose";
 
 export const runtime = 'nodejs';
 
@@ -35,7 +36,7 @@ export async function POST(
     }
 
     user.isApprovedByAdmin = true;
-    user.approvedBy = session.user.id;
+    user.approvedBy = new mongoose.Types.ObjectId(session.user.id);
     user.approvedAt = new Date();
     await user.save();
 

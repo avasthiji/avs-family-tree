@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import { hasAdminPrivileges } from "@/lib/roles";
+import mongoose from "mongoose";
 
 export const runtime = 'nodejs';
 
@@ -54,7 +55,7 @@ export async function POST(
 
     // Update user role
     user.role = role;
-    user.updatedBy = session.user.id;
+    user.updatedBy = new mongoose.Types.ObjectId(session.user.id);
     await user.save();
 
     return NextResponse.json({ 

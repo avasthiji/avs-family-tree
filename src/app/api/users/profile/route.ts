@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
+import mongoose from "mongoose";
 
 export const runtime = 'nodejs';
 
@@ -102,12 +103,12 @@ export async function PUT(request: NextRequest) {
         // Handle empty string, null, or undefined as undefined for matchMakerId
         if (field === 'matchMakerId') {
           if (body[field] === '' || body[field] === null || body[field] === undefined) {
-            user[field] = undefined;
+            (user as any)[field] = undefined;
           } else {
-            user[field] = body[field];
+            (user as any)[field] = body[field];
           }
         } else {
-          user[field] = body[field];
+          (user as any)[field] = body[field];
         }
       }
     });
@@ -120,13 +121,13 @@ export async function PUT(request: NextRequest) {
         // Only update to matchmaker if not already admin or profileEndorser
         if (matchmakerUser.role !== 'matchmaker') {
           matchmakerUser.role = 'matchmaker';
-          matchmakerUser.updatedBy = session.user.id;
+          matchmakerUser.updatedBy = new mongoose.Types.ObjectId(session.user.id);
           await matchmakerUser.save();
         }
       }
     }
 
-    user.updatedBy = session.user.id;
+    user.updatedBy = new mongoose.Types.ObjectId(session.user.id);
     await user.save();
 
     return NextResponse.json({

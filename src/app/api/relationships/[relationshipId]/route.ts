@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import Relationship from "@/models/Relationship";
 import { getInverseRelationshipType } from "@/lib/utils";
+import mongoose from "mongoose";
 
 export const runtime = 'nodejs';
 
@@ -122,7 +123,7 @@ export async function PUT(
     if (description !== undefined) {
       relationship.description = description;
     }
-    relationship.updatedBy = session.user.id;
+    relationship.updatedBy = new mongoose.Types.ObjectId(session.user.id);
 
     await relationship.save();
 
@@ -141,7 +142,7 @@ export async function PUT(
         if (description !== undefined) {
           reverseRelationship.description = description;
         }
-        reverseRelationship.updatedBy = session.user.id;
+        reverseRelationship.updatedBy = new mongoose.Types.ObjectId(session.user.id);
         await reverseRelationship.save();
       }
     }
