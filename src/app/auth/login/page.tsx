@@ -103,7 +103,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50 lg:bg-white">
       {/* Split Screen Layout */}
       <div className="flex h-screen">
         {/* Left Side - Logo and Branding */}
@@ -190,17 +190,17 @@ export default function LoginPage() {
         {/* Right Side - Login Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <div className="w-full max-w-md">
-            {/* Mobile Logo */}
+            {/* Mobile Logo and Back Link - Above Card */}
             <div className="lg:hidden text-center mb-6">
               <div className="w-16 h-16 mx-auto mb-3">
                 <Logo size="lg" className="rounded-full" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold avs-text-gradient">
+              <h1 className="text-xl sm:text-2xl font-bold avs-text-gradient mb-4">
                 AVS Family Tree
               </h1>
               <Link
                 href="/"
-                className="inline-flex items-center space-x-2 text-gray-600 hover:text-[#E63946] transition-colors mt-3 text-sm sm:text-base min-h-[44px]"
+                className="inline-flex items-center justify-center space-x-2 text-gray-600 hover:text-[#E63946] transition-colors text-sm sm:text-base min-h-[44px]"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Back to Home</span>
@@ -209,13 +209,10 @@ export default function LoginPage() {
 
             <Card className="avs-card border-0 shadow-2xl">
               <CardHeader className="text-center pb-4 sm:pb-6">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 lg:hidden">
-                  <Logo size="lg" className="rounded-full" />
-                </div>
                 <CardTitle className="text-xl sm:text-2xl font-bold avs-text-gradient">
                   Welcome Back
                 </CardTitle>
-                <CardDescription className="text-sm sm:text-base">
+                <CardDescription className="text-sm sm:text-base mt-2">
                   Sign in to your AVS Family Tree account
                 </CardDescription>
               </CardHeader>
@@ -299,10 +296,10 @@ export default function LoginPage() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-end">
                     <Link
                       href="/auth/forgot-password"
-                      className="text-sm text-[#E63946] hover:underline"
+                      className="text-sm text-[#E63946] hover:underline min-h-[44px] flex items-center"
                     >
                       Forgot password?
                     </Link>
