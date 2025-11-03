@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminLoader } from "@/components/ui/loader";
 import AppHeader from "@/components/AppHeader";
+import BackButton from "@/components/BackButton";
 import { MATRIMONIAL_ENABLED } from "@/lib/features";
 import { toast } from "sonner";
 import { hasAdminPrivileges, getRoleDisplayName } from "@/lib/roles";
@@ -58,7 +59,6 @@ import {
   X,
   Trash2,
   AlertCircle,
-  ArrowLeft,
 } from "lucide-react";
 import UserDetailsModal from "@/components/UserDetailsModal";
 
@@ -526,15 +526,8 @@ export default function AdminUsersPage() {
       <AppHeader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
-        <div className="mb-6">
-          <Link href="/admin/dashboard">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Admin Dashboard
-            </Button>
-          </Link>
-        </div>
+        <BackButton href="/admin/dashboard" label="Back to Admin Dashboard" />
+        
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">

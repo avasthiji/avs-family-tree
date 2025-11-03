@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AdminLoader } from "@/components/ui/loader";
 import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
+import BackButton from "@/components/BackButton";
 import { 
   Crown,
   Plus,
@@ -199,6 +200,8 @@ export default function GothiramManagementPage() {
       <AppHeader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <BackButton href="/admin/dashboard" label="Back to Admin Dashboard" />
+        
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">

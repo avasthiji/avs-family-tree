@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import {
   Card,
   CardContent,
@@ -18,6 +17,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import SearchBar from "@/components/SearchBar";
 import UserDetailsModal from "@/components/UserDetailsModal";
 import { Loader } from "@/components/ui/loader";
+import AppHeader from "@/components/AppHeader";
+import BackButton from "@/components/BackButton";
 import Link from "next/link";
 import {
   User,
@@ -26,7 +27,6 @@ import {
   Heart,
   Mail,
   Phone,
-  ArrowLeft,
   Search as SearchIcon,
   Eye,
 } from "lucide-react";
@@ -106,38 +106,11 @@ function SearchPageContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA]">
-      {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/dashboard" className="flex items-center space-x-2">
-              <div className="w-10 h-10">
-                <Image
-                  src="/avs-logo.png"
-                  alt="AVS Logo"
-                  width={40}
-                  height={40}
-                  className="object-contain"
-                />
-              </div>
-              <span className="text-xl font-bold avs-text-gradient">
-                AVS Family Tree
-              </span>
-            </Link>
-
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard">
-                <Button variant="outline" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <AppHeader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <BackButton href="/dashboard" label="Back to Dashboard" />
+        
         {/* Header with Search */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">

@@ -41,11 +41,10 @@ import {
   Shield,
   CheckCircle,
   Download,
-  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
-import MatchmakerSearch from "@/components/MatchmakerSearch";
+import BackButton from "@/components/BackButton";
 import { MATRIMONIAL_ENABLED } from "@/lib/features";
 import { toast } from "sonner";
 
@@ -72,6 +71,17 @@ export default function ProfilePage() {
       tamilName?: string;
     }>
   >([]);
+  const [avsMatchmakers, setAvsMatchmakers] = useState<
+    Array<{
+      _id: string;
+      firstName: string;
+      lastName: string;
+      gothiram?: string;
+      nativePlace?: string;
+      city?: string;
+      profilePicture?: string;
+    }>
+  >([]);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -87,13 +97,14 @@ export default function ProfilePage() {
 
   const fetchUserProfile = async () => {
     try {
-      const [profileRes, gothiramRes, rasiRes, nakshatramRes, kuladeivamRes] =
+      const [profileRes, gothiramRes, rasiRes, nakshatramRes, kuladeivamRes, matchmakersRes] =
         await Promise.all([
           fetch("/api/users/profile"),
           fetch("/api/gothiram"),
           fetch("/api/rasi"),
           fetch("/api/nakshatram"),
           fetch("/api/kuladeivam"),
+          fetch("/api/matchmakers"),
         ]);
 
       if (profileRes.ok) {
@@ -126,6 +137,13 @@ export default function ProfilePage() {
         setRasiList(data.rasi || []);
       } else {
         console.error("Rasi API failed:", rasiRes.status);
+      }
+
+      if (matchmakersRes.ok) {
+        const data = await matchmakersRes.json();
+        setAvsMatchmakers(data.matchmakers || []);
+      } else {
+        console.error("Matchmakers API failed:", matchmakersRes.status);
       }
 
       if (nakshatramRes.ok) {
@@ -205,15 +223,8 @@ export default function ProfilePage() {
       <AppHeader />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
-        <div className="mb-6">
-          <Link href="/dashboard">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </Link>
-        </div>
+        <BackButton href="/dashboard" label="Back to Dashboard" />
+        
         {/* Profile Header */}
         <Card className="avs-card border-0 shadow-xl mb-8">
           <CardContent className="p-8">
@@ -797,21 +808,36 @@ export default function ProfilePage() {
                       <>
                         <div>
                           <Label
-                            htmlFor="matchmakerSearch"
+                            htmlFor="matchmakerSelect"
                             className="text-sm font-medium"
                           >
                             Select Matchmaker (Optional)
                           </Label>
-                          <MatchmakerSearch
-                            value={userData?.matchMakerId}
-                            onChange={(matchmakerId) =>
+                          <Select
+                            value={userData?.matchMakerId || "none"}
+                            onValueChange={(value) =>
                               setUserData({
                                 ...userData,
-                                matchMakerId: matchmakerId,
+                                matchMakerId: value === "none" ? undefined : value,
                               })
                             }
                             disabled={!editing}
-                          />
+                          >
+                            <SelectTrigger id="matchmakerSelect" className="w-full">
+                              <SelectValue placeholder="Select an AVS Matchmaker" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">None</SelectItem>
+                              {avsMatchmakers.map((matchmaker) => (
+                                <SelectItem key={matchmaker._id} value={matchmaker._id}>
+                                  {matchmaker.firstName} {matchmaker.lastName}
+                                  {matchmaker.gothiram && ` - ${matchmaker.gothiram}`}
+                                  {(matchmaker.nativePlace || matchmaker.city) &&
+                                    ` (${matchmaker.nativePlace || matchmaker.city})`}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <p className="text-xs text-gray-500 mt-1">
                             Choose someone who can help with your matrimony search
                           </p>

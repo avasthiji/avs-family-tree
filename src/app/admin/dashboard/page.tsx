@@ -427,7 +427,7 @@ export default function AdminDashboardPage() {
           } gap-6 mb-8`}
         >
           <Card
-            className={`avs-card border-0 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 ${
+            className={`avs-card border-0 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 ${
               userFilter === "all" ? "ring-2 ring-[#E63946]" : ""
             }`}
             onClick={() => handleCardClick("all")}
@@ -448,7 +448,7 @@ export default function AdminDashboardPage() {
           </Card>
 
           <Card
-            className={`avs-card border-0 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 ${
+            className={`avs-card border-0 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 ${
               userFilter === "pending" ? "ring-2 ring-[#F77F00]" : ""
             }`}
             onClick={() => handleCardClick("pending")}
@@ -471,7 +471,7 @@ export default function AdminDashboardPage() {
           </Card>
 
           <Card
-            className={`avs-card border-0 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 ${
+            className={`avs-card border-0 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 ${
               userFilter === "approved" ? "ring-2 ring-[#2A9D8F]" : ""
             }`}
             onClick={() => handleCardClick("approved")}

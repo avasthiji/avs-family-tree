@@ -215,7 +215,7 @@
   
   /* Enhanced card hover effects */
   .avs-card-hover {
-    @apply transition-all duration-300 ease-in-out cursor-pointer;
+    @apply transition-all duration-300 ease-in-out;
   }
   
   .avs-card-hover:hover {

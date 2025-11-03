@@ -34,6 +34,8 @@ import { Label } from "@/components/ui/label";
 import SearchBar from "@/components/SearchBar";
 import UserDetailsModal from "@/components/UserDetailsModal";
 import { AdminLoader } from "@/components/ui/loader";
+import AppHeader from "@/components/AppHeader";
+import BackButton from "@/components/BackButton";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
@@ -41,7 +43,6 @@ import {
   Plus,
   Trash2,
   Edit,
-  ArrowLeft,
   MapPin,
   User,
   CheckCircle,
@@ -304,26 +305,11 @@ export default function RelationshipsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center h-16">
-          <Link href="/dashboard" className="flex items-center space-x-3">
-            <div className="w-10 h-10 avs-gradient rounded-full flex items-center justify-center text-white font-bold">
-              AVS
-            </div>
-            <span className="text-xl font-semibold text-gray-900">
-              AVS Family Tree
-            </span>
-          </Link>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/dashboard">
-              <ArrowLeft className="h-4 w-4 mr-2" /> Back
-            </Link>
-          </Button>
-        </div>
-      </nav>
+      <AppHeader />
 
       <main className="max-w-6xl mx-auto px-6 py-10 space-y-10">
+        <BackButton href="/dashboard" label="Back to Dashboard" />
+        
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center mb-2">
