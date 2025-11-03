@@ -99,16 +99,16 @@ export default function FamilyTreePage() {
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] via-white to-[#F8F9FA]">
       <AppHeader />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <BackButton href="/dashboard" label="Back to Dashboard" />
         
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-            <TreePine className="h-8 w-8 mr-3 text-[#E63946]" />
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 flex items-center">
+            <TreePine className="h-6 w-6 sm:h-8 sm:w-8 mr-2 sm:mr-3 text-[#E63946]" />
             Family Tree
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm sm:text-base">
             Visualize and manage your family relationships
           </p>
         </div>

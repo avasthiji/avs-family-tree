@@ -145,6 +145,38 @@
   textarea:disabled {
     cursor: not-allowed;
   }
+  
+  /* Mobile-specific improvements */
+  @media (max-width: 640px) {
+    /* Ensure minimum tap target size on mobile */
+    button,
+    a,
+    [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Better text handling on mobile */
+    p, span, div {
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    
+    /* Prevent horizontal scrolling */
+    body {
+      overflow-x: hidden;
+    }
+    
+    /* Better table handling on mobile */
+    table {
+      font-size: 0.875rem;
+    }
+    
+    /* Better input sizing on mobile */
+    input, textarea, select {
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+  }
 }
 
 @layer components {
@@ -166,11 +198,11 @@
   }
   
   .avs-button-primary {
-    @apply bg-gradient-to-r from-[#E63946] to-[#F77F00] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer;
+    @apply bg-gradient-to-r from-[#E63946] to-[#F77F00] text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer min-h-[44px] text-sm sm:text-base;
   }
   
   .avs-button-secondary {
-    @apply bg-gradient-to-r from-[#2A9D8F] to-[#4361EE] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer;
+    @apply bg-gradient-to-r from-[#2A9D8F] to-[#4361EE] text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer min-h-[44px] text-sm sm:text-base;
   }
   
   .avs-text-gradient {

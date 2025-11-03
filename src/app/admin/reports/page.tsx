@@ -146,21 +146,21 @@ Female,${stats.femaleUsers}
       {/* Navigation */}
       <AppHeader />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <BackButton href="/admin/dashboard" label="Back to Admin Dashboard" />
         
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-              <BarChart3 className="h-8 w-8 mr-3 text-[#E63946]" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 flex items-center">
+              <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 mr-2 sm:mr-3 text-[#E63946]" />
               Analytics & Reports
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-sm sm:text-base">
               Comprehensive insights into your AVS community
             </p>
           </div>
-          <Button onClick={exportToCSV} className="avs-button-primary">
+          <Button onClick={exportToCSV} className="avs-button-primary w-full sm:w-auto">
             <Download className="h-4 w-4 mr-2" />
             Export CSV
           </Button>

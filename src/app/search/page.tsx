@@ -112,14 +112,14 @@ function SearchPageContent() {
         <BackButton href="/dashboard" label="Back to Dashboard" />
         
         {/* Header with Search */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-                <SearchIcon className="h-8 w-8 mr-3 text-[#E63946]" />
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 flex items-center">
+                <SearchIcon className="h-6 w-6 sm:h-8 sm:w-8 mr-2 sm:mr-3 text-[#E63946]" />
                 Search Community Members
               </h1>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-sm sm:text-base">
                 Use quick search for simple queries or advanced search to
                 combine multiple criteria
               </p>

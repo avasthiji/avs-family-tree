@@ -307,15 +307,15 @@ export default function RelationshipsPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <AppHeader />
 
-      <main className="max-w-6xl mx-auto px-6 py-10 space-y-10">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6 sm:space-y-10">
         <BackButton href="/dashboard" label="Back to Dashboard" />
         
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center mb-2">
-            <Users className="h-7 w-7 text-[#E63946] mr-3" /> My Relationships
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center mb-2">
+            <Users className="h-6 w-6 sm:h-7 sm:w-7 text-[#E63946] mr-2 sm:mr-3" /> My Relationships
           </h1>
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-600 text-xs sm:text-sm">
             Manage your family connections and relationships
           </p>
         </div>
@@ -336,17 +336,17 @@ export default function RelationshipsPage() {
                 </Button>
               </DialogTrigger>
               <DialogContent
-                className="max-w-3xl w-full max-h-[90vh] flex flex-col p-0"
+                className="max-w-3xl w-[95vw] sm:w-full max-h-[90vh] flex flex-col p-0 mx-2 sm:mx-0"
                 style={{ maxWidth: "800px" }}
               >
-                <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
-                  <DialogTitle>Add New Relationship</DialogTitle>
-                  <DialogDescription>
+                <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2 shrink-0">
+                  <DialogTitle className="text-lg sm:text-xl">Add New Relationship</DialogTitle>
+                  <DialogDescription className="text-sm">
                     Search for a family member and select your relationship
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-5 overflow-y-auto px-6 py-4">
+                <div className="space-y-4 sm:space-y-5 overflow-y-auto px-4 sm:px-6 py-3 sm:py-4">
                   {/* Search Bar */}
                   <div>
                     <Label>Search Member</Label>
@@ -482,8 +482,8 @@ export default function RelationshipsPage() {
                   </div>
                 </div>
 
-                <DialogFooter className="px-6 py-4 border-t shrink-0">
-                  <Button variant="outline" onClick={resetAddDialog}>
+                <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t shrink-0 flex-col sm:flex-row gap-2 sm:gap-0">
+                  <Button variant="outline" onClick={resetAddDialog} className="w-full sm:w-auto min-h-[44px]">
                     Cancel
                   </Button>
                   <Button
@@ -501,7 +501,7 @@ export default function RelationshipsPage() {
                         return otherId === selectedUser._id;
                       })
                     }
-                    className="avs-button-primary"
+                    className="avs-button-primary w-full sm:w-auto"
                   >
                     {submitting ? "Adding..." : "Add Relationship"}
                   </Button>
@@ -544,86 +544,88 @@ export default function RelationshipsPage() {
                   return (
                     <div
                       key={rel._id}
-                      className="flex justify-between items-center p-5 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow transition"
+                      className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 p-4 sm:p-5 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow transition"
                     >
-                      <div className="flex items-center gap-4 flex-1">
-                        <Avatar className="h-12 w-12">
+                      <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                        <Avatar className="h-12 w-12 flex-shrink-0">
                           <AvatarImage src={person.profilePicture} />
                           <AvatarFallback className="avs-gradient text-white">
                             {person.firstName?.[0]}
                             {person.lastName?.[0]}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
                             <button
                               onClick={() => handleViewProfile(person._id)}
-                              className="font-semibold text-gray-900 hover:text-[#E63946] hover:underline cursor-pointer transition-colors"
+                              className="font-semibold text-gray-900 hover:text-[#E63946] hover:underline cursor-pointer transition-colors text-left break-words"
                             >
                               {person.firstName} {person.lastName}
                             </button>
                             <Badge
                               variant="outline"
-                              className="border-[#E63946] text-[#E63946]"
+                              className="border-[#E63946] text-[#E63946] flex-shrink-0"
                             >
                               {getRelationshipLabel(rel)}
                             </Badge>
                             {rel.isApproved ? (
-                              <CheckCircle className="h-4 w-4 text-green-500" />
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
                             ) : (
-                              <Clock className="h-4 w-4 text-yellow-500" />
+                              <Clock className="h-4 w-4 text-yellow-500 flex-shrink-0" />
                             )}
                           </div>
-                          <div className="flex flex-wrap gap-3 text-xs text-gray-600">
+                          <div className="flex flex-wrap gap-2 sm:gap-3 text-xs text-gray-600">
                             {person.gothiram && (
-                              <span>
+                              <span className="break-words">
                                 <User className="inline h-3 w-3 mr-1" />
                                 {person.gothiram}
                               </span>
                             )}
                             {person.nativePlace && (
-                              <span>
+                              <span className="break-words">
                                 <MapPin className="inline h-3 w-3 mr-1" />
                                 {person.nativePlace}
                               </span>
                             )}
                             {rel.description && (
-                              <span className="italic text-gray-500">
+                              <span className="italic text-gray-500 break-words">
                                 {rel.description}
                               </span>
                             )}
                           </div>
                           {rel.createdBy && (
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-gray-400 mt-1 break-words">
                               Added by {rel.createdBy.firstName} on{" "}
                               {new Date(rel.createdAt).toLocaleDateString()}
                             </p>
                           )}
                         </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 sm:gap-2 justify-end sm:justify-start flex-shrink-0">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleViewProfile(person._id)}
                           title="View Profile"
+                          className="min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-2 sm:p-1.5"
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-4 w-4 sm:h-4 sm:w-4" />
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => openEditDialog(rel)}
+                          className="min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-2 sm:p-1.5"
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-4 w-4 sm:h-4 sm:w-4" />
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-red-300 text-red-600 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
+                          className="border-red-300 text-red-600 hover:bg-red-100 hover:border-red-400 hover:text-red-800 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-2 sm:p-1.5"
                           onClick={() => handleDeleteRelationship(rel._id)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
                     </div>
@@ -636,12 +638,12 @@ export default function RelationshipsPage() {
 
         {/* Edit Dialog */}
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="max-w-md w-full max-h-[90vh] flex flex-col p-0">
-            <DialogHeader className="px-6 pt-6 pb-2 shrink-0">
-              <DialogTitle>Edit Relationship</DialogTitle>
-              <DialogDescription>Update relationship details</DialogDescription>
+          <DialogContent className="max-w-md w-[95vw] sm:w-full max-h-[90vh] flex flex-col p-0 mx-2 sm:mx-0">
+            <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2 shrink-0">
+              <DialogTitle className="text-lg sm:text-xl">Edit Relationship</DialogTitle>
+              <DialogDescription className="text-sm">Update relationship details</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 overflow-y-auto px-6 py-4">
+            <div className="space-y-4 overflow-y-auto px-4 sm:px-6 py-3 sm:py-4">
               <div>
                 <Label>Relationship Type</Label>
                 <Select value={relationType} onValueChange={setRelationType}>
@@ -671,14 +673,14 @@ export default function RelationshipsPage() {
                 </p>
               </div>
             </div>
-            <DialogFooter className="px-6 py-4 border-t shrink-0">
-              <Button variant="outline" onClick={resetEditDialog}>
+            <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t shrink-0 flex-col sm:flex-row gap-2 sm:gap-0">
+              <Button variant="outline" onClick={resetEditDialog} className="w-full sm:w-auto min-h-[44px]">
                 Cancel
               </Button>
               <Button
                 onClick={handleEditRelationship}
                 disabled={!relationType || submitting}
-                className="avs-button-primary"
+                className="avs-button-primary w-full sm:w-auto"
               >
                 {submitting ? "Updating..." : "Update"}
               </Button>

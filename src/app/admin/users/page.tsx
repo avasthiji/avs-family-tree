@@ -530,19 +530,19 @@ export default function AdminUsersPage() {
         
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center">
-            <Users className="h-8 w-8 mr-3 text-[#E63946]" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 flex items-center">
+            <Users className="h-6 w-6 sm:h-8 sm:w-8 mr-2 sm:mr-3 text-[#E63946]" />
             User Management
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm sm:text-base">
             Manage all registered users and their permissions
           </p>
         </div>
 
         {/* Search and Filters */}
-        <Card className="avs-card border-0 shadow-lg mb-8">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
+        <Card className="avs-card border-0 shadow-lg mb-6 sm:mb-8">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -552,18 +552,21 @@ export default function AdminUsersPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                    className="pl-10 pr-10"
+                    className="pl-10 pr-10 text-base sm:text-sm"
                   />
                 </div>
               </div>
-              <Button onClick={handleSearch} className="avs-button-primary">
-                <Search className="h-4 w-4 mr-2" />
-                Search
-              </Button>
-              <Button onClick={fetchUsers} variant="outline">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </Button>
+              <div className="flex gap-2 sm:gap-2">
+                <Button onClick={handleSearch} className="avs-button-primary flex-1 sm:flex-none min-h-[44px]">
+                  <Search className="h-4 w-4 mr-2" />
+                  Search
+                </Button>
+                <Button onClick={fetchUsers} variant="outline" className="flex-1 sm:flex-none min-h-[44px]">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Refresh</span>
+                  <span className="sm:hidden">Ref</span>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -609,10 +612,10 @@ export default function AdminUsersPage() {
                   </div>
 
                   {selectedUsers.length > 0 && (
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2 items-center">
                       <Badge
                         variant="outline"
-                        className="text-blue-700 border-blue-300"
+                        className="text-blue-700 border-blue-300 text-xs sm:text-sm"
                       >
                         {selectedUsers.length} selected
                       </Badge>
@@ -622,20 +625,22 @@ export default function AdminUsersPage() {
                             size="sm"
                             onClick={handleBulkApprove}
                             disabled={bulkActionLoading}
-                            className="bg-green-600 hover:bg-green-700 text-white"
+                            className="bg-green-600 hover:bg-green-700 text-white min-h-[44px] px-3 sm:px-2 text-xs sm:text-sm"
                           >
                             <CheckCircle className="h-4 w-4 mr-1" />
-                            Approve Selected
+                            <span className="hidden sm:inline">Approve Selected</span>
+                            <span className="sm:hidden">Approve</span>
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={handleBulkReject}
                             disabled={bulkActionLoading}
-                            className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
+                            className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 min-h-[44px] px-3 sm:px-2 text-xs sm:text-sm"
                           >
                             <XCircle className="h-4 w-4 mr-1" />
-                            Reject Selected
+                            <span className="hidden sm:inline">Reject Selected</span>
+                            <span className="sm:hidden">Reject</span>
                           </Button>
                         </>
                       )}
@@ -643,20 +648,22 @@ export default function AdminUsersPage() {
                         size="sm"
                         onClick={handleBulkMakeAdmin}
                         disabled={bulkActionLoading}
-                        className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white"
+                        className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white min-h-[44px] px-3 sm:px-2 text-xs sm:text-sm"
                       >
                         <Crown className="h-4 w-4 mr-1" />
-                        Make Admin
+                        <span className="hidden sm:inline">Make Admin</span>
+                        <span className="sm:hidden">Admin</span>
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={handleBulkMakeUser}
                         disabled={bulkActionLoading}
-                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50 min-h-[44px] px-3 sm:px-2 text-xs sm:text-sm"
                       >
                         <UserIcon className="h-4 w-4 mr-1" />
-                        Make User
+                        <span className="hidden sm:inline">Make User</span>
+                        <span className="sm:hidden">User</span>
                       </Button>
                     </div>
                   )}
@@ -681,11 +688,12 @@ export default function AdminUsersPage() {
                   </div>
                 ) : users.length > 0 ? (
                   <>
-                    <div className="overflow-x-auto">
-                      <Table>
+                    <div className="overflow-x-auto -mx-4 sm:mx-0">
+                      <div className="inline-block min-w-full align-middle">
+                        <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="w-12">
+                            <TableHead className="w-12 px-2 sm:px-4">
                               <input
                                 type="checkbox"
                                 checked={
@@ -693,18 +701,18 @@ export default function AdminUsersPage() {
                                   users.length > 0
                                 }
                                 onChange={handleSelectAll}
-                                className="h-4 w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
+                                className="h-5 w-5 sm:h-4 sm:w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
                               />
                             </TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Contact</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Name</TableHead>
+                            <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Contact</TableHead>
+                            <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Status</TableHead>
                             {/* <TableHead>Role</TableHead> */}
                             {(statusFilter === "all" || statusFilter === "approved") && (
-                              <TableHead>Approved By</TableHead>
+                              <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Approved By</TableHead>
                             )}
-                            <TableHead>Joined</TableHead>
-                            <TableHead>Actions</TableHead>
+                            <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Joined</TableHead>
+                            <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -717,61 +725,61 @@ export default function AdminUsersPage() {
                                   : ""
                               }
                             >
-                              <TableCell>
+                              <TableCell className="px-2 sm:px-4">
                                 <input
                                   type="checkbox"
                                   checked={selectedUsers.includes(user._id)}
                                   onChange={() => handleSelectUser(user._id)}
-                                  className="h-4 w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
+                                  className="h-5 w-5 sm:h-4 sm:w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
                                 />
                               </TableCell>
-                              <TableCell>
-                                <div>
-                                  <p className="font-medium text-gray-900">
+                              <TableCell className="px-2 sm:px-4">
+                                <div className="min-w-0">
+                                  <p className="font-medium text-gray-900 truncate text-sm sm:text-base">
                                     {user.firstName} {user.lastName}
                                   </p>
                                   {user.gothiram && (
-                                    <p className="text-xs text-gray-500">
+                                    <p className="text-xs text-gray-500 truncate">
                                       {user.gothiram}
                                     </p>
                                   )}
                                 </div>
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="px-2 sm:px-4">
                                 <div className="text-sm">
                                   {user.email && (
-                                    <div className="flex items-center gap-1 mb-1">
-                                      <Mail className="h-3 w-3 text-gray-400" />
-                                      <span className="text-xs">
+                                    <div className="flex items-center gap-1 mb-1 min-w-0">
+                                      <Mail className="h-3 w-3 text-gray-400 flex-shrink-0" />
+                                      <span className="text-xs truncate max-w-[150px] sm:max-w-[200px] md:max-w-none" title={user.email}>
                                         {user.email}
                                       </span>
                                       {user.isEmailVerified ? (
-                                        <CheckCircle className="h-3 w-3 text-green-600" />
+                                        <CheckCircle className="h-3 w-3 text-green-600 flex-shrink-0" />
                                       ) : (
-                                        <AlertCircle className="h-3 w-3 text-yellow-600" />
+                                        <AlertCircle className="h-3 w-3 text-yellow-600 flex-shrink-0" />
                                       )}
                                     </div>
                                   )}
                                   {user.mobile && (
-                                    <div className="flex items-center gap-1">
-                                      <Phone className="h-3 w-3 text-gray-400" />
-                                      <span className="text-xs">
-                                        {user.mobile}
-                                      </span>
+                                    <div className="flex items-center gap-1 min-w-0">
+                                      <Phone className="h-3 w-3 text-gray-400 flex-shrink-0" />
+                                      <span className="text-xs truncate max-w-[120px] sm:max-w-none">{user.mobile}</span>
                                     </div>
                                   )}
                                 </div>
                               </TableCell>
-                              <TableCell>
+                              <TableCell className="px-2 sm:px-4">
                                 {user.isApprovedByAdmin ? (
-                                  <Badge className="bg-green-100 text-green-800 border-green-300">
+                                  <Badge className="bg-green-100 text-green-800 border-green-300 text-xs">
                                     <CheckCircle className="w-3 h-3 mr-1" />
-                                    Approved
+                                    <span className="hidden sm:inline">Approved</span>
+                                    <span className="sm:hidden">App</span>
                                   </Badge>
                                 ) : (
-                                  <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                                  <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
                                     <UserX className="w-3 h-3 mr-1" />
-                                    Pending
+                                    <span className="hidden sm:inline">Pending</span>
+                                    <span className="sm:hidden">Pend</span>
                                   </Badge>
                                 )}
                               </TableCell>
@@ -792,29 +800,29 @@ export default function AdminUsersPage() {
                                 </div>
                               </TableCell> */}
                               {(statusFilter === "all" || statusFilter === "approved") && (
-                                <TableCell>
+                                <TableCell className="px-2 sm:px-4">
                                   {user.approvedBy ? (
                                     <button
                                       onClick={() => handleApprovedByClick(user.approvedBy!._id)}
-                                      className="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium cursor-pointer"
+                                      className="text-blue-600 hover:text-blue-800 hover:underline text-xs sm:text-sm font-medium cursor-pointer min-h-[44px] sm:min-h-0 break-words"
                                     >
                                       {user.approvedBy.firstName} {user.approvedBy.lastName}
                                     </button>
                                   ) : (
-                                    <span className="text-gray-400 text-sm">N/A</span>
+                                    <span className="text-gray-400 text-xs sm:text-sm">N/A</span>
                                   )}
                                 </TableCell>
                               )}
-                              <TableCell>
+                              <TableCell className="px-2 sm:px-4">
                                 <div className="flex items-center gap-1 text-xs text-gray-600">
-                                  <Calendar className="h-3 w-3" />
-                                  {new Date(
+                                  <Calendar className="h-3 w-3 flex-shrink-0" />
+                                  <span className="whitespace-nowrap">{new Date(
                                     user.createdAt
-                                  ).toLocaleDateString()}
+                                  ).toLocaleDateString()}</span>
                                 </div>
                               </TableCell>
-                              <TableCell>
-                                <div className="flex gap-2">
+                              <TableCell className="px-2 sm:px-4">
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                   {user._id !== session?.user.id && (
                                     <>
                                       <Button
@@ -823,7 +831,7 @@ export default function AdminUsersPage() {
                                           handleApproveUser(user._id)
                                         }
                                         disabled={user.isApprovedByAdmin}
-                                        className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-2 sm:p-1.5"
                                       >
                                         <CheckCircle className="h-4 w-4" />
                                       </Button>
@@ -834,7 +842,7 @@ export default function AdminUsersPage() {
                                           handleRejectUser(user._id)
                                         }
                                         disabled={user.isApprovedByAdmin}
-                                        className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-2 sm:p-1.5"
                                       >
                                         <XCircle className="h-4 w-4" />
                                       </Button>
@@ -847,33 +855,33 @@ export default function AdminUsersPage() {
                                           <Button
                                             size="sm"
                                             variant="outline"
-                                            className="border-gray-300"
+                                            className="border-gray-300 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-2 sm:p-1.5 text-xs sm:text-sm"
                                           >
                                             {user.role === "admin" && (
                                               <>
-                                                <Crown className="h-4 w-4 mr-1 text-orange-500" />
-                                                {getRoleDisplayName(user.role)}
+                                                <Crown className="h-4 w-4 mr-1 text-orange-500 flex-shrink-0" />
+                                                <span className="hidden sm:inline">{getRoleDisplayName(user.role)}</span>
                                               </>
                                             )}
                                             {user.role === "profileEndorser" && (
                                               <>
-                                                <Shield className="h-4 w-4 mr-1 text-orange-500" />
-                                                {getRoleDisplayName(user.role)}
+                                                <Shield className="h-4 w-4 mr-1 text-orange-500 flex-shrink-0" />
+                                                <span className="hidden sm:inline">{getRoleDisplayName(user.role)}</span>
                                               </>
                                             )}
                                             {user.role === "avsMatchMaker" && (
                                               <>
-                                                <Heart className="h-4 w-4 mr-1 text-blue-500" />
-                                                {getRoleDisplayName(user.role)}
+                                                <Heart className="h-4 w-4 mr-1 text-blue-500 flex-shrink-0" />
+                                                <span className="hidden sm:inline">{getRoleDisplayName(user.role)}</span>
                                               </>
                                             )}
                                             {user.role === "user" && (
                                               <>
-                                                <UserIcon className="h-4 w-4 mr-1 text-gray-500" />
-                                                {getRoleDisplayName(user.role)}
+                                                <UserIcon className="h-4 w-4 mr-1 text-gray-500 flex-shrink-0" />
+                                                <span className="hidden sm:inline">{getRoleDisplayName(user.role)}</span>
                                               </>
                                             )}
-                                            <ChevronDown className="h-3 w-3 ml-1" />
+                                            <ChevronDown className="h-3 w-3 ml-1 flex-shrink-0" />
                                           </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
@@ -936,7 +944,8 @@ export default function AdminUsersPage() {
                                             `${user.firstName} ${user.lastName}`
                                           )
                                         }
-                                        className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
+                                        className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-2 sm:p-1.5"
+                                        title="Delete User"
                                       >
                                         <Trash2 className="h-4 w-4" />
                                       </Button>
@@ -948,12 +957,13 @@ export default function AdminUsersPage() {
                           ))}
                         </TableBody>
                       </Table>
+                      </div>
                     </div>
 
                     {/* Pagination */}
                     {pagination.totalPages > 1 && (
-                      <div className="mt-6 flex items-center justify-between">
-                        <div className="text-sm text-gray-600">
+                      <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
                           Showing{" "}
                           {(pagination.currentPage - 1) * pagination.limit + 1}{" "}
                           to{" "}
@@ -963,7 +973,7 @@ export default function AdminUsersPage() {
                           )}{" "}
                           of {pagination.totalUsers} users
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap items-center justify-center gap-2">
                           <Button
                             variant="outline"
                             size="sm"
@@ -971,11 +981,13 @@ export default function AdminUsersPage() {
                               handlePageChange(pagination.currentPage - 1)
                             }
                             disabled={pagination.currentPage === 1}
+                            className="min-h-[44px] sm:min-h-0 px-3 sm:px-2"
                           >
                             <ChevronLeft className="h-4 w-4 mr-1" />
-                            Previous
+                            <span className="hidden sm:inline">Previous</span>
+                            <span className="sm:hidden">Prev</span>
                           </Button>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 sm:gap-2">
                             {Array.from(
                               { length: Math.min(5, pagination.totalPages) },
                               (_, i) => {
@@ -1003,11 +1015,11 @@ export default function AdminUsersPage() {
                                     }
                                     size="sm"
                                     onClick={() => handlePageChange(pageNum)}
-                                    className={
+                                    className={`min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 px-3 sm:px-2 ${
                                       pagination.currentPage === pageNum
                                         ? "avs-button-primary"
                                         : ""
-                                    }
+                                    }`}
                                   >
                                     {pageNum}
                                   </Button>
@@ -1024,8 +1036,10 @@ export default function AdminUsersPage() {
                             disabled={
                               pagination.currentPage === pagination.totalPages
                             }
+                            className="min-h-[44px] sm:min-h-0 px-3 sm:px-2"
                           >
-                            Next
+                            <span className="hidden sm:inline">Next</span>
+                            <span className="sm:hidden">Next</span>
                             <ChevronRight className="h-4 w-4 ml-1" />
                           </Button>
                         </div>

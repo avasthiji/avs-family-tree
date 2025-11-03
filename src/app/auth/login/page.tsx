@@ -188,19 +188,19 @@ export default function LoginPage() {
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <div className="w-full max-w-md">
             {/* Mobile Logo */}
-            <div className="lg:hidden text-center mb-8">
-              <div className="w-16 h-16 mx-auto mb-4">
+            <div className="lg:hidden text-center mb-6">
+              <div className="w-16 h-16 mx-auto mb-3">
                 <Logo size="lg" className="rounded-full" />
               </div>
-              <h1 className="text-2xl font-bold avs-text-gradient">
+              <h1 className="text-xl sm:text-2xl font-bold avs-text-gradient">
                 AVS Family Tree
               </h1>
               <Link
                 href="/"
-                className="inline-flex items-center space-x-2 text-gray-600 hover:text-[#E63946] transition-colors mt-4"
+                className="inline-flex items-center space-x-2 text-gray-600 hover:text-[#E63946] transition-colors mt-3 text-sm sm:text-base min-h-[44px]"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Back to Home</span>
@@ -208,14 +208,14 @@ export default function LoginPage() {
             </div>
 
             <Card className="avs-card border-0 shadow-2xl">
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 lg:hidden">
+              <CardHeader className="text-center pb-4 sm:pb-6">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 lg:hidden">
                   <Logo size="lg" className="rounded-full" />
                 </div>
-                <CardTitle className="text-2xl font-bold avs-text-gradient">
+                <CardTitle className="text-xl sm:text-2xl font-bold avs-text-gradient">
                   Welcome Back
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm sm:text-base">
                   Sign in to your AVS Family Tree account
                 </CardDescription>
               </CardHeader>
@@ -310,7 +310,7 @@ export default function LoginPage() {
 
                   <Button
                     type="submit"
-                    className="w-full avs-button-primary"
+                    className="w-full avs-button-primary min-h-[44px] text-base sm:text-sm"
                     disabled={loading}
                   >
                     {loading ? (
