@@ -26,9 +26,9 @@ export async function POST(
     const { role } = await request.json();
 
     // Validate role
-    if (!['user', 'admin', 'matchmaker', 'profileEndorser', 'avsMatchMaker'].includes(role)) {
+    if (!['user', 'admin', 'profileEndorser', 'avsMatchMaker'].includes(role)) {
       return NextResponse.json(
-        { error: "Invalid role. Must be 'user', 'admin', 'matchmaker', 'profileEndorser', or 'avsMatchMaker'" },
+        { error: "Invalid role. Must be 'user', 'admin', 'profileEndorser', or 'avsMatchMaker'" },
         { status: 400 }
       );
     }

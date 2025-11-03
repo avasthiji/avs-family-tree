@@ -118,9 +118,9 @@ export async function PUT(request: NextRequest) {
     if (newMatchMakerId && newMatchMakerId !== oldMatchMakerId) {
       const matchmakerUser = await User.findById(newMatchMakerId);
       if (matchmakerUser && matchmakerUser.role !== 'admin' && matchmakerUser.role !== 'profileEndorser') {
-        // Only update to matchmaker if not already admin or profileEndorser
-        if (matchmakerUser.role !== 'matchmaker') {
-          matchmakerUser.role = 'matchmaker';
+        // Only update to avsMatchMaker if not already admin or profileEndorser
+        if (matchmakerUser.role !== 'avsMatchMaker') {
+          matchmakerUser.role = 'avsMatchMaker';
           matchmakerUser.updatedBy = new mongoose.Types.ObjectId(session.user.id);
           await matchmakerUser.save();
         }

@@ -45,7 +45,6 @@ export default function AppHeader() {
   const user = session.user;
   const isAdmin = hasAdminPrivileges(user.role);
   const isProfileEndorser = user.role === "profileEndorser";
-  const isMatchmaker = user.role === "matchmaker";
   const isAvsMatchMaker = user.role === "avsMatchMaker";
 
   const getInitials = (firstName: string, lastName?: string) => {
@@ -125,12 +124,6 @@ export default function AppHeader() {
               <Badge className="hidden sm:flex items-center gap-1 bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 shadow-md px-3 py-1">
                 <Shield className="w-3 h-3" />
                 {getRoleDisplayName(user.role)}
-              </Badge>
-            )}
-            {isMatchmaker && (
-              <Badge className="hidden sm:flex items-center gap-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-md px-3 py-1">
-                <Heart className="w-3 h-3" />
-                Matchmaker
               </Badge>
             )}
             {isAvsMatchMaker && (

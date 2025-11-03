@@ -2,7 +2,7 @@
  * Role utility functions
  */
 
-export type UserRole = 'user' | 'admin' | 'matchmaker' | 'profileEndorser' | 'avsMatchMaker';
+export type UserRole = 'user' | 'admin' | 'profileEndorser' | 'avsMatchMaker';
 
 /**
  * Check if a role has admin privileges (admin or profileEndorser)
@@ -25,7 +25,6 @@ export function getRoleDisplayName(role: string): string {
   const roleMap: Record<string, string> = {
     'user': 'User',
     'admin': 'Administrator',
-    'matchmaker': 'Matchmaker',
     'profileEndorser': 'AVS Profile Endorser',
     'avsMatchMaker': 'AVS Match Maker'
   };
@@ -39,7 +38,6 @@ export function getRoleBadgeColor(role: string): string {
   const colorMap: Record<string, string> = {
     'user': 'bg-gray-500',
     'admin': 'from-red-500 to-orange-500',
-    'matchmaker': 'from-purple-500 to-pink-500',
     'profileEndorser': 'from-red-500 to-orange-500',
     'avsMatchMaker': 'from-blue-500 to-cyan-500'
   };

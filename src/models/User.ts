@@ -12,7 +12,7 @@ export interface IUser extends Document {
   isApprovedByAdmin: boolean;
   approvedBy?: mongoose.Types.ObjectId;
   approvedAt?: Date;
-  role: 'user' | 'admin' | 'matchmaker' | 'profileEndorser' | 'avsMatchMaker';
+  role: 'user' | 'admin' | 'profileEndorser' | 'avsMatchMaker';
   
   // Profile Details
   gender?: 'Male' | 'Female' | 'Other';
@@ -109,7 +109,7 @@ const UserSchema = new Schema<IUser>({
   approvedAt: Date,
   role: {
     type: String,
-    enum: ['user', 'admin', 'matchmaker', 'profileEndorser', 'avsMatchMaker'],
+    enum: ['user', 'admin', 'profileEndorser', 'avsMatchMaker'],
     default: 'user'
   },
   

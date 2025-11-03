@@ -783,12 +783,6 @@ export default function AdminUsersPage() {
                                       <span className="text-sm font-medium text-orange-700">Admin</span>
                                     </>
                                   )}
-                                  {user.role === "matchmaker" && (
-                                    <>
-                                      <Heart className="h-4 w-4 text-purple-500" />
-                                      <span className="text-sm font-medium text-purple-700">Matchmaker</span>
-                                    </>
-                                  )}
                                   {user.role === "user" && (
                                     <>
                                       <UserIcon className="h-4 w-4 text-gray-500" />
@@ -867,12 +861,6 @@ export default function AdminUsersPage() {
                                                 {getRoleDisplayName(user.role)}
                                               </>
                                             )}
-                                            {user.role === "matchmaker" && (
-                                              <>
-                                                <Heart className="h-4 w-4 mr-1 text-purple-500" />
-                                                {getRoleDisplayName(user.role)}
-                                              </>
-                                            )}
                                             {user.role === "avsMatchMaker" && (
                                               <>
                                                 <Heart className="h-4 w-4 mr-1 text-blue-500" />
@@ -910,18 +898,6 @@ export default function AdminUsersPage() {
                                             <Shield className="h-4 w-4 mr-2 text-orange-500" />
                                             {getRoleDisplayName("profileEndorser")}
                                             {user.role === "profileEndorser" && (
-                                              <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
-                                            )}
-                                          </DropdownMenuItem>
-                                          <DropdownMenuItem
-                                            onClick={() =>
-                                              handleChangeRole(user._id, "matchmaker")
-                                            }
-                                            disabled={user.role === "matchmaker"}
-                                          >
-                                            <Heart className="h-4 w-4 mr-2 text-purple-500" />
-                                            {getRoleDisplayName("matchmaker")}
-                                            {user.role === "matchmaker" && (
                                               <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
                                             )}
                                           </DropdownMenuItem>
