@@ -105,6 +105,7 @@ export function generateOTPEmailTemplate(otp: string, purpose: string): string {
           font-weight: bold;
           letter-spacing: 8px;
           margin: 10px 0;
+          color: #000000;
         }
         .footer {
           background-color: #f8f9fa;
