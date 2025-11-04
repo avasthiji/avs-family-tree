@@ -5,17 +5,17 @@
 export type UserRole = 'user' | 'admin' | 'profileEndorser' | 'avsMatchMaker';
 
 /**
- * Check if a role has admin privileges (admin or profileEndorser)
+ * Check if a role has admin privileges (admin only)
  */
 export function hasAdminPrivileges(role: string): boolean {
-  return role === 'admin' || role === 'profileEndorser';
+  return role === 'admin';
 }
 
 /**
- * Check if a role is a regular user role (user or avsMatchMaker)
+ * Check if a role is a regular user role (user, profileEndorser, or avsMatchMaker)
  */
 export function isRegularUser(role: string): boolean {
-  return role === 'user' || role === 'avsMatchMaker';
+  return role === 'user' || role === 'profileEndorser' || role === 'avsMatchMaker';
 }
 
 /**
