@@ -292,9 +292,15 @@ export default function RelationshipsPage() {
       setProfileModalOpen(true);
     };
 
-    window.addEventListener('userProfileNodeClick', handleUserProfileNodeClick as EventListener);
+    window.addEventListener(
+      "userProfileNodeClick",
+      handleUserProfileNodeClick as EventListener
+    );
     return () => {
-      window.removeEventListener('userProfileNodeClick', handleUserProfileNodeClick as EventListener);
+      window.removeEventListener(
+        "userProfileNodeClick",
+        handleUserProfileNodeClick as EventListener
+      );
     };
   }, []);
 
@@ -309,11 +315,12 @@ export default function RelationshipsPage() {
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6 sm:space-y-10">
         <BackButton href="/dashboard" label="Back to Dashboard" />
-        
+
         {/* Header */}
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center mb-2">
-            <Users className="h-6 w-6 sm:h-7 sm:w-7 text-[#E63946] mr-2 sm:mr-3" /> My Relationships
+            <Users className="h-6 w-6 sm:h-7 sm:w-7 text-[#E63946] mr-2 sm:mr-3" />{" "}
+            My Relationships
           </h1>
           <p className="text-gray-600 text-xs sm:text-sm">
             Manage your family connections and relationships
@@ -340,7 +347,9 @@ export default function RelationshipsPage() {
                 style={{ maxWidth: "800px" }}
               >
                 <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2 shrink-0">
-                  <DialogTitle className="text-lg sm:text-xl">Add New Relationship</DialogTitle>
+                  <DialogTitle className="text-lg sm:text-xl">
+                    Add New Relationship
+                  </DialogTitle>
                   <DialogDescription className="text-sm">
                     Search for a family member and select your relationship
                   </DialogDescription>
@@ -355,6 +364,7 @@ export default function RelationshipsPage() {
                         isAdmin={session.user.role === "admin"}
                         onSelectUser={setSelectedUser}
                         onViewProfile={handleViewProfile}
+                        stopViewing={true}
                       />
                     </div>
                   </div>
@@ -483,7 +493,11 @@ export default function RelationshipsPage() {
                 </div>
 
                 <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t shrink-0 flex-col sm:flex-row gap-2 sm:gap-0">
-                  <Button variant="outline" onClick={resetAddDialog} className="w-full sm:w-auto min-h-[44px]">
+                  <Button
+                    variant="outline"
+                    onClick={resetAddDialog}
+                    className="w-full sm:w-auto min-h-[44px]"
+                  >
                     Cancel
                   </Button>
                   <Button
@@ -640,8 +654,12 @@ export default function RelationshipsPage() {
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
           <DialogContent className="max-w-md w-[95vw] sm:w-full max-h-[90vh] flex flex-col p-0 mx-2 sm:mx-0">
             <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2 shrink-0">
-              <DialogTitle className="text-lg sm:text-xl">Edit Relationship</DialogTitle>
-              <DialogDescription className="text-sm">Update relationship details</DialogDescription>
+              <DialogTitle className="text-lg sm:text-xl">
+                Edit Relationship
+              </DialogTitle>
+              <DialogDescription className="text-sm">
+                Update relationship details
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 overflow-y-auto px-4 sm:px-6 py-3 sm:py-4">
               <div>
@@ -674,7 +692,11 @@ export default function RelationshipsPage() {
               </div>
             </div>
             <DialogFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t shrink-0 flex-col sm:flex-row gap-2 sm:gap-0">
-              <Button variant="outline" onClick={resetEditDialog} className="w-full sm:w-auto min-h-[44px]">
+              <Button
+                variant="outline"
+                onClick={resetEditDialog}
+                className="w-full sm:w-auto min-h-[44px]"
+              >
                 Cancel
               </Button>
               <Button

@@ -52,6 +52,7 @@ interface SearchBarProps {
   onSelectUser?: (user: SearchResult) => void;
   onViewProfile?: (userId: string) => void;
   onSearchChange?: () => void; // New callback for when search changes
+  stopViewing?: boolean;
 }
 
 interface GothiramOption {
@@ -65,6 +66,7 @@ export default function SearchBar({
   onSelectUser,
   onViewProfile,
   onSearchChange,
+  stopViewing = false,
 }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
@@ -81,7 +83,6 @@ export default function SearchBar({
   const [advancedNativePlace, setAdvancedNativePlace] = useState("");
   const [advancedGothiram, setAdvancedGothiram] = useState("");
   const [gothiramOptions, setGothiramOptions] = useState<GothiramOption[]>([]);
-
 
   // Load Gothiram options
   useEffect(() => {
@@ -198,7 +199,9 @@ export default function SearchBar({
         ...(advancedEmail && { email: advancedEmail.trim() }),
         ...(advancedNativePlace && { nativePlace: advancedNativePlace.trim() }),
         ...(advancedGothiram &&
-          advancedGothiram !== "__none__" && { gothiram: advancedGothiram.trim() }),
+          advancedGothiram !== "__none__" && {
+            gothiram: advancedGothiram.trim(),
+          }),
         advanced: "true",
         ...(isAdmin && { status }),
       });
@@ -234,12 +237,12 @@ export default function SearchBar({
   const handleSelectUser = (user: SearchResult) => {
     // Close search results popup
     setShowResults(false);
-    
+
     // Open the User Profile Details modal (same as clicking "View")
-    if (onViewProfile) {
+    if (onViewProfile && !stopViewing) {
       onViewProfile(user._id);
     }
-    
+
     // Also call onSelectUser callback if provided (for showing details card)
     if (onSelectUser) {
       onSelectUser(user);
@@ -666,7 +669,6 @@ export default function SearchBar({
             )}
           </Card>
         )}
-
     </div>
   );
 }

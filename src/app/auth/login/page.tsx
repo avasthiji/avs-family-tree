@@ -191,11 +191,11 @@ export default function LoginPage() {
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <div className="w-full max-w-md">
             {/* Mobile Logo and Back Link - Above Card */}
-            <div className="lg:hidden text-center mb-6">
-              <div className="w-16 h-16 mx-auto mb-3">
+            <div className="lg:hidden text-center mb-6 space-y-4">
+              <div className="w-16 h-16 mx-auto overflow-hidden flex items-center justify-center">
                 <Logo size="lg" className="rounded-full" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold avs-text-gradient mb-4">
+              <h1 className="text-xl sm:text-2xl font-bold avs-text-gradient">
                 AVS Family Tree
               </h1>
               <Link

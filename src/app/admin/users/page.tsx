@@ -490,7 +490,11 @@ export default function AdminUsersPage() {
   };
 
   const handleDeleteUser = async (userId: string, userName: string) => {
-    if (!confirm(`Are you sure you want to delete ${userName}? This will remove them from all relationships.`))
+    if (
+      !confirm(
+        `Are you sure you want to delete ${userName}? This will remove them from all relationships.`
+      )
+    )
       return;
 
     try {
@@ -499,7 +503,9 @@ export default function AdminUsersPage() {
       });
 
       if (response.ok) {
-        toast.success("User deleted successfully and removed from all relationships");
+        toast.success(
+          "User deleted successfully and removed from all relationships"
+        );
         fetchUsers();
         fetchUserCounts();
       } else {
@@ -527,7 +533,7 @@ export default function AdminUsersPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <BackButton href="/admin/dashboard" label="Back to Admin Dashboard" />
-        
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 flex items-center">
@@ -557,11 +563,18 @@ export default function AdminUsersPage() {
                 </div>
               </div>
               <div className="flex gap-2 sm:gap-2">
-                <Button onClick={handleSearch} className="avs-button-primary flex-1 sm:flex-none min-h-[44px]">
+                <Button
+                  onClick={handleSearch}
+                  className="avs-button-primary flex-1 sm:flex-none min-h-[44px]"
+                >
                   <Search className="h-4 w-4 mr-2" />
                   Search
                 </Button>
-                <Button onClick={fetchUsers} variant="outline" className="flex-1 sm:flex-none min-h-[44px]">
+                <Button
+                  onClick={fetchUsers}
+                  variant="outline"
+                  className="flex-1 sm:flex-none min-h-[44px]"
+                >
                   <RefreshCw className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">Refresh</span>
                   <span className="sm:hidden">Ref</span>
@@ -628,7 +641,9 @@ export default function AdminUsersPage() {
                             className="bg-green-600 hover:bg-green-700 text-white min-h-[44px] px-3 sm:px-2 text-xs sm:text-sm"
                           >
                             <CheckCircle className="h-4 w-4 mr-1" />
-                            <span className="hidden sm:inline">Approve Selected</span>
+                            <span className="hidden sm:inline">
+                              Approve Selected
+                            </span>
                             <span className="sm:hidden">Approve</span>
                           </Button>
                           <Button
@@ -639,7 +654,9 @@ export default function AdminUsersPage() {
                             className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 min-h-[44px] px-3 sm:px-2 text-xs sm:text-sm"
                           >
                             <XCircle className="h-4 w-4 mr-1" />
-                            <span className="hidden sm:inline">Reject Selected</span>
+                            <span className="hidden sm:inline">
+                              Reject Selected
+                            </span>
                             <span className="sm:hidden">Reject</span>
                           </Button>
                         </>
@@ -691,99 +708,121 @@ export default function AdminUsersPage() {
                     <div className="overflow-x-auto -mx-4 sm:mx-0">
                       <div className="inline-block min-w-full align-middle">
                         <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="w-12 px-2 sm:px-4">
-                              <input
-                                type="checkbox"
-                                checked={
-                                  selectedUsers.length === users.length &&
-                                  users.length > 0
-                                }
-                                onChange={handleSelectAll}
-                                className="h-5 w-5 sm:h-4 sm:w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
-                              />
-                            </TableHead>
-                            <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Name</TableHead>
-                            <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Contact</TableHead>
-                            <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Status</TableHead>
-                            {/* <TableHead>Role</TableHead> */}
-                            {(statusFilter === "all" || statusFilter === "approved") && (
-                              <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Approved By</TableHead>
-                            )}
-                            <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Joined</TableHead>
-                            <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {users.map((user) => (
-                            <TableRow
-                              key={user._id}
-                              className={
-                                selectedUsers.includes(user._id)
-                                  ? "bg-blue-50"
-                                  : ""
-                              }
-                            >
-                              <TableCell className="px-2 sm:px-4">
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="w-12 px-2 sm:px-4">
                                 <input
                                   type="checkbox"
-                                  checked={selectedUsers.includes(user._id)}
-                                  onChange={() => handleSelectUser(user._id)}
+                                  checked={
+                                    selectedUsers.length === users.length &&
+                                    users.length > 0
+                                  }
+                                  onChange={handleSelectAll}
                                   className="h-5 w-5 sm:h-4 sm:w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
                                 />
-                              </TableCell>
-                              <TableCell className="px-2 sm:px-4">
-                                <div className="min-w-0">
-                                  <p className="font-medium text-gray-900 truncate text-sm sm:text-base">
-                                    {user.firstName} {user.lastName}
-                                  </p>
-                                  {user.gothiram && (
-                                    <p className="text-xs text-gray-500 truncate">
-                                      {user.gothiram}
+                              </TableHead>
+                              <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">
+                                Name
+                              </TableHead>
+                              <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">
+                                Contact
+                              </TableHead>
+                              <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">
+                                Status
+                              </TableHead>
+                              {/* <TableHead>Role</TableHead> */}
+                              {(statusFilter === "all" ||
+                                statusFilter === "approved") && (
+                                <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">
+                                  Approved By
+                                </TableHead>
+                              )}
+                              <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">
+                                Joined
+                              </TableHead>
+                              <TableHead className="px-2 sm:px-4 text-xs sm:text-sm">
+                                Actions
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {users.map((user) => (
+                              <TableRow
+                                key={user._id}
+                                className={
+                                  selectedUsers.includes(user._id)
+                                    ? "bg-blue-50"
+                                    : ""
+                                }
+                              >
+                                <TableCell className="px-2 sm:px-4">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedUsers.includes(user._id)}
+                                    onChange={() => handleSelectUser(user._id)}
+                                    className="h-5 w-5 sm:h-4 sm:w-4 rounded border-gray-300 text-[#E63946] focus:ring-[#E63946] cursor-pointer"
+                                  />
+                                </TableCell>
+                                <TableCell className="px-2 sm:px-4">
+                                  <div className="min-w-0">
+                                    <p className="font-medium text-gray-900 truncate text-sm sm:text-base">
+                                      {user.firstName} {user.lastName}
                                     </p>
-                                  )}
-                                </div>
-                              </TableCell>
-                              <TableCell className="px-2 sm:px-4">
-                                <div className="text-sm">
-                                  {user.email && (
-                                    <div className="flex items-center gap-1 mb-1 min-w-0">
-                                      <Mail className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                                      <span className="text-xs truncate max-w-[150px] sm:max-w-[200px] md:max-w-none" title={user.email}>
-                                        {user.email}
+                                    {user.gothiram && (
+                                      <p className="text-xs text-gray-500 truncate">
+                                        {user.gothiram}
+                                      </p>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="px-2 sm:px-4">
+                                  <div className="text-sm">
+                                    {user.email && (
+                                      <div className="flex items-center gap-1 mb-1 min-w-0">
+                                        <Mail className="h-3 w-3 text-gray-400 flex-shrink-0" />
+                                        <span
+                                          className="text-xs truncate max-w-[150px] sm:max-w-[200px] md:max-w-none"
+                                          title={user.email}
+                                        >
+                                          {user.email}
+                                        </span>
+                                        {user.isEmailVerified ? (
+                                          <CheckCircle className="h-3 w-3 text-green-600 flex-shrink-0" />
+                                        ) : (
+                                          <AlertCircle className="h-3 w-3 text-yellow-600 flex-shrink-0" />
+                                        )}
+                                      </div>
+                                    )}
+                                    {user.mobile && (
+                                      <div className="flex items-center gap-1 min-w-0">
+                                        <Phone className="h-3 w-3 text-gray-400 flex-shrink-0" />
+                                        <span className="text-xs truncate max-w-[120px] sm:max-w-none">
+                                          {user.mobile}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="px-2 sm:px-4">
+                                  {user.isApprovedByAdmin ? (
+                                    <Badge className="bg-green-100 text-green-800 border-green-300 text-xs">
+                                      <CheckCircle className="w-3 h-3 mr-1" />
+                                      <span className="hidden sm:inline">
+                                        Approved
                                       </span>
-                                      {user.isEmailVerified ? (
-                                        <CheckCircle className="h-3 w-3 text-green-600 flex-shrink-0" />
-                                      ) : (
-                                        <AlertCircle className="h-3 w-3 text-yellow-600 flex-shrink-0" />
-                                      )}
-                                    </div>
+                                      <span className="sm:hidden">App</span>
+                                    </Badge>
+                                  ) : (
+                                    <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
+                                      <UserX className="w-3 h-3 mr-1" />
+                                      <span className="hidden sm:inline">
+                                        Pending
+                                      </span>
+                                      <span className="sm:hidden">Pend</span>
+                                    </Badge>
                                   )}
-                                  {user.mobile && (
-                                    <div className="flex items-center gap-1 min-w-0">
-                                      <Phone className="h-3 w-3 text-gray-400 flex-shrink-0" />
-                                      <span className="text-xs truncate max-w-[120px] sm:max-w-none">{user.mobile}</span>
-                                    </div>
-                                  )}
-                                </div>
-                              </TableCell>
-                              <TableCell className="px-2 sm:px-4">
-                                {user.isApprovedByAdmin ? (
-                                  <Badge className="bg-green-100 text-green-800 border-green-300 text-xs">
-                                    <CheckCircle className="w-3 h-3 mr-1" />
-                                    <span className="hidden sm:inline">Approved</span>
-                                    <span className="sm:hidden">App</span>
-                                  </Badge>
-                                ) : (
-                                  <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
-                                    <UserX className="w-3 h-3 mr-1" />
-                                    <span className="hidden sm:inline">Pending</span>
-                                    <span className="sm:hidden">Pend</span>
-                                  </Badge>
-                                )}
-                              </TableCell>
-                              {/* <TableCell>
+                                </TableCell>
+                                {/* <TableCell>
                                 <div className="flex items-center gap-2">
                                   {user.role === "admin" && (
                                     <>
@@ -799,164 +838,214 @@ export default function AdminUsersPage() {
                                   )}
                                 </div>
                               </TableCell> */}
-                              {(statusFilter === "all" || statusFilter === "approved") && (
-                                <TableCell className="px-2 sm:px-4">
-                                  {user.approvedBy ? (
-                                    <button
-                                      onClick={() => handleApprovedByClick(user.approvedBy!._id)}
-                                      className="text-blue-600 hover:text-blue-800 hover:underline text-xs sm:text-sm font-medium cursor-pointer min-h-[44px] sm:min-h-0 break-words"
-                                    >
-                                      {user.approvedBy.firstName} {user.approvedBy.lastName}
-                                    </button>
-                                  ) : (
-                                    <span className="text-gray-400 text-xs sm:text-sm">N/A</span>
-                                  )}
-                                </TableCell>
-                              )}
-                              <TableCell className="px-2 sm:px-4">
-                                <div className="flex items-center gap-1 text-xs text-gray-600">
-                                  <Calendar className="h-3 w-3 flex-shrink-0" />
-                                  <span className="whitespace-nowrap">{new Date(
-                                    user.createdAt
-                                  ).toLocaleDateString()}</span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="px-2 sm:px-4">
-                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                  {user._id !== session?.user.id && (
-                                    <>
-                                      <Button
-                                        size="sm"
+                                {(statusFilter === "all" ||
+                                  statusFilter === "approved") && (
+                                  <TableCell className="px-2 sm:px-4">
+                                    {user.approvedBy ? (
+                                      <button
                                         onClick={() =>
-                                          handleApproveUser(user._id)
-                                        }
-                                        disabled={user.isApprovedByAdmin}
-                                        className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-2 sm:p-1.5"
-                                      >
-                                        <CheckCircle className="h-4 w-4" />
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() =>
-                                          handleRejectUser(user._id)
-                                        }
-                                        disabled={user.isApprovedByAdmin}
-                                        className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-2 sm:p-1.5"
-                                      >
-                                        <XCircle className="h-4 w-4" />
-                                      </Button>
-                                    </>
-                                  )}
-                                  {user._id !== session?.user.id && (
-                                    <>
-                                      <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                          <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="border-gray-300 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-2 sm:p-1.5 text-xs sm:text-sm"
-                                          >
-                                            {user.role === "admin" && (
-                                              <>
-                                                <Crown className="h-4 w-4 mr-1 text-orange-500 flex-shrink-0" />
-                                                <span className="hidden sm:inline">{getRoleDisplayName(user.role)}</span>
-                                              </>
-                                            )}
-                                            {user.role === "profileEndorser" && (
-                                              <>
-                                                <Shield className="h-4 w-4 mr-1 text-orange-500 flex-shrink-0" />
-                                                <span className="hidden sm:inline">{getRoleDisplayName(user.role)}</span>
-                                              </>
-                                            )}
-                                            {user.role === "avsMatchMaker" && (
-                                              <>
-                                                <Heart className="h-4 w-4 mr-1 text-blue-500 flex-shrink-0" />
-                                                <span className="hidden sm:inline">{getRoleDisplayName(user.role)}</span>
-                                              </>
-                                            )}
-                                            {user.role === "user" && (
-                                              <>
-                                                <UserIcon className="h-4 w-4 mr-1 text-gray-500 flex-shrink-0" />
-                                                <span className="hidden sm:inline">{getRoleDisplayName(user.role)}</span>
-                                              </>
-                                            )}
-                                            <ChevronDown className="h-3 w-3 ml-1 flex-shrink-0" />
-                                          </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                          <DropdownMenuItem
-                                            onClick={() =>
-                                              handleChangeRole(user._id, "admin")
-                                            }
-                                            disabled={user.role === "admin"}
-                                          >
-                                            <Crown className="h-4 w-4 mr-2 text-orange-500" />
-                                            {getRoleDisplayName("admin")}
-                                            {user.role === "admin" && (
-                                              <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
-                                            )}
-                                          </DropdownMenuItem>
-                                          <DropdownMenuItem
-                                            onClick={() =>
-                                              handleChangeRole(user._id, "profileEndorser")
-                                            }
-                                            disabled={user.role === "profileEndorser"}
-                                          >
-                                            <Shield className="h-4 w-4 mr-2 text-orange-500" />
-                                            {getRoleDisplayName("profileEndorser")}
-                                            {user.role === "profileEndorser" && (
-                                              <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
-                                            )}
-                                          </DropdownMenuItem>
-                                          <DropdownMenuItem
-                                            onClick={() =>
-                                              handleChangeRole(user._id, "avsMatchMaker")
-                                            }
-                                            disabled={user.role === "avsMatchMaker"}
-                                          >
-                                            <Heart className="h-4 w-4 mr-2 text-blue-500" />
-                                            {getRoleDisplayName("avsMatchMaker")}
-                                            {user.role === "avsMatchMaker" && (
-                                              <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
-                                            )}
-                                          </DropdownMenuItem>
-                                          <DropdownMenuItem
-                                            onClick={() =>
-                                              handleChangeRole(user._id, "user")
-                                            }
-                                            disabled={user.role === "user"}
-                                          >
-                                            <UserIcon className="h-4 w-4 mr-2 text-gray-500" />
-                                            {getRoleDisplayName("user")}
-                                            {user.role === "user" && (
-                                              <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
-                                            )}
-                                          </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                      </DropdownMenu>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() =>
-                                          handleDeleteUser(
-                                            user._id,
-                                            `${user.firstName} ${user.lastName}`
+                                          handleApprovedByClick(
+                                            user.approvedBy!._id
                                           )
                                         }
-                                        className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 p-2 sm:p-1.5"
-                                        title="Delete User"
+                                        className="text-blue-600 hover:text-blue-800 hover:underline text-xs sm:text-sm font-medium cursor-pointer min-h-[44px] sm:min-h-0 break-words"
                                       >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </>
-                                  )}
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                                        {user.approvedBy.firstName}{" "}
+                                        {user.approvedBy.lastName}
+                                      </button>
+                                    ) : (
+                                      <span className="text-gray-400 text-xs sm:text-sm">
+                                        N/A
+                                      </span>
+                                    )}
+                                  </TableCell>
+                                )}
+                                <TableCell className="px-2 sm:px-4">
+                                  <div className="flex items-center gap-1 text-xs text-gray-600">
+                                    <Calendar className="h-3 w-3 flex-shrink-0" />
+                                    <span className="whitespace-nowrap">
+                                      {new Date(
+                                        user.createdAt
+                                      ).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="px-2 sm:px-4">
+                                  <div className="flex flex-nowrap gap-1 sm:gap-1.5 items-center">
+                                    {user._id !== session?.user.id && (
+                                      <>
+                                        <Button
+                                          size="sm"
+                                          onClick={() =>
+                                            handleApproveUser(user._id)
+                                          }
+                                          disabled={user.isApprovedByAdmin}
+                                          className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed h-8 w-8 p-0 flex-shrink-0"
+                                        >
+                                          <CheckCircle className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() =>
+                                            handleRejectUser(user._id)
+                                          }
+                                          disabled={user.isApprovedByAdmin}
+                                          className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed h-8 w-8 p-0 flex-shrink-0"
+                                        >
+                                          <XCircle className="h-4 w-4" />
+                                        </Button>
+                                      </>
+                                    )}
+                                    {user._id !== session?.user.id && (
+                                      <>
+                                        <DropdownMenu>
+                                          <DropdownMenuTrigger asChild>
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              className="border-gray-300 h-8 px-2 flex-shrink-0 text-xs sm:text-sm whitespace-nowrap"
+                                            >
+                                              {user.role === "admin" && (
+                                                <>
+                                                  <Crown className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-orange-500 flex-shrink-0" />
+                                                  <span className="hidden sm:inline">
+                                                    {getRoleDisplayName(
+                                                      user.role
+                                                    )}
+                                                  </span>
+                                                </>
+                                              )}
+                                              {user.role ===
+                                                "profileEndorser" && (
+                                                <>
+                                                  <Shield className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-orange-500 flex-shrink-0" />
+                                                  <span className="hidden sm:inline">
+                                                    {getRoleDisplayName(
+                                                      user.role
+                                                    )}
+                                                  </span>
+                                                </>
+                                              )}
+                                              {user.role ===
+                                                "avsMatchMaker" && (
+                                                <>
+                                                  <Heart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-blue-500 flex-shrink-0" />
+                                                  <span className="hidden sm:inline">
+                                                    {getRoleDisplayName(
+                                                      user.role
+                                                    )}
+                                                  </span>
+                                                </>
+                                              )}
+                                              {user.role === "user" && (
+                                                <>
+                                                  <UserIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 text-gray-500 flex-shrink-0" />
+                                                  <span className="hidden sm:inline">
+                                                    {getRoleDisplayName(
+                                                      user.role
+                                                    )}
+                                                  </span>
+                                                </>
+                                              )}
+                                              <ChevronDown className="h-3 w-3 ml-1 flex-shrink-0" />
+                                            </Button>
+                                          </DropdownMenuTrigger>
+                                          <DropdownMenuContent align="end">
+                                            <DropdownMenuItem
+                                              onClick={() =>
+                                                handleChangeRole(
+                                                  user._id,
+                                                  "admin"
+                                                )
+                                              }
+                                              disabled={user.role === "admin"}
+                                            >
+                                              <Crown className="h-4 w-4 mr-2 text-orange-500" />
+                                              {getRoleDisplayName("admin")}
+                                              {user.role === "admin" && (
+                                                <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
+                                              )}
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                              onClick={() =>
+                                                handleChangeRole(
+                                                  user._id,
+                                                  "profileEndorser"
+                                                )
+                                              }
+                                              disabled={
+                                                user.role === "profileEndorser"
+                                              }
+                                            >
+                                              <Shield className="h-4 w-4 mr-2 text-orange-500" />
+                                              {getRoleDisplayName(
+                                                "profileEndorser"
+                                              )}
+                                              {user.role ===
+                                                "profileEndorser" && (
+                                                <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
+                                              )}
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                              onClick={() =>
+                                                handleChangeRole(
+                                                  user._id,
+                                                  "avsMatchMaker"
+                                                )
+                                              }
+                                              disabled={
+                                                user.role === "avsMatchMaker"
+                                              }
+                                            >
+                                              <Heart className="h-4 w-4 mr-2 text-blue-500" />
+                                              {getRoleDisplayName(
+                                                "avsMatchMaker"
+                                              )}
+                                              {user.role ===
+                                                "avsMatchMaker" && (
+                                                <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
+                                              )}
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                              onClick={() =>
+                                                handleChangeRole(
+                                                  user._id,
+                                                  "user"
+                                                )
+                                              }
+                                              disabled={user.role === "user"}
+                                            >
+                                              <UserIcon className="h-4 w-4 mr-2 text-gray-500" />
+                                              {getRoleDisplayName("user")}
+                                              {user.role === "user" && (
+                                                <CheckCircle className="h-4 w-4 ml-auto text-green-600" />
+                                              )}
+                                            </DropdownMenuItem>
+                                          </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() =>
+                                            handleDeleteUser(
+                                              user._id,
+                                              `${user.firstName} ${user.lastName}`
+                                            )
+                                          }
+                                          className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800 h-8 w-8 p-0 flex-shrink-0"
+                                          title="Delete User"
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </>
+                                    )}
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
                       </div>
                     </div>
 

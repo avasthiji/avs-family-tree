@@ -200,14 +200,17 @@ export default function RegisterPage() {
         {/* Right Side - Register Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
           <div className="w-full max-w-md">
-            {/* Mobile Logo */}
-            <div className="lg:hidden text-center mb-8">
-              <h1 className="text-2xl font-bold avs-text-gradient">
+            {/* Mobile Logo and Back Link - Above Card */}
+            <div className="lg:hidden text-center mb-6 space-y-4">
+              <div className="w-16 h-16 mx-auto overflow-hidden flex items-center justify-center">
+                <Logo size="lg" className="rounded-full" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold avs-text-gradient">
                 AVS Family Tree
               </h1>
               <Link
                 href="/"
-                className="inline-flex items-center space-x-2 text-gray-600 hover:text-[#E63946] transition-colors mt-4"
+                className="inline-flex items-center justify-center space-x-2 text-gray-600 hover:text-[#E63946] transition-colors text-sm sm:text-base min-h-[44px]"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <span>Back to Home</span>

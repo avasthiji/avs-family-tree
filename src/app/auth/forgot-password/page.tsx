@@ -275,16 +275,6 @@ export default function ForgotPasswordPage() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Logo for Mobile */}
-            <div className="lg:hidden mt-8 text-center">
-              <div className="w-16 h-16 mx-auto mb-4">
-                <Logo size="lg" className="rounded-full" />
-              </div>
-              <p className="text-sm text-gray-600">
-                AVS Family Tree - அகில இந்திய வேளாளர் சங்கம்
-              </p>
-            </div>
           </div>
         </div>
       </div>
