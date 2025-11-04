@@ -352,21 +352,7 @@ export default function UserDetailsModal({
                     <Phone className="h-4 w-4 text-gray-500" />
                     <div>
                       <span className="text-sm text-gray-600">Mobile</span>
-                      <div className="flex items-center space-x-2">
-                        <span>{displayValue(userProfile.mobile)}</span>
-                        <Badge
-                          variant={
-                            userProfile.isMobileVerified
-                              ? "default"
-                              : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {userProfile.isMobileVerified
-                            ? "Verified"
-                            : "Unverified"}
-                        </Badge>
-                      </div>
+                      <div>{displayValue(userProfile.mobile)}</div>
                     </div>
                   </div>
 
