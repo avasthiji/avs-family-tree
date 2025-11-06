@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: avs-family-tree-app-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/avs-family-tree
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=dev-secret-key-change-in-production
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - MATRIMONIAL_FEATURE=true
+      - EVENT_FEATURE=true
+    env_file:
+      - .env.local
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+    networks:
+      - avs-network
+    depends_on:
+      - mongodb
+    command: npm run dev
+
+  mongodb:
+    image: mongo:7.0
+    container_name: avs-mongodb-dev
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=changeme
+      - MONGO_INITDB_DATABASE=avs-family-tree
+    volumes:
+      - mongodb_data_dev:/data/db
+      - mongodb_config_dev:/data/configdb
+    restart: unless-stopped
+    networks:
+      - avs-network
+
+networks:
+  avs-network:
+    driver: bridge
+
+volumes:
+  mongodb_data_dev:
+  mongodb_config_dev:
+
+
