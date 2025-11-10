@@ -340,6 +340,82 @@ export default function UserDetailsModal({
               {/* Details Tab */}
               <TabsContent value="details" className="space-y-6 mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Basic Information */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <User className="h-5 w-5 mr-2" />
+                        Basic Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center space-x-3">
+                        <User className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">Gender</span>
+                          <div>{displayValue(userProfile.gender)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Date of Birth
+                          </span>
+                          <div>{formatDate(userProfile.dob)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Date of Death
+                          </span>
+                          <div>{formatDate(userProfile.deathday)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Place of Birth
+                          </span>
+                          <div>{displayValue(userProfile.placeOfBirth)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Clock className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Time of Birth
+                          </span>
+                          <div>{displayValue(userProfile.timeOfBirth)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Users className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">Height</span>
+                          <div>{displayNumber(userProfile.height, " cm")}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Native Place
+                          </span>
+                          <div>{displayValue(userProfile.nativePlace)}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                   {/* Contact Information */}
                   <Card>
                     <CardHeader>
@@ -440,83 +516,6 @@ export default function UserDetailsModal({
                             Citizenship
                           </span>
                           <div>{displayValue(userProfile.citizenship)}</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Basic Information */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <User className="h-5 w-5 mr-2" />
-                        Basic Information
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex items-center space-x-3">
-                        <User className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <span className="text-sm text-gray-600">Gender</span>
-                          <div>{displayValue(userProfile.gender)}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3">
-                        <Calendar className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <span className="text-sm text-gray-600">
-                            Date of Birth
-                          </span>
-                          <div>{formatDate(userProfile.dob)}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3">
-                        <Calendar className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <span className="text-sm text-gray-600">
-                            Date of Death
-                          </span>
-                          <div>{formatDate(userProfile.deathday)}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <span className="text-sm text-gray-600">
-                            Place of Birth
-                          </span>
-                          <div>{displayValue(userProfile.placeOfBirth)}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3">
-                        <Clock className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <span className="text-sm text-gray-600">
-                            Time of Birth
-                          </span>
-                          <div>{displayValue(userProfile.timeOfBirth)}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3">
-                        <Users className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <span className="text-sm text-gray-600">Height</span>
-                          <div>{displayNumber(userProfile.height, " cm")}</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <span className="text-sm text-gray-600">
-                            Native Place
-                          </span>
-                          <div>{displayValue(userProfile.nativePlace)}</div>
                         </div>
                       </div>
                     </CardContent>
