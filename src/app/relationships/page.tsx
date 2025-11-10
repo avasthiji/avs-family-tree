@@ -143,12 +143,9 @@ export default function RelationshipsPage() {
     }
 
     // Validate: Check if relationship already exists
+    // Since we only fetch relationships where user is personId1, we can directly check personId2
     const relationshipExists = relationships.some((rel) => {
-      const otherId =
-        rel.personId1._id === session?.user.id
-          ? rel.personId2._id
-          : rel.personId1._id;
-      return otherId === selectedUser._id;
+      return rel.personId2._id === selectedUser._id;
     });
 
     if (relationshipExists) {
@@ -245,39 +242,12 @@ export default function RelationshipsPage() {
     setEditDialogOpen(true);
   };
 
-  const getOtherPerson = (r: RelationshipData) =>
-    r.personId1._id === session?.user.id ? r.personId2 : r.personId1;
+  // Since we only fetch relationships where user is personId1, the other person is always personId2
+  const getOtherPerson = (r: RelationshipData) => r.personId2;
 
   // Get the correct relationship label from current user's perspective
-  const getRelationshipLabel = (r: RelationshipData) => {
-    // If current user is personId1, the relationType is correct as-is
-    if (r.personId1._id === session?.user.id) {
-      return r.relationType;
-    }
-
-    // If current user is personId2, we need to show the inverse relationship
-    const inverseMap: Record<string, string> = {
-      Father: "Son/Daughter",
-      Mother: "Son/Daughter",
-      Son: "Father/Mother",
-      Daughter: "Father/Mother",
-      Spouse: "Spouse",
-      Brother: "Brother/Sister",
-      Sister: "Brother/Sister",
-      "Older Sibling": "Younger Sibling",
-      "Younger Sibling": "Older Sibling",
-      "Grand Father": "Grandchild",
-      "Grand Mother": "Grandchild",
-      Uncle: "Nephew/Niece",
-      Aunt: "Nephew/Niece",
-      Nephew: "Uncle/Aunt",
-      Niece: "Uncle/Aunt",
-      Cousin: "Cousin",
-      Other: "Other",
-    };
-
-    return inverseMap[r.relationType] || r.relationType;
-  };
+  // Since user is always personId1, the relationType is correct as-is
+  const getRelationshipLabel = (r: RelationshipData) => r.relationType;
 
   const handleViewProfile = (userId: string) => {
     setProfileUserId(userId);
@@ -373,19 +343,12 @@ export default function RelationshipsPage() {
                   {selectedUser &&
                     (() => {
                       const isSelf = selectedUser._id === session?.user.id;
+                      // Since we only fetch relationships where user is personId1, check personId2
                       const relationshipExists = relationships.some((rel) => {
-                        const otherId =
-                          rel.personId1._id === session?.user.id
-                            ? rel.personId2._id
-                            : rel.personId1._id;
-                        return otherId === selectedUser._id;
+                        return rel.personId2._id === selectedUser._id;
                       });
                       const existingRel = relationships.find((rel) => {
-                        const otherId =
-                          rel.personId1._id === session?.user.id
-                            ? rel.personId2._id
-                            : rel.personId1._id;
-                        return otherId === selectedUser._id;
+                        return rel.personId2._id === selectedUser._id;
                       });
 
                       return (
@@ -508,11 +471,7 @@ export default function RelationshipsPage() {
                       submitting ||
                       selectedUser._id === session?.user.id ||
                       relationships.some((rel) => {
-                        const otherId =
-                          rel.personId1._id === session?.user.id
-                            ? rel.personId2._id
-                            : rel.personId1._id;
-                        return otherId === selectedUser._id;
+                        return rel.personId2._id === selectedUser._id;
                       })
                     }
                     className="avs-button-primary w-full sm:w-auto"
