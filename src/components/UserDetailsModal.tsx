@@ -174,12 +174,18 @@ export default function UserDetailsModal({
     }
   };
 
-  const displayValue = (value: string | null | undefined, suffix: string = "") => {
+  const displayValue = (
+    value: string | null | undefined,
+    suffix: string = ""
+  ) => {
     if (!value) return "N/A";
     return `${value}${suffix}`;
   };
 
-  const displayNumber = (value: number | null | undefined, suffix: string = "") => {
+  const displayNumber = (
+    value: number | null | undefined,
+    suffix: string = ""
+  ) => {
     if (value === null || value === undefined) return "N/A";
     return `${value}${suffix}`;
   };
@@ -211,7 +217,11 @@ export default function UserDetailsModal({
       setTimeout(() => {
         // This will be handled by parent components (family-tree page, search page)
         // They should listen for userId changes and reopen the modal
-        window.dispatchEvent(new CustomEvent('userProfileNodeClick', { detail: { userId: clickedUserId } }));
+        window.dispatchEvent(
+          new CustomEvent("userProfileNodeClick", {
+            detail: { userId: clickedUserId },
+          })
+        );
       }, 100);
     }
   };
@@ -278,14 +288,17 @@ export default function UserDetailsModal({
                     <div className="flex items-center space-x-4 text-gray-600 mb-4">
                       <span className="flex items-center">
                         <User className="h-4 w-4 mr-1" />
-                        {displayValue(userProfile.gender)} • Age {getAge(userProfile.dob)}
+                        {displayValue(userProfile.gender)} • Age{" "}
+                        {getAge(userProfile.dob)}
                       </span>
                       <span className="flex items-center">
                         <MapPin className="h-4 w-4 mr-1" />
                         {(() => {
                           const city = userProfile.city || "";
                           const state = userProfile.state || "";
-                          const location = [city, state].filter(Boolean).join(", ");
+                          const location = [city, state]
+                            .filter(Boolean)
+                            .join(", ");
                           return location || "N/A";
                         })()}
                       </span>
@@ -302,13 +315,23 @@ export default function UserDetailsModal({
             </Card>
 
             {/* Tabs */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
               <TabsList className="grid w-full max-w-md grid-cols-2">
-                <TabsTrigger value="details" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="details"
+                  className="flex items-center gap-2"
+                >
                   <FileText className="h-4 w-4" />
                   Details
                 </TabsTrigger>
-                <TabsTrigger value="family-tree" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="family-tree"
+                  className="flex items-center gap-2"
+                >
                   <TreePine className="h-4 w-4" />
                   Family Tree
                 </TabsTrigger>
@@ -317,324 +340,362 @@ export default function UserDetailsModal({
               {/* Details Tab */}
               <TabsContent value="details" className="space-y-6 mt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Contact Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Mail className="h-5 w-5 mr-2" />
-                    Contact Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <Mail className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Email</span>
-                      <div className="flex items-center space-x-2">
-                        <span>{displayValue(userProfile.email)}</span>
-                        <Badge
-                          variant={
-                            userProfile.isEmailVerified
-                              ? "default"
-                              : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {userProfile.isEmailVerified
-                            ? "Verified"
-                            : "Unverified"}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Phone className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Mobile</span>
-                      <div>{displayValue(userProfile.mobile)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Phone className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Primary Phone</span>
-                      <div>{displayValue(userProfile.primaryPhone)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Phone className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Secondary Phone</span>
-                      <div>{displayValue(userProfile.secondaryPhone)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Home className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Address</span>
-                      <div>{displayValue(userProfile.address1)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">City</span>
-                      <div>{displayValue(userProfile.city)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">State</span>
-                      <div>{displayValue(userProfile.state)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Postal Code</span>
-                      <div>{displayValue(userProfile.postalCode)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Country</span>
-                      <div>{displayValue(userProfile.country)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Citizenship</span>
-                      <div>{displayValue(userProfile.citizenship)}</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Basic Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <User className="h-5 w-5 mr-2" />
-                    Basic Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <User className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Gender</span>
-                      <div>{displayValue(userProfile.gender)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Calendar className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">
-                        Date of Birth
-                      </span>
-                      <div>{formatDate(userProfile.dob)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Calendar className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">
-                        Date of Death
-                      </span>
-                      <div>{formatDate(userProfile.deathday)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">
-                        Place of Birth
-                      </span>
-                      <div>{displayValue(userProfile.placeOfBirth)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Clock className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">
-                        Time of Birth
-                      </span>
-                      <div>{displayValue(userProfile.timeOfBirth)}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <Users className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Height</span>
-                      <div>{displayNumber(userProfile.height, " cm")}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Native Place</span>
-                      <div>{displayValue(userProfile.nativePlace)}</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Astrological Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Star className="h-5 w-5 mr-2" />
-                    Astrological Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-600">
-                      Rasi (Zodiac):
-                    </span>
-                    <Badge variant="outline">{displayValue(userProfile.rasi)}</Badge>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-600">
-                      Natchathiram (Star):
-                    </span>
-                    <Badge variant="outline">{displayValue(userProfile.natchathiram)}</Badge>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-600">Gothiram:</span>
-                    <Badge variant="outline">{displayValue(userProfile.gothiram)}</Badge>
-                  </div>
-
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-600">Kuladeivam:</span>
-                    <Badge variant="outline">{displayValue(userProfile.kuladeivam)}</Badge>
-                  </div>
-
-                  {/* Matrimony Profile */}
-                  <div className="pt-4 border-t border-gray-200">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <Heart className="h-4 w-4 text-pink-500" />
-                      <span className="text-sm font-medium text-gray-700">Matrimony Profile</span>
-                      <Badge 
-                        variant={userProfile.enableMarriageFlag ? "default" : "secondary"}
-                        className={userProfile.enableMarriageFlag ? "bg-pink-100 text-pink-800" : ""}
-                      >
-                        {userProfile.enableMarriageFlag ? "Active" : "Inactive"}
-                      </Badge>
-                    </div>
-
-                    {userProfile.enableMarriageFlag && userProfile.matchMaker && (
-                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4">
-                        <p className="text-sm font-medium text-gray-700 mb-2">Matchmaker</p>
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={userProfile.matchMaker.profilePicture} />
-                            <AvatarFallback className="text-xs">
-                              {userProfile.matchMaker.firstName[0]}
-                              {userProfile.matchMaker.lastName[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {userProfile.matchMaker.firstName} {userProfile.matchMaker.lastName}
-                            </p>
-                            <div className="flex items-center gap-2 text-xs text-gray-600">
-                              {userProfile.matchMaker.gothiram && (
-                                <span className="flex items-center gap-1">
-                                  <User className="h-3 w-3" />
-                                  {userProfile.matchMaker.gothiram}
-                                </span>
-                              )}
-                              {(userProfile.matchMaker.nativePlace || userProfile.matchMaker.city) && (
-                                <span className="flex items-center gap-1">
-                                  <MapPin className="h-3 w-3" />
-                                  {userProfile.matchMaker.nativePlace || userProfile.matchMaker.city}
-                                </span>
-                              )}
-                            </div>
+                  {/* Contact Information */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Mail className="h-5 w-5 mr-2" />
+                        Contact Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center space-x-3">
+                        <Mail className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">Email</span>
+                          <div className="flex items-center space-x-2">
+                            <span>{displayValue(userProfile.email)}</span>
+                            <Badge
+                              variant={
+                                userProfile.isEmailVerified
+                                  ? "default"
+                                  : "secondary"
+                              }
+                              className="text-xs"
+                            >
+                              {userProfile.isEmailVerified
+                                ? "Verified"
+                                : "Unverified"}
+                            </Badge>
                           </div>
                         </div>
                       </div>
-                    )}
 
-                    {userProfile.enableMarriageFlag && (
-                      <div>
-                        <span className="text-sm text-gray-600 block mb-2">Partner Description</span>
-                        <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">
-                          {displayValue(userProfile.partnerDesc) === "N/A" ? "N/A" : (userProfile.partnerDesc || "N/A")}
-                        </p>
+                      <div className="flex items-center space-x-3">
+                        <Phone className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Primary Phone
+                          </span>
+                          <div>{displayValue(userProfile.primaryPhone)}</div>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
 
-              {/* Professional Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Briefcase className="h-5 w-5 mr-2" />
-                    Professional Details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <GraduationCap className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">
-                        Qualification
-                      </span>
-                      <div>{displayValue(userProfile.qualification)}</div>
-                    </div>
-                  </div>
+                      <div className="flex items-center space-x-3">
+                        <Phone className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Secondary Phone
+                          </span>
+                          <div>{displayValue(userProfile.secondaryPhone)}</div>
+                        </div>
+                      </div>
 
-                  <div className="flex items-center space-x-3">
-                    <Briefcase className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">
-                        Job Description
-                      </span>
-                      <div>{displayValue(userProfile.jobDesc)}</div>
-                    </div>
-                  </div>
+                      <div className="flex items-center space-x-3">
+                        <Home className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">Address</span>
+                          <div>{displayValue(userProfile.address1)}</div>
+                        </div>
+                      </div>
 
-                  <div className="flex items-center space-x-3">
-                    <DollarSign className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Salary</span>
-                      <div>{displayValue(userProfile.salary)}</div>
-                    </div>
-                  </div>
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">City</span>
+                          <div>{displayValue(userProfile.city)}</div>
+                        </div>
+                      </div>
 
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <div>
-                      <span className="text-sm text-gray-600">Work Place</span>
-                      <div>{displayValue(userProfile.workPlace)}</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">State</span>
+                          <div>{displayValue(userProfile.state)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Postal Code
+                          </span>
+                          <div>{displayValue(userProfile.postalCode)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">Country</span>
+                          <div>{displayValue(userProfile.country)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Citizenship
+                          </span>
+                          <div>{displayValue(userProfile.citizenship)}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Basic Information */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <User className="h-5 w-5 mr-2" />
+                        Basic Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center space-x-3">
+                        <User className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">Gender</span>
+                          <div>{displayValue(userProfile.gender)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Date of Birth
+                          </span>
+                          <div>{formatDate(userProfile.dob)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Date of Death
+                          </span>
+                          <div>{formatDate(userProfile.deathday)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Place of Birth
+                          </span>
+                          <div>{displayValue(userProfile.placeOfBirth)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Clock className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Time of Birth
+                          </span>
+                          <div>{displayValue(userProfile.timeOfBirth)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Users className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">Height</span>
+                          <div>{displayNumber(userProfile.height, " cm")}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Native Place
+                          </span>
+                          <div>{displayValue(userProfile.nativePlace)}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Astrological Information */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Star className="h-5 w-5 mr-2" />
+                        Astrological Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-sm text-gray-600">
+                          Rasi (Zodiac):
+                        </span>
+                        <Badge variant="outline">
+                          {displayValue(userProfile.rasi)}
+                        </Badge>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <span className="text-sm text-gray-600">
+                          Natchathiram (Star):
+                        </span>
+                        <Badge variant="outline">
+                          {displayValue(userProfile.natchathiram)}
+                        </Badge>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <span className="text-sm text-gray-600">Gothiram:</span>
+                        <Badge variant="outline">
+                          {displayValue(userProfile.gothiram)}
+                        </Badge>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <span className="text-sm text-gray-600">
+                          Kuladeivam:
+                        </span>
+                        <Badge variant="outline">
+                          {displayValue(userProfile.kuladeivam)}
+                        </Badge>
+                      </div>
+
+                      {/* Matrimony Profile */}
+                      <div className="pt-4 border-t border-gray-200">
+                        <div className="flex items-center space-x-3 mb-3">
+                          <Heart className="h-4 w-4 text-pink-500" />
+                          <span className="text-sm font-medium text-gray-700">
+                            Matrimony Profile
+                          </span>
+                          <Badge
+                            variant={
+                              userProfile.enableMarriageFlag
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={
+                              userProfile.enableMarriageFlag
+                                ? "bg-pink-100 text-pink-800"
+                                : ""
+                            }
+                          >
+                            {userProfile.enableMarriageFlag
+                              ? "Active"
+                              : "Inactive"}
+                          </Badge>
+                        </div>
+
+                        {userProfile.enableMarriageFlag &&
+                          userProfile.matchMaker && (
+                            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                              <p className="text-sm font-medium text-gray-700 mb-2">
+                                Matchmaker
+                              </p>
+                              <div className="flex items-center space-x-3">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarImage
+                                    src={userProfile.matchMaker.profilePicture}
+                                  />
+                                  <AvatarFallback className="text-xs">
+                                    {userProfile.matchMaker.firstName[0]}
+                                    {userProfile.matchMaker.lastName[0]}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-medium text-gray-900">
+                                    {userProfile.matchMaker.firstName}{" "}
+                                    {userProfile.matchMaker.lastName}
+                                  </p>
+                                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                                    {userProfile.matchMaker.gothiram && (
+                                      <span className="flex items-center gap-1">
+                                        <User className="h-3 w-3" />
+                                        {userProfile.matchMaker.gothiram}
+                                      </span>
+                                    )}
+                                    {(userProfile.matchMaker.nativePlace ||
+                                      userProfile.matchMaker.city) && (
+                                      <span className="flex items-center gap-1">
+                                        <MapPin className="h-3 w-3" />
+                                        {userProfile.matchMaker.nativePlace ||
+                                          userProfile.matchMaker.city}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                        {userProfile.enableMarriageFlag && (
+                          <div>
+                            <span className="text-sm text-gray-600 block mb-2">
+                              Partner Description
+                            </span>
+                            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm">
+                              {displayValue(userProfile.partnerDesc) === "N/A"
+                                ? "N/A"
+                                : userProfile.partnerDesc || "N/A"}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Professional Information */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Briefcase className="h-5 w-5 mr-2" />
+                        Professional Details
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center space-x-3">
+                        <GraduationCap className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Qualification
+                          </span>
+                          <div>{displayValue(userProfile.qualification)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Briefcase className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Job Description
+                          </span>
+                          <div>{displayValue(userProfile.jobDesc)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <DollarSign className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">Salary</span>
+                          <div>{displayValue(userProfile.salary)}</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <span className="text-sm text-gray-600">
+                            Work Place
+                          </span>
+                          <div>{displayValue(userProfile.workPlace)}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
 
                 {/* About Me Section */}
@@ -647,9 +708,13 @@ export default function UserDetailsModal({
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <span className="text-sm text-gray-600 block mb-2">Bio Description</span>
+                      <span className="text-sm text-gray-600 block mb-2">
+                        Bio Description
+                      </span>
                       <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {displayValue(userProfile.bioDesc) === "N/A" ? "N/A" : userProfile.bioDesc}
+                        {displayValue(userProfile.bioDesc) === "N/A"
+                          ? "N/A"
+                          : userProfile.bioDesc}
                       </p>
                     </div>
                   </CardContent>
@@ -674,7 +739,7 @@ export default function UserDetailsModal({
                     </p>
                   </div>
                 ) : (
-                  <div className="w-full" style={{ height: '750px' }}>
+                  <div className="w-full" style={{ height: "750px" }}>
                     <D3FamilyTree
                       relationships={relationships}
                       currentUserId={userId || ""}

@@ -383,7 +383,7 @@ export default function UserProfileModal({
                             </div>
                           </div>
                         )}
-                        {userData?.mobile && (
+                        {/* {userData?.mobile && (
                           <div className="flex items-start gap-2">
                             <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
                             <div>
@@ -391,7 +391,7 @@ export default function UserProfileModal({
                               <p className="font-medium">{userData.mobile}</p>
                             </div>
                           </div>
-                        )}
+                        )} */}
                         {userData?.primaryPhone && (
                           <div className="flex items-start gap-2">
                             <Phone className="h-5 w-5 text-gray-400 mt-0.5" />
@@ -579,12 +579,24 @@ export default function UserProfileModal({
                       <div className="mt-4 pt-4 border-t border-gray-200">
                         <div className="flex items-center gap-2 mb-3">
                           <Heart className="h-4 w-4 text-pink-500" />
-                          <span className="text-sm text-gray-600">Matrimony Status:</span>
-                          <Badge 
-                            variant={userData.enableMarriageFlag ? "default" : "secondary"}
-                            className={userData.enableMarriageFlag ? "bg-pink-100 text-pink-800" : ""}
+                          <span className="text-sm text-gray-600">
+                            Matrimony Status:
+                          </span>
+                          <Badge
+                            variant={
+                              userData.enableMarriageFlag
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={
+                              userData.enableMarriageFlag
+                                ? "bg-pink-100 text-pink-800"
+                                : ""
+                            }
                           >
-                            {userData.enableMarriageFlag ? "Active" : "Inactive"}
+                            {userData.enableMarriageFlag
+                              ? "Active"
+                              : "Inactive"}
                           </Badge>
                         </div>
 
@@ -596,7 +608,9 @@ export default function UserProfileModal({
                             </p>
                             <div className="flex items-center space-x-3">
                               <Avatar className="h-8 w-8">
-                                <AvatarImage src={userData.matchMaker.profilePicture} />
+                                <AvatarImage
+                                  src={userData.matchMaker.profilePicture}
+                                />
                                 <AvatarFallback className="text-xs">
                                   {userData.matchMaker.firstName[0]}
                                   {userData.matchMaker.lastName[0]}
@@ -604,7 +618,8 @@ export default function UserProfileModal({
                               </Avatar>
                               <div>
                                 <p className="font-medium text-gray-900">
-                                  {userData.matchMaker.firstName} {userData.matchMaker.lastName}
+                                  {userData.matchMaker.firstName}{" "}
+                                  {userData.matchMaker.lastName}
                                 </p>
                                 <div className="flex items-center gap-2 text-xs text-gray-600">
                                   {userData.matchMaker.gothiram && (
@@ -613,14 +628,17 @@ export default function UserProfileModal({
                                       {userData.matchMaker.gothiram}
                                     </span>
                                   )}
-                                  {(userData.matchMaker.nativePlace || userData.matchMaker.city) && (
+                                  {(userData.matchMaker.nativePlace ||
+                                    userData.matchMaker.city) && (
                                     <span className="flex items-center gap-1">
                                       <MapPin className="h-3 w-3" />
-                                      {userData.matchMaker.nativePlace || userData.matchMaker.city}
+                                      {userData.matchMaker.nativePlace ||
+                                        userData.matchMaker.city}
                                     </span>
                                   )}
                                 </div>
-                                {(userData.matchMaker.primaryPhone || userData.matchMaker.secondaryPhone) && (
+                                {(userData.matchMaker.primaryPhone ||
+                                  userData.matchMaker.secondaryPhone) && (
                                   <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
                                     {userData.matchMaker.primaryPhone && (
                                       <span className="flex items-center gap-1">
@@ -657,7 +675,7 @@ export default function UserProfileModal({
                             Matrimony Profile Active
                           </span>
                         </div>
-                        
+
                         {userData?.matchMaker && (
                           <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                             <p className="text-sm font-medium text-gray-700 mb-2">
@@ -665,7 +683,9 @@ export default function UserProfileModal({
                             </p>
                             <div className="flex items-center space-x-3">
                               <Avatar className="h-8 w-8">
-                                <AvatarImage src={userData.matchMaker.profilePicture} />
+                                <AvatarImage
+                                  src={userData.matchMaker.profilePicture}
+                                />
                                 <AvatarFallback className="avs-gradient text-white text-xs">
                                   {userData.matchMaker.firstName[0]}
                                   {userData.matchMaker.lastName[0]}
@@ -673,7 +693,8 @@ export default function UserProfileModal({
                               </Avatar>
                               <div>
                                 <p className="font-medium text-gray-900">
-                                  {userData.matchMaker.firstName} {userData.matchMaker.lastName}
+                                  {userData.matchMaker.firstName}{" "}
+                                  {userData.matchMaker.lastName}
                                 </p>
                                 <div className="flex items-center gap-2 text-xs text-gray-600">
                                   {userData.matchMaker.gothiram && (
@@ -682,14 +703,17 @@ export default function UserProfileModal({
                                       {userData.matchMaker.gothiram}
                                     </span>
                                   )}
-                                  {(userData.matchMaker.nativePlace || userData.matchMaker.city) && (
+                                  {(userData.matchMaker.nativePlace ||
+                                    userData.matchMaker.city) && (
                                     <span className="flex items-center gap-1">
                                       <MapPin className="h-3 w-3" />
-                                      {userData.matchMaker.nativePlace || userData.matchMaker.city}
+                                      {userData.matchMaker.nativePlace ||
+                                        userData.matchMaker.city}
                                     </span>
                                   )}
                                 </div>
-                                {(userData.matchMaker.primaryPhone || userData.matchMaker.secondaryPhone) && (
+                                {(userData.matchMaker.primaryPhone ||
+                                  userData.matchMaker.secondaryPhone) && (
                                   <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
                                     {userData.matchMaker.primaryPhone && (
                                       <span className="flex items-center gap-1">
