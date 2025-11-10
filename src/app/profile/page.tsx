@@ -97,22 +97,29 @@ export default function ProfilePage() {
 
   const fetchUserProfile = async () => {
     try {
-      const [profileRes, gothiramRes, rasiRes, nakshatramRes, kuladeivamRes, matchmakersRes] =
-        await Promise.all([
-          fetch("/api/users/profile"),
-          fetch("/api/gothiram"),
-          fetch("/api/rasi"),
-          fetch("/api/nakshatram"),
-          fetch("/api/kuladeivam"),
-          fetch("/api/matchmakers"),
-        ]);
+      const [
+        profileRes,
+        gothiramRes,
+        rasiRes,
+        nakshatramRes,
+        kuladeivamRes,
+        matchmakersRes,
+      ] = await Promise.all([
+        fetch("/api/users/profile"),
+        fetch("/api/gothiram"),
+        fetch("/api/rasi"),
+        fetch("/api/nakshatram"),
+        fetch("/api/kuladeivam"),
+        fetch("/api/matchmakers"),
+      ]);
 
       if (profileRes.ok) {
         const data = await profileRes.json();
         // Convert matchMaker back to matchMakerId for state consistency
         const userData = { ...data.user };
         if (userData.matchMaker && !userData.matchMakerId) {
-          userData.matchMakerId = userData.matchMaker._id || userData.matchMaker;
+          userData.matchMakerId =
+            userData.matchMaker._id || userData.matchMaker;
         }
         // Store both current and original data
         setUserData(userData);
@@ -177,7 +184,7 @@ export default function ProfilePage() {
         ...userData,
         matchMakerId: userData?.matchMakerId || undefined,
       };
-      
+
       const response = await fetch("/api/users/profile", {
         method: "PUT",
         headers: {
@@ -224,7 +231,7 @@ export default function ProfilePage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <BackButton href="/dashboard" label="Back to Dashboard" />
-        
+
         {/* Profile Header */}
         <Card className="avs-card border-0 shadow-xl mb-8">
           <CardContent className="p-8">
@@ -367,7 +374,9 @@ export default function ProfilePage() {
                     type="date"
                     value={
                       userData?.deathday
-                        ? new Date(userData.deathday).toISOString().split("T")[0]
+                        ? new Date(userData.deathday)
+                            .toISOString()
+                            .split("T")[0]
                         : ""
                     }
                     onChange={(e) =>
@@ -818,32 +827,47 @@ export default function ProfilePage() {
                             onValueChange={(value) =>
                               setUserData({
                                 ...userData,
-                                matchMakerId: value === "none" ? undefined : value,
+                                matchMakerId:
+                                  value === "none" ? undefined : value,
                               })
                             }
                             disabled={!editing}
                           >
-                            <SelectTrigger id="matchmakerSelect" className="w-full">
+                            <SelectTrigger
+                              id="matchmakerSelect"
+                              className="w-full"
+                            >
                               <SelectValue placeholder="Select an AVS Matchmaker" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="none">None</SelectItem>
                               {avsMatchmakers.map((matchmaker) => (
-                                <SelectItem key={matchmaker._id} value={matchmaker._id}>
+                                <SelectItem
+                                  key={matchmaker._id}
+                                  value={matchmaker._id}
+                                >
                                   {matchmaker.firstName} {matchmaker.lastName}
-                                  {matchmaker.gothiram && ` - ${matchmaker.gothiram}`}
-                                  {(matchmaker.nativePlace || matchmaker.city) &&
-                                    ` (${matchmaker.nativePlace || matchmaker.city})`}
+                                  {matchmaker.gothiram &&
+                                    ` - ${matchmaker.gothiram}`}
+                                  {(matchmaker.nativePlace ||
+                                    matchmaker.city) &&
+                                    ` (${
+                                      matchmaker.nativePlace || matchmaker.city
+                                    })`}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                           <p className="text-xs text-gray-500 mt-1">
-                            Choose someone who can help with your matrimony search
+                            Choose someone who can help with your matrimony
+                            search
                           </p>
                         </div>
                         <div>
-                          <Label htmlFor="partnerDesc" className="text-sm font-medium">
+                          <Label
+                            htmlFor="partnerDesc"
+                            className="text-sm font-medium"
+                          >
                             Partner Description
                           </Label>
                           <Textarea
@@ -859,10 +883,11 @@ export default function ProfilePage() {
                             className="mt-1"
                             placeholder="Describe your ideal partner..."
                             rows={5}
-                            maxLength={500}
+                            maxLength={5000}
                           />
                           <p className="text-xs text-gray-500 mt-1">
-                            {(userData?.partnerDesc || "").length}/500 characters
+                            {(userData?.partnerDesc || "").length}/5000
+                            characters
                           </p>
                         </div>
                       </>
@@ -894,35 +919,35 @@ export default function ProfilePage() {
                     className="mt-1"
                     placeholder="Tell us about yourself..."
                     rows={5}
-                    maxLength={500}
+                    maxLength={5000}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    {(userData?.bioDesc || "").length}/500 characters
+                    {(userData?.bioDesc || "").length}/5000 characters
                   </p>
                 </div>
                 {MATRIMONIAL_ENABLED && (
                   <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="enableMarriageFlag"
-                        checked={userData?.enableMarriageFlag || false}
-                        onChange={(e) =>
-                          setUserData({
-                            ...userData,
-                            enableMarriageFlag: e.target.checked,
-                          })
-                        }
-                        disabled={!editing}
-                        className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-                      />
-                      <Label
-                        htmlFor="enableMarriageFlag"
-                        className="cursor-pointer"
-                      >
-                        Enable Matrimony Profile (Make my profile visible for
-                        matrimony matches)
-                      </Label>
-                    </div>
+                    <input
+                      type="checkbox"
+                      id="enableMarriageFlag"
+                      checked={userData?.enableMarriageFlag || false}
+                      onChange={(e) =>
+                        setUserData({
+                          ...userData,
+                          enableMarriageFlag: e.target.checked,
+                        })
+                      }
+                      disabled={!editing}
+                      className="h-4 w-4 rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+                    />
+                    <Label
+                      htmlFor="enableMarriageFlag"
+                      className="cursor-pointer"
+                    >
+                      Enable Matrimony Profile (Make my profile visible for
+                      matrimony matches)
+                    </Label>
+                  </div>
                 )}
               </CardContent>
             </Card>

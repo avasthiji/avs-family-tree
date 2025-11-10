@@ -832,8 +832,8 @@ Reject a user.
   workPlace: String,
   
   // Matrimony
-  bioDesc: String (max 500),
-  partnerDesc: String (max 500),
+  bioDesc: String (max 5000),
+  partnerDesc: String (max 5000),
   enableMarriageFlag: Boolean (indexed),
   
   // System
