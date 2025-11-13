@@ -90,7 +90,7 @@ const PARENT_TYPES = new Set([
   "Uncle",
   "Aunt",
 ]);
-const CHILD_TYPES = new Set(["Son", "Daughter", "Nephew", "Niece"]);
+const CHILD_TYPES = new Set(["Son", "Daughter", "Grandson", "Granddaughter", "Nephew", "Niece"]);
 const SAME_LEVEL_TYPES = new Set([
   "Spouse",
   "Brother",

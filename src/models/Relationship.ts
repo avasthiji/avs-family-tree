@@ -6,8 +6,8 @@ export interface IRelationship extends Document {
   personId2: mongoose.Types.ObjectId;
   relationType: 'Father' | 'Mother' | 'Spouse' | 'Son' | 'Daughter' |
                 'Older Sibling' | 'Younger Sibling' | 'Brother' | 'Sister' |
-                'Grand Father' | 'Grand Mother' | 'Uncle' | 'Aunt' | 
-                'Cousin' | 'Nephew' | 'Niece' | 'Other';
+                'Grand Father' | 'Grand Mother' | 'Grandson' | 'Granddaughter' |
+                'Uncle' | 'Aunt' | 'Cousin' | 'Nephew' | 'Niece' | 'Other';
   description?: string;
   isApproved: boolean;
   approvedBy?: mongoose.Types.ObjectId;
@@ -33,8 +33,8 @@ const RelationshipSchema = new Schema<IRelationship>({
     enum: [
       'Father', 'Mother', 'Spouse', 'Son', 'Daughter',
       'Older Sibling', 'Younger Sibling', 'Brother', 'Sister',
-      'Grand Father', 'Grand Mother', 'Uncle', 'Aunt', 
-      'Cousin', 'Nephew', 'Niece', 'Other'
+      'Grand Father', 'Grand Mother', 'Grandson', 'Granddaughter',
+      'Uncle', 'Aunt', 'Cousin', 'Nephew', 'Niece', 'Other'
     ],
     required: [true, 'Relationship type is required']
   },

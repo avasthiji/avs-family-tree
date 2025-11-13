@@ -135,6 +135,8 @@ export async function POST(request: NextRequest) {
       "Sister",
       "Grand Father",
       "Grand Mother",
+      "Grandson",
+      "Granddaughter",
       "Uncle",
       "Aunt",
       "Cousin",
@@ -166,6 +168,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Fetch current user to get gender
+    const currentUser = await User.findById(session.user.id);
+    if (!currentUser) {
+      return NextResponse.json({ error: "Current user not found" }, { status: 404 });
+    }
+
     // Check if relationship already exists in either direction
     const existingRelationship = await Relationship.findOne({
       $or: [
@@ -181,8 +189,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get inverse relationship type
-    const inverseRelationType = getInverseRelationshipType(relationType);
+    // Determine which person's gender to use for inverse relationship
+    // For grandparent relationships (Grand Father, Grand Mother), use current user's gender
+    //   (to determine if inverse is Grandson or Granddaughter)
+    // For grandchild relationships (Grandson, Granddaughter), use current user's gender
+    //   (to determine if inverse is Grand Father or Grand Mother)
+    // For other relationships, use current user's gender
+    let genderForInverse: string | undefined = currentUser.gender;
+
+    // Get inverse relationship type with gender consideration
+    const inverseRelationType = getInverseRelationshipType(relationType, genderForInverse);
 
     // Create forward relationship (person1 -> person2)
     const relationship = new Relationship({

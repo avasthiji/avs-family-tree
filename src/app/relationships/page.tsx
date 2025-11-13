@@ -87,6 +87,8 @@ const RELATIONSHIP_TYPES = [
   "Younger Sibling",
   "Grand Father",
   "Grand Mother",
+  "Grandson",
+  "Granddaughter",
   "Uncle",
   "Aunt",
   "Cousin",
@@ -541,11 +543,11 @@ export default function RelationshipsPage() {
                             >
                               {getRelationshipLabel(rel)}
                             </Badge>
-                            {rel.isApproved ? (
+                            {/* {rel.isApproved ? (
                               <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
                             ) : (
                               <Clock className="h-4 w-4 text-yellow-500 flex-shrink-0" />
-                            )}
+                            )} */}
                           </div>
                           <div className="flex flex-wrap gap-2 sm:gap-3 text-xs text-gray-600">
                             {person.gothiram && (

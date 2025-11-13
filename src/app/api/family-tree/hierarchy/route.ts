@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
       "Grand Father",
       "Grand Mother",
     ]);
-    const CHILD_TYPES = new Set(["Son", "Daughter"]);
+    const CHILD_TYPES = new Set(["Son", "Daughter", "Grandson", "Granddaughter"]);
     const SPOUSE_TYPE = "Spouse";
     const SIBLING_TYPES = new Set([
       "Brother",

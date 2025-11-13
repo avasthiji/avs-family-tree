@@ -49,7 +49,7 @@ const nodeTypes = {
 };
 
 const PARENT_RELATIONS = ["Father", "Mother", "Grand Father", "Grand Mother"];
-const CHILD_RELATIONS = ["Son", "Daughter"];
+const CHILD_RELATIONS = ["Son", "Daughter", "Grandson", "Granddaughter"];
 const SIBLING_RELATIONS = [
   "Brother",
   "Sister",
@@ -160,7 +160,10 @@ export default function D3FamilyTree({
         // Store generation distance for this specific parent-child pair
         generationDistance.set(`${p2._id}-${p1._id}`, distance);
       } else if (CHILD_RELATIONS.includes(relType)) {
-        // p2 is the child (Son/Daughter) of p1
+        // p2 is the child (Son/Daughter/Grandson/Granddaughter) of p1
+        const isGrandChild = relType === "Grandson" || relType === "Granddaughter";
+        const distance = isGrandChild ? 2 : 1;
+        
         if (!children.has(p1._id)) children.set(p1._id, []);
         if (!children.get(p1._id)!.includes(p2._id)) {
           children.get(p1._id)!.push(p2._id);
@@ -172,8 +175,8 @@ export default function D3FamilyTree({
         // Store the relationship type from parent to child perspective
         relationshipTypes.set(`${p1._id}-${p2._id}`, relType);
         
-        // Store generation distance for this parent-child pair (distance is always 1 for child relations)
-        generationDistance.set(`${p1._id}-${p2._id}`, 1);
+        // Store generation distance for this parent-child pair (distance is 2 for grandchild, 1 for child)
+        generationDistance.set(`${p1._id}-${p2._id}`, distance);
       } else if (SIBLING_RELATIONS.includes(relType)) {
         // p2 is sibling (Brother/Sister) of p1 - bidirectional
         if (!siblings.has(p1._id)) siblings.set(p1._id, []);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import Relationship from "@/models/Relationship";
+import User from "@/models/User";
 import { getInverseRelationshipType } from "@/lib/utils";
 import mongoose from "mongoose";
 
@@ -129,7 +130,15 @@ export async function PUT(
 
     // Find and update the reverse relationship if relationType changed
     if (relationType) {
-      const inverseRelationType = getInverseRelationshipType(relationType);
+      // Fetch personId1 to get gender for inverse relationship calculation
+      const person1 = await User.findById(relationship.personId1);
+      const person2 = await User.findById(relationship.personId2);
+      
+      // Determine which person's gender to use for inverse relationship
+      // For all relationships, use person1's gender (the one who created/owns the relationship)
+      const genderForInverse = person1?.gender;
+      
+      const inverseRelationType = getInverseRelationshipType(relationType, genderForInverse);
       
       // Find the reverse relationship
       const reverseRelationship = await Relationship.findOne({
