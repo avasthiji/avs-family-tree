@@ -105,15 +105,21 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  let session: any = null;
+  let personId2: string | undefined;
+  let relationType: string | undefined;
+  
   try {
-    const session = await auth();
+    session = await auth();
 
     if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
-    const { personId2, relationType, description } = body;
+    personId2 = body.personId2;
+    relationType = body.relationType;
+    const description = body.description;
 
     if (!personId2 || !relationType) {
       return NextResponse.json(
@@ -210,19 +216,89 @@ export async function POST(request: NextRequest) {
       isApproved: session.user.role === "admin", // Auto-approve if admin
     });
 
-    await relationship.save();
+    try {
+      await relationship.save();
+    } catch (saveError: any) {
+      // If forward relationship save fails due to duplicate, check if it already exists
+      if (saveError.code === 11000) {
+        const existing = await Relationship.findOne({
+          personId1: session.user.id,
+          personId2: personId2,
+        });
+        if (existing) {
+          return NextResponse.json(
+            { error: "Relationship already exists between these users" },
+            { status: 409 }
+          );
+        }
+      }
+      throw saveError; // Re-throw if it's a different error
+    }
 
-    // Create reverse relationship (person2 -> person1)
-    const reverseRelationship = new Relationship({
+    // Check if reverse relationship already exists before creating
+    let reverseRelationship = await Relationship.findOne({
       personId1: personId2,
       personId2: session.user.id,
-      relationType: inverseRelationType,
-      description, // Use same description for both
-      createdBy: session.user.id,
-      isApproved: session.user.role === "admin", // Auto-approve if admin
     });
 
-    await reverseRelationship.save();
+    if (reverseRelationship) {
+      // Update existing reverse relationship
+      reverseRelationship.relationType = inverseRelationType;
+      reverseRelationship.description = description;
+      reverseRelationship.updatedBy = session.user.id;
+      if (session.user.role === "admin") {
+        reverseRelationship.isApproved = true;
+      }
+      try {
+        await reverseRelationship.save();
+      } catch (updateError: any) {
+        // If update fails, delete the forward relationship we just created to maintain consistency
+        await Relationship.findByIdAndDelete(relationship._id);
+        throw updateError;
+      }
+    } else {
+      // Create new reverse relationship (person2 -> person1)
+      reverseRelationship = new Relationship({
+        personId1: personId2,
+        personId2: session.user.id,
+        relationType: inverseRelationType,
+        description, // Use same description for both
+        createdBy: session.user.id,
+        isApproved: session.user.role === "admin", // Auto-approve if admin
+      });
+      
+      try {
+        await reverseRelationship.save();
+      } catch (saveError: any) {
+        // If reverse relationship save fails due to duplicate, check if it was created concurrently
+        if (saveError.code === 11000) {
+          const existingReverse = await Relationship.findOne({
+            personId1: personId2,
+            personId2: session.user.id,
+          });
+          
+          if (existingReverse) {
+            // Update the existing reverse relationship instead
+            existingReverse.relationType = inverseRelationType;
+            existingReverse.description = description;
+            existingReverse.updatedBy = session.user.id;
+            if (session.user.role === "admin") {
+              existingReverse.isApproved = true;
+            }
+            await existingReverse.save();
+            // Forward relationship is already saved, so we're good
+          } else {
+            // Unexpected duplicate error, delete forward relationship and throw
+            await Relationship.findByIdAndDelete(relationship._id);
+            throw saveError;
+          }
+        } else {
+          // Different error, delete forward relationship and throw
+          await Relationship.findByIdAndDelete(relationship._id);
+          throw saveError;
+        }
+      }
+    }
 
     // Populate before returning
     await relationship.populate(
@@ -243,8 +319,17 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Relationship creation error:", error);
+    console.error("Relationship creation error:", {
+      error: error.message,
+      code: error.code,
+      name: error.name,
+      stack: error.stack,
+      userId: session?.user?.id,
+      personId2: personId2,
+      relationType: relationType,
+    });
 
+    // Handle specific error cases
     if (error.message?.includes("Cannot create relationship with oneself")) {
       return NextResponse.json(
         { error: "Cannot create relationship with yourself" },
@@ -252,8 +337,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Handle MongoDB duplicate key error (unique constraint violation)
+    if (error.code === 11000 || error.message?.includes("duplicate key")) {
+      // Try to find which relationship already exists
+      try {
+        const existingRel = await Relationship.findOne({
+          $or: [
+            { personId1: session.user.id, personId2: personId2 },
+            { personId1: personId2, personId2: session.user.id },
+          ],
+        });
+
+        if (existingRel) {
+          return NextResponse.json(
+            { 
+              error: "Relationship already exists between these users",
+              existingRelationship: existingRel 
+            },
+            { status: 409 }
+          );
+        }
+      } catch (lookupError) {
+        // If lookup fails, just return generic error
+      }
+
+      return NextResponse.json(
+        { error: "A relationship already exists between these users" },
+        { status: 409 }
+      );
+    }
+
+    // Handle validation errors
+    if (error.name === "ValidationError") {
+      return NextResponse.json(
+        { error: error.message || "Validation error occurred" },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      { 
+        error: "Internal server error",
+        details: process.env.NODE_ENV === "development" ? error.message : undefined
+      },
       { status: 500 }
     );
   }
