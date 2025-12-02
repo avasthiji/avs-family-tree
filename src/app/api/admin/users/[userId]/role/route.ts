@@ -53,10 +53,24 @@ export async function POST(
       );
     }
 
+    // Store old role before updating
+    const oldRole = user.role;
+
     // Update user role
     user.role = role;
     user.updatedBy = new mongoose.Types.ObjectId(session.user.id);
     await user.save();
+
+    // If matchmaker role was removed, remove this user as matchmaker from all users
+    if (oldRole === 'avsMatchMaker' && role !== 'avsMatchMaker') {
+      await User.updateMany(
+        { matchMakerId: userId },
+        { 
+          $unset: { matchMakerId: "" },
+          $set: { updatedBy: new mongoose.Types.ObjectId(session.user.id) }
+        }
+      );
+    }
 
     return NextResponse.json({ 
       message: `User role updated to ${role}`,
