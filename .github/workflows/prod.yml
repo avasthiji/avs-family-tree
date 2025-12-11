@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "npm"
 
       - name: Create ENV File
@@ -37,16 +37,23 @@ jobs:
       - name: Build Next.js
         run: npm run build
 
+      - name: Prepare Deployment Files
+        run: |
+          mkdir -p deploy
+          cp -r .next deploy/
+          cp package.json package-lock.json next.config.js .env.production deploy/
+
       - name: Copy Files to EC2
-        uses: appleboy/scp-action@v1
+        uses: burnett01/rsync-deployments@7.0.0
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_PEM_KEY }}
-          port: 22
-          source: ".next,package.json,package-lock.json,next.config.js,.env.production"
-          target: "/var/www/avs"
-          debug: true
+          switches: -avzr --delete
+          legacy_allow_rsa_hostkeys: "true"
+          path: ./deploy/*
+          remote_path: /var/www/avs
+          remote_host: ${{ secrets.EC2_HOST }}
+          remote_port: 22
+          remote_user: ubuntu
+          remote_key: ${{ secrets.EC2_PEM_KEY }}
 
       - name: "SSH: Install & Restart App"
         uses: appleboy/ssh-action@v1.2.0
