@@ -43,9 +43,10 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_PEM_KEY }}
-          port: 80
+          port: 22
           source: ".next,package.json,package-lock.json,next.config.js,.env.production"
           target: "/var/www/avs"
+          debug: true
 
       - name: "SSH: Install & Restart App"
         uses: appleboy/ssh-action@v1.2.0
@@ -53,6 +54,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_PEM_KEY }}
+          port: 22
           script: |
             cd /var/www/avs
             npm ci --omit=dev
