@@ -11,7 +11,13 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
 
       - name: Create ENV File
         run: |
@@ -26,13 +32,13 @@ jobs:
           echo "NEXT_PUBLIC_USE_TEST_OTP=${{ secrets.NEXT_PUBLIC_USE_TEST_OTP }}" >> .env.production
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build Next.js
         run: npm run build
 
       - name: Copy Files to EC2
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v0.1.9
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
@@ -40,15 +46,15 @@ jobs:
           source: ".next,package.json,package-lock.json,next.config.js,.env.production"
           target: "/var/www/avs"
 
-      - name: SSH: Install & Restart App
-        uses: appleboy/ssh-action@v1.1.0
+      - name: "SSH: Install & Restart App"
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_PEM_KEY }}
           script: |
             cd /var/www/avs
-            npm install --omit=dev
+            npm ci --omit=dev
             pm2 delete avs || true
             pm2 start "npm start" --name avs
             pm2 save
