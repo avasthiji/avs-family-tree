@@ -1,0 +1,54 @@
+name: AVS Family Tree Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Create ENV File
+        run: |
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env.production
+          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env.production
+          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env.production
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env.production
+          echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env.production
+          echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> .env.production
+          echo "EMAIL_FROM=${{ secrets.EMAIL_FROM }}" >> .env.production
+          echo "NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}" >> .env.production
+          echo "NEXT_PUBLIC_USE_TEST_OTP=${{ secrets.NEXT_PUBLIC_USE_TEST_OTP }}" >> .env.production
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Copy Files to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PEM_KEY }}
+          source: ".next,package.json,package-lock.json,next.config.js,.env.production"
+          target: "/var/www/avs"
+
+      - name: SSH: Install & Restart App
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PEM_KEY }}
+          script: |
+            cd /var/www/avs
+            npm install --omit=dev
+            pm2 delete avs || true
+            pm2 start "npm start" --name avs
+            pm2 save
