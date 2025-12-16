@@ -27,6 +27,16 @@ jobs:
         env:
           NODE_ENV: production
 
+      - name: Verify build output
+        run: |
+          if [ ! -d ".next" ]; then
+            echo "Error: .next directory not found after build"
+            exit 1
+          fi
+          if [ ! -f ".next/routes-manifest.json" ]; then
+            echo "Warning: routes-manifest.json not found"
+          fi
+
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -40,6 +50,9 @@ jobs:
             .next \
             public \
             package.json \
+            package-lock.json \
+            next.config.ts \
+            tsconfig.json \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
 
       - name: Install prod dependencies & restart PM2
@@ -47,8 +60,26 @@ jobs:
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
             set -e
             cd ${{ secrets.SERVER_PATH }}
-            npm install --omit=dev --legacy-peer-deps
+            
+            # Install all dependencies (production + dev for Next.js build tools)
+            npm install --legacy-peer-deps
+            
+            # Verify .next directory exists
+            if [ ! -d ".next" ]; then
+              echo "Error: .next directory not found after deployment"
+              exit 1
+            fi
+            
+            # Verify routes-manifest exists
+            if [ ! -f ".next/routes-manifest.json" ]; then
+              echo "Warning: routes-manifest.json not found, rebuilding..."
+              npm run build
+            fi
+            
+            # Restart PM2
             pm2 delete avs || true
-            pm2 start npm --name avs -- run dev
+            pm2 start npm --name avs -- start
             pm2 save --force
+            
+            echo "Deployment completed successfully!"
           EOF
