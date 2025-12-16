@@ -49,6 +49,6 @@ jobs:
             cd ${{ secrets.SERVER_PATH }}
             npm install --omit=dev --legacy-peer-deps
             pm2 delete avs || true
-            pm2 start npm --name avs -- start
+            pm2 start npm --name avs -- run dev
             pm2 save --force
           EOF
