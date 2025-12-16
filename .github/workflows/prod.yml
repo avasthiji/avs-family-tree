@@ -48,5 +48,5 @@ jobs:
             npm install --production
             pm2 delete avs || true
             pm2 start server.js --name avs
-            pm2 save
+            pm2 save --force
           EOF
