@@ -23,9 +23,7 @@ jobs:
         run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
       - name: Build Next.js app
-        run: npm run build
-        env:
-          NODE_ENV: production
+        run: NODE_ENV=production npm run build
 
       - name: Verify build output
         run: |
@@ -73,12 +71,16 @@ jobs:
             # Verify routes-manifest exists
             if [ ! -f ".next/routes-manifest.json" ]; then
               echo "Warning: routes-manifest.json not found, rebuilding..."
-              npm run build
+              NODE_ENV=production npm run build
             fi
             
             # Restart PM2
             pm2 delete avs || true
-            pm2 start npm --name avs -- start
+            pm2 start npm \
+              --name "avs" \
+              --env production \
+              --env-file /var/env/avs.production.env \
+              -- start
             pm2 save --force
             
             echo "Deployment completed successfully!"
