@@ -677,7 +677,7 @@ export default function ProfilePage() {
                     <Label className="flex items-center gap-2">
                       Natchathiram
                       <a
-                        href="/culturals_pdf/Nakshathiram%20List.pdf"
+                        href="/culturals_pdf/Nakshathiram_List.pdf"
                         download="Natchathiram.pdf"
                         target="_blank"
                         rel="noopener noreferrer"
