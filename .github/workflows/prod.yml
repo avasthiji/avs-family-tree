@@ -76,12 +76,12 @@ jobs:
             
             # Restart PM2
             pm2 delete avs || true
-            pm2 start npm \
-              --name "avs" \
-              --env production \
-              --env-file /var/env/avs.production.env \
-              -- start
-            pm2 save --force
+            # Source env file and start PM2 with production environment
+            set -a
+            source /var/env/avs.production.env
+            set +a
+            NODE_ENV=production pm2 start npm --name "avs" -- start
+            pm2 save
             
             echo "Deployment completed successfully!"
           EOF
