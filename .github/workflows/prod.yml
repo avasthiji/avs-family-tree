@@ -43,13 +43,13 @@ jobs:
             package.json \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
 
-      - name: Restart App with PM2
-        run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
-            set -e
-            cd ${{ secrets.SERVER_PATH }}
+            - name: Restart App with PM2
+            run: |
+              ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+                set -e
+                cd ${{ secrets.SERVER_PATH }}
             npm install --production --legacy-peer-deps
-            pm2 delete avs || true
-            pm2 start .next/standalone/server.js --name avs
-            pm2 save --force
-          EOF
+                pm2 delete avs || true
+                pm2 start server.js --name avs
+                pm2 save --force
+              EOF
