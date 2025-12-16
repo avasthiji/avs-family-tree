@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
     // your project has type errors.
     ignoreBuildErrors: false,
   },
-  output: "standalone",
 };
 
 export default nextConfig;

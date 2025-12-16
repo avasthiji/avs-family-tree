@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start:dev": "next start",
-    "start": "node .next/standalone/server.js",
+    "start": "next start -p 3000",
     "lint": "eslint",
     "seed": "dotenv -e .env.local -- tsx src/lib/seed-data.ts",
     "seed:masters": "node seed-masters.js"
