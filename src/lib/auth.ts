@@ -2,13 +2,15 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     Credentials({
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         mobile: { label: "Mobile", type: "text" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials) {
@@ -38,7 +40,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const user = await User.findOne({
             $or: searchConditions,
-            deletedAt: null // Exclude deleted users
+            deletedAt: null, // Exclude deleted users
           });
 
           if (!user) {
@@ -52,10 +54,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           // Verify password
           const isPasswordValid = await bcrypt.compare(
-            credentials.password as string, 
+            credentials.password as string,
             user.password
           );
-          
+
           if (!isPasswordValid) {
             return null;
           }
@@ -76,13 +78,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           };
 
           return authUser;
-
         } catch (error) {
           console.error("❌ [AUTH] Error during authentication:", error);
           return null;
         }
-      }
-    })
+      },
+    }),
   ],
   session: {
     strategy: "jwt",
