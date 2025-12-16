@@ -63,9 +63,9 @@ After updating `.env.local`, restart your development server:
 npm run dev
 ```
 
-Then try registering a new user to test if emails are being sent.
+Then try registering a new user to test if emails are being sent
 
-#Step 5: Monitor Email Sending
+## Step 5: Monitor Email Sending
 
 Check your terminal/console for email sending logs:
 
