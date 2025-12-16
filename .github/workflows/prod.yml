@@ -40,7 +40,6 @@ jobs:
             .next \
             public \
             package.json \
-            next.config.js \
             ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}
 
       - name: Install prod dependencies & restart PM2
