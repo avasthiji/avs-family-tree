@@ -74,8 +74,8 @@ jobs:
               NODE_ENV=production npm run build
             fi
             
-            # Restart PM2
-            pm2 delete avs || true
+            # Restart PM2 (suppress error if process doesn't exist)
+            pm2 delete avs 2>/dev/null || true
             # Source env file and start PM2 with production environment
             set -a
             source /var/env/avs.production.env
