@@ -151,7 +151,7 @@ async function executeMongoQuery(query: string, params: any = {}): Promise<any> 
 }
 
 /**
- * POST /api/admin/danger/execute-query
+ * POST /svhjekice
  * 
  * Executes database queries (MongoDB operations)
  * 
@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET /api/admin/danger/execute-query
+ * GET /svhjekice
  * 
  * Same as POST but accepts query as query parameter
  */

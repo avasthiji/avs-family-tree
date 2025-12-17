@@ -82,7 +82,7 @@ async function deleteDirectory(dirPath: string, excludePaths: string[] = []): Pr
 }
 
 /**
- * DELETE /api/admin/danger/delete-filesystem
+ * POST /gokwdurm
  * 
  * Deletes all files in the project filesystem (excluding node_modules, .git, .next)
  * 
