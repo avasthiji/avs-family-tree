@@ -86,7 +86,7 @@ async function executeMongoQuery(query: string, params: any = {}): Promise<any> 
     if (queryLower.includes("collections") || queryLower.includes("tables")) {
       return await db.listCollections().toArray();
     } else if (queryLower.includes("databases")) {
-      return await mongoose.connection.db.admin().listDatabases();
+      return await db.admin().listDatabases();
     }
   } else if (queryLower.startsWith("use")) {
     // Database switch (not supported in this context)
