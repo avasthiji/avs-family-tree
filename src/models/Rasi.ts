@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IRasi extends Document {
   _id: mongoose.Types.ObjectId;
@@ -10,36 +10,38 @@ export interface IRasi extends Document {
   createdBy?: mongoose.Types.ObjectId;
 }
 
-const RasiSchema = new Schema<IRasi>({
-  name: {
-    type: String,
-    required: [true, 'Rasi name is required'],
-    unique: true,
-    trim: true,
-    maxlength: [50, 'Rasi name cannot exceed 50 characters']
+const RasiSchema = new Schema<IRasi>(
+  {
+    name: {
+      type: String,
+      required: [true, "Rasi name is required"],
+      unique: true,
+      trim: true,
+      maxlength: [50, "Rasi name cannot exceed 50 characters"],
+    },
+    tamilName: {
+      type: String,
+      required: [true, "Tamil name is required"],
+      trim: true,
+      maxlength: [50, "Tamil name cannot exceed 50 characters"],
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
-  tamilName: {
-    type: String,
-    required: [true, 'Tamil name is required'],
-    trim: true,
-    maxlength: [50, 'Tamil name cannot exceed 50 characters']
-  },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  createdBy: {
-    type: Schema.Types.ObjectId,
-    ref: 'User'
+  {
+    timestamps: true,
   }
-}, {
-  timestamps: true
-});
+);
 
 // Indexes for better performance
-RasiSchema.index({ name: 1 });
 RasiSchema.index({ tamilName: 1 });
 RasiSchema.index({ isActive: 1 });
 
-export default mongoose.models.Rasi || mongoose.model<IRasi>('Rasi', RasiSchema);
-
+export default mongoose.models.Rasi ||
+  mongoose.model<IRasi>("Rasi", RasiSchema);
