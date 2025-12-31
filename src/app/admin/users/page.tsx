@@ -492,7 +492,7 @@ export default function AdminUsersPage() {
   const handleDeleteUser = async (userId: string, userName: string) => {
     if (
       !confirm(
-        `Are you sure you want to delete ${userName}? This will remove them from all relationships.`
+        `⚠️ WARNING: This will PERMANENTLY delete ${userName} from the database!\n\nThis action will:\n• Remove the user completely from the database\n• Delete all their relationships\n• Remove them from all events\n• Clean up all references in the system\n\nThis action CANNOT be undone. Are you absolutely sure?`
       )
     )
       return;
@@ -504,7 +504,7 @@ export default function AdminUsersPage() {
 
       if (response.ok) {
         toast.success(
-          "User deleted successfully and removed from all relationships"
+          "User permanently deleted and all references removed successfully"
         );
         fetchUsers();
         fetchUserCounts();
