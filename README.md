@@ -1,7 +1,7 @@
 # 🌳 AVS Family Tree Application
 
 **Complete Family Tree & Matrimony Management System**  
-*Connecting the Akhil Bharatiya Vellalar Sangam (AVS) Community*
+_Connecting the Akhil Bharatiya Vellalar Sangam (AVS) Community_
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.5.4-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
@@ -58,6 +58,7 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 ### Core Features
 
 #### 1. **User Management**
+
 - Email & mobile OTP verification
 - Admin approval workflow for new users
 - Detailed profile management (40+ fields)
@@ -65,6 +66,7 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 - Gothiram (family clan) and native place tracking
 
 #### 2. **Family Tree**
+
 - Interactive visual tree with React Flow
 - Multiple generations support (4+ levels)
 - Hierarchical layout with clear parent-child relationships
@@ -73,6 +75,7 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 - Export and share options
 
 #### 3. **Relationship Management**
+
 - 16+ relationship types (Father, Mother, Son, Daughter, Siblings, etc.)
 - Add/Edit/Delete relationships
 - Bidirectional relationship mapping
@@ -81,6 +84,7 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 - Relationship descriptions and notes
 
 #### 4. **Advanced Search**
+
 - Real-time autocomplete search
 - Multi-criteria filtering (Name, Gothiram, Place, Email, Mobile)
 - Facebook-style dropdown results
@@ -88,6 +92,7 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 - Advanced search page with detailed results
 
 #### 5. **Matrimony Service**
+
 - Enable/disable matrimony profile
 - Partner preferences and descriptions
 - Bio and profile showcase
@@ -96,6 +101,7 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 - Match suggestions (coming soon)
 
 #### 6. **Admin Dashboard**
+
 - User approval management
 - Bulk approve/reject operations
 - Multi-select functionality
@@ -105,6 +111,7 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 - Content moderation
 
 #### 7. **Events & Community**
+
 - Community event listings
 - Event registration
 - Calendar integration
@@ -115,9 +122,11 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 ## 👥 User Roles
 
 ### 1. **Admin** 👑
+
 **Full System Access**
 
 **Capabilities:**
+
 - Approve/reject user registrations
 - Manage all users and profiles
 - View sensitive information (email, mobile)
@@ -129,15 +138,18 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 - Generate reports and statistics
 
 **Default Admin Account:**
+
 - Email: `admin@avs.com`
 - Password: `admin123`
 
 ---
 
 ### 2. **Matchmaker** 💝
+
 **Matrimony Management**
 
 **Capabilities:**
+
 - View all matrimony profiles
 - Search and filter profiles
 - Suggest matches
@@ -151,9 +163,11 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 ---
 
 ### 3. **Regular User** 👤
+
 **Standard Member**
 
 **Capabilities:**
+
 - Create and manage personal profile
 - Build family tree
 - Add/edit/delete own relationships
@@ -164,6 +178,7 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 - Connect with family members
 
 **Restrictions:**
+
 - Cannot see pending users
 - Cannot access admin features
 - Cannot view email/mobile of others
@@ -202,6 +217,7 @@ Step 6: Full Access
 ```
 
 **Timeline:**
+
 - Registration: 2-3 minutes
 - OTP Verification: Instant (dev) / 1-2 minutes (production)
 - Admin Approval: Varies (manual process)
@@ -240,6 +256,7 @@ Step 6: View Tree
 ```
 
 **Features:**
+
 - Real-time search with autocomplete
 - 16 relationship types
 - Duplicate prevention
@@ -276,6 +293,7 @@ Method 3: Matrimony Search
 ```
 
 **Search Capabilities:**
+
 - **Users:** 20 results max
 - **Admins:** 50 results max
 - **Debounce:** 300ms
@@ -358,6 +376,7 @@ Step 5: Save & Activate
 ## 🛠 Technical Stack
 
 ### Frontend
+
 - **Framework:** Next.js 15.5.4 (App Router)
 - **Language:** TypeScript
 - **UI Library:** React 19
@@ -370,6 +389,7 @@ Step 5: Save & Activate
 - **Notifications:** Sonner (Toast)
 
 ### Backend
+
 - **Runtime:** Node.js 20+
 - **API:** Next.js API Routes
 - **Database:** MongoDB with Mongoose
@@ -380,6 +400,7 @@ Step 5: Save & Activate
 - **Validation:** Zod
 
 ### DevOps & Tools
+
 - **Package Manager:** npm
 - **Build Tool:** Next.js (Turbopack)
 - **Linting:** ESLint
@@ -387,6 +408,7 @@ Step 5: Save & Activate
 - **Environment:** dotenv
 
 ### Key Libraries
+
 ```json
 {
   "next": "15.5.4",
@@ -416,12 +438,14 @@ Step 5: Save & Activate
 ### Installation
 
 1. **Clone the Repository**
+
    ```bash
-cd /Users/abhisheksaraswst/Desktop/familytreeavs
+   cd /Users/abhisheksaraswst/Desktop/familytreeavs
    cd avs-family-tree
    ```
 
 2. **Install Dependencies**
+
    ```bash
    npm install
    ```
@@ -429,16 +453,17 @@ cd /Users/abhisheksaraswst/Desktop/familytreeavs
 3. **Setup Environment Variables**
 
 Create `.env.local` file:
-   ```env
-   # Database
-   MONGODB_URI=mongodb://localhost:27017/avs-family-tree
-   
+
+```env
+# Database
+MONGODB_URI=mongodb://localhost:27017/avs-family-tree
+
 # NextAuth
 NEXTAUTH_SECRET=your-secret-key-min-32-characters-long
-   NEXTAUTH_URL=http://localhost:3000
-   
+NEXTAUTH_URL=http://localhost:3000
+
 # Email (Optional in dev)
-   EMAIL_USER=your-email@gmail.com
+EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-app-specific-password
 
 # Development
@@ -447,6 +472,7 @@ NEXT_PUBLIC_USE_TEST_OTP=true
 ```
 
 4. **Seed Database**
+
 ```bash
 # Seed complete family tree (10 users, 24 relationships)
 npx tsx src/lib/seed-complete-family.ts
@@ -456,11 +482,13 @@ npx tsx src/lib/seed-data.ts
 ```
 
 5. **Start Development Server**
+
    ```bash
    npm run dev
    ```
 
 6. **Access Application**
+
 - **URL:** http://localhost:3000
 - **Admin:** admin@avs.com / admin123
 - **Main User:** arun.ramesh@avs.com / password123
@@ -534,9 +562,11 @@ avs-family-tree/
 ### Authentication APIs
 
 #### `POST /api/auth/register`
+
 Register a new user.
 
 **Request:**
+
 ```json
 {
   "firstName": "Arun",
@@ -552,20 +582,23 @@ Register a new user.
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Registration successful!",
   "userId": "user_id",
   "identifier": "arun@example.com",
   "type": "email",
-  "devOtp": "123456"  // Only in development
+  "devOtp": "123456" // Only in development
 }
 ```
 
 #### `POST /api/auth/verify-otp`
+
 Verify OTP and activate account.
 
 **Request:**
+
 ```json
 {
   "userId": "user_id",
@@ -576,12 +609,15 @@ Verify OTP and activate account.
 ```
 
 **Response:**
+
 ```json
 {
   "message": "OTP verified successfully!",
   "verified": true,
   "autoLogin": true,
-  "user": { /* user data */ }
+  "user": {
+    /* user data */
+  }
 }
 ```
 
@@ -590,14 +626,17 @@ Verify OTP and activate account.
 ### User APIs
 
 #### `GET /api/users/profile`
+
 Get current user's profile.
 
 **Headers:**
+
 ```
 Authorization: Bearer <session_token>
 ```
 
 **Response:**
+
 ```json
 {
   "user": {
@@ -606,16 +645,18 @@ Authorization: Bearer <session_token>
     "lastName": "Ramesh",
     "email": "arun@example.com",
     "gothiram": "Bharadvaja",
-    "isApprovedByAdmin": true,
+    "isApprovedByAdmin": true
     // ... other fields
   }
 }
 ```
 
 #### `PUT /api/users/profile`
+
 Update user profile.
 
 **Request:**
+
 ```json
 {
   "bioDesc": "Updated bio",
@@ -629,16 +670,22 @@ Update user profile.
 ### Relationship APIs
 
 #### `GET /api/relationships`
+
 Get all relationships for current user.
 
 **Response:**
+
 ```json
 {
   "relationships": [
     {
       "_id": "rel_id",
-      "personId1": { /* user object */ },
-      "personId2": { /* user object */ },
+      "personId1": {
+        /* user object */
+      },
+      "personId2": {
+        /* user object */
+      },
       "relationType": "Father",
       "description": "My father",
       "isApproved": true,
@@ -649,9 +696,11 @@ Get all relationships for current user.
 ```
 
 #### `POST /api/relationships`
+
 Create a new relationship.
 
 **Request:**
+
 ```json
 {
   "personId2": "user_id",
@@ -661,17 +710,22 @@ Create a new relationship.
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Relationship created successfully",
-  "relationship": { /* relationship object */ }
+  "relationship": {
+    /* relationship object */
+  }
 }
 ```
 
 #### `PUT /api/relationships/[id]`
+
 Update a relationship.
 
 **Request:**
+
 ```json
 {
   "relationType": "Mother",
@@ -680,9 +734,11 @@ Update a relationship.
 ```
 
 #### `DELETE /api/relationships/[id]`
+
 Delete a relationship.
 
 **Response:**
+
 ```json
 {
   "message": "Relationship deleted successfully"
@@ -694,31 +750,39 @@ Delete a relationship.
 ### Search APIs
 
 #### `GET /api/search`
+
 Search for users (regular users).
 
 **Query Parameters:**
+
 - `q` (required): Search query (min 2 chars)
 - `filter`: all | name | gothiram | place
 - `limit`: Number of results (default: 20)
 
 **Example:**
+
 ```
 GET /api/search?q=arun&filter=name&limit=20
 ```
 
 **Response:**
+
 ```json
 {
-  "users": [ /* user objects */ ],
+  "users": [
+    /* user objects */
+  ],
   "count": 5,
   "query": "arun"
 }
 ```
 
 #### `GET /api/admin/search`
+
 Search for users (admin only).
 
 **Query Parameters:**
+
 - `q` (required): Search query
 - `filter`: all | name | email | mobile | gothiram | place
 - `status`: all | approved | pending
@@ -729,9 +793,11 @@ Search for users (admin only).
 ### Admin APIs
 
 #### `GET /api/admin/stats`
+
 Get dashboard statistics.
 
 **Response:**
+
 ```json
 {
   "stats": {
@@ -746,9 +812,11 @@ Get dashboard statistics.
 ```
 
 #### `GET /api/admin/users/pending`
+
 Get pending user approvals.
 
 **Response:**
+
 ```json
 {
   "users": [
@@ -767,9 +835,11 @@ Get pending user approvals.
 ```
 
 #### `POST /api/admin/users/[userId]/approve`
+
 Approve a user.
 
 **Response:**
+
 ```json
 {
   "message": "User approved successfully"
@@ -777,9 +847,11 @@ Approve a user.
 ```
 
 #### `POST /api/admin/users/[userId]/reject`
+
 Reject a user.
 
 **Response:**
+
 ```json
 {
   "message": "User rejected successfully"
@@ -800,21 +872,21 @@ Reject a user.
   email: String (unique, sparse),
   mobile: String (unique, sparse),
   password: String (required, hashed),
-  
+
   // Profile Details
   gender: "Male" | "Female" | "Other",
   dob: Date,
   placeOfBirth: String,
   timeOfBirth: String,
   height: Number (cm),
-  
+
   // AVS Specific
   gothiram: String (indexed),
   rasi: String,
   natchathiram: String,
   kuladeivam: String,
   nativePlace: String (indexed),
-  
+
   // Contact
   primaryPhone: String,
   address1: String,
@@ -824,25 +896,25 @@ Reject a user.
   country: String,
   postalCode: String,
   citizenship: String,
-  
+
   // Professional
   qualification: String,
   jobDesc: String,
   salary: String,
   workPlace: String,
-  
+
   // Matrimony
   bioDesc: String (max 5000),
   partnerDesc: String (max 5000),
   enableMarriageFlag: Boolean (indexed),
-  
+
   // System
   role: "user" | "admin" | "matchmaker",
   isEmailVerified: Boolean,
   isMobileVerified: Boolean,
   isApprovedByAdmin: Boolean (indexed),
   profilePicture: String,
-  
+
   // Metadata
   createdAt: Date,
   updatedAt: Date,
@@ -871,6 +943,7 @@ Reject a user.
 ```
 
 **Relationship Types:**
+
 - Father, Mother, Son, Daughter
 - Brother, Sister, Older Sibling, Younger Sibling
 - Spouse
@@ -944,12 +1017,14 @@ Reject a user.
 ### Authorization Levels
 
 #### Public Routes (No Auth Required)
+
 - `/` - Landing page
 - `/auth/login` - Login page
 - `/auth/register` - Registration page
 - `/auth/verify-otp` - OTP verification
 
 #### Protected Routes (Auth Required)
+
 - `/dashboard` - User dashboard
 - `/profile` - User profile
 - `/family-tree` - Family tree visualization
@@ -958,12 +1033,14 @@ Reject a user.
 - `/matrimony` - Matrimony profiles
 
 #### Admin Routes (Admin Role Required)
+
 - `/admin/dashboard` - Admin dashboard
 - `/admin/reports` - Reports and analytics
 - `/admin/users` - User management
 - `/admin/events` - Event management
 
 #### Pending Approval Route
+
 - `/pending-approval` - Shown to verified but unapproved users
 
 ### Middleware Protection
@@ -973,23 +1050,23 @@ Reject a user.
 export default async function middleware(req: NextRequest) {
   const token = await getToken({ req });
   const path = req.nextUrl.pathname;
-  
+
   // Public routes
   if (publicRoutes.includes(path)) return NextResponse.next();
-  
+
   // Auth required
-  if (!token) return NextResponse.redirect('/auth/login');
-  
+  if (!token) return NextResponse.redirect("/auth/login");
+
   // Approval check
-  if (!token.isApprovedByAdmin && !path.includes('/pending-approval')) {
-    return NextResponse.redirect('/pending-approval');
+  if (!token.isApprovedByAdmin && !path.includes("/pending-approval")) {
+    return NextResponse.redirect("/pending-approval");
   }
-  
+
   // Admin routes
-  if (path.startsWith('/admin') && token.role !== 'admin') {
-    return NextResponse.redirect('/dashboard');
+  if (path.startsWith("/admin") && token.role !== "admin") {
+    return NextResponse.redirect("/dashboard");
   }
-  
+
   return NextResponse.next();
 }
 ```
@@ -1001,6 +1078,7 @@ export default async function middleware(req: NextRequest) {
 ### Admin Features
 
 #### User Management
+
 - ✅ View all users (approved + pending)
 - ✅ Approve/reject registrations
 - ✅ Bulk approve/reject operations
@@ -1011,6 +1089,7 @@ export default async function middleware(req: NextRequest) {
 - ✅ Assign roles
 
 #### Dashboard & Reports
+
 - ✅ Statistics overview
 - ✅ Pending approvals count
 - ✅ Gender distribution
@@ -1021,6 +1100,7 @@ export default async function middleware(req: NextRequest) {
 - ✅ Custom date ranges
 
 #### Search & Discovery
+
 - ✅ Search all users
 - ✅ Filter by approval status
 - ✅ Search by email/mobile
@@ -1028,6 +1108,7 @@ export default async function middleware(req: NextRequest) {
 - ✅ Full profile access
 
 #### Relationship Management
+
 - ✅ View all relationships
 - ✅ Edit any relationship
 - ✅ Delete any relationship
@@ -1035,6 +1116,7 @@ export default async function middleware(req: NextRequest) {
 - ✅ Relationship statistics
 
 #### Event Management
+
 - ✅ Create events
 - ✅ Edit events
 - ✅ Delete events
@@ -1046,6 +1128,7 @@ export default async function middleware(req: NextRequest) {
 ### Matchmaker Features
 
 #### Matrimony Management
+
 - ✅ View all matrimony profiles
 - ✅ Advanced filtering
 - ✅ Contact details access
@@ -1054,6 +1137,7 @@ export default async function middleware(req: NextRequest) {
 - ✅ Generate match reports
 
 #### Profile Access
+
 - ✅ Extended profile view
 - ✅ Bio and preferences
 - ✅ Family information
@@ -1065,6 +1149,7 @@ export default async function middleware(req: NextRequest) {
 ### Regular User Features
 
 #### Profile Management
+
 - ✅ Edit personal details
 - ✅ Upload profile picture
 - ✅ Update bio (500 chars)
@@ -1073,6 +1158,7 @@ export default async function middleware(req: NextRequest) {
 - ✅ Privacy settings
 
 #### Family Tree
+
 - ✅ Add relationships
 - ✅ Edit relationships
 - ✅ Delete relationships
@@ -1082,6 +1168,7 @@ export default async function middleware(req: NextRequest) {
 - ✅ See relationship count
 
 #### Search & Connect
+
 - ✅ Quick search from dashboard
 - ✅ Advanced search page
 - ✅ Filter by criteria
@@ -1090,6 +1177,7 @@ export default async function middleware(req: NextRequest) {
 - ✅ 20 results per query
 
 #### Matrimony
+
 - ✅ Create matrimony profile
 - ✅ View matches
 - ✅ Search profiles
@@ -1097,6 +1185,7 @@ export default async function middleware(req: NextRequest) {
 - ✅ Privacy controls
 
 #### Events
+
 - ✅ View upcoming events
 - ✅ Register for events
 - ✅ View past events
@@ -1107,12 +1196,14 @@ export default async function middleware(req: NextRequest) {
 ## 📸 Screenshots
 
 ### Landing Page
+
 - Hero section with AVS branding
 - Feature highlights
 - Call-to-action buttons
 - Community statistics
 
 ### Dashboard
+
 - Quick action cards
 - Search bar integration
 - My Relationships card
@@ -1122,6 +1213,7 @@ export default async function middleware(req: NextRequest) {
 - Admin panel (for admins)
 
 ### Family Tree
+
 - Interactive visual tree
 - Node-based layout
 - Connection lines
@@ -1131,6 +1223,7 @@ export default async function middleware(req: NextRequest) {
 - Member count display
 
 ### Relationships Page
+
 - Add relationship button
 - Search integration
 - Relationship cards with avatars
@@ -1139,6 +1232,7 @@ export default async function middleware(req: NextRequest) {
 - Empty state with CTA
 
 ### Search Page
+
 - Integrated search bar
 - Filter dropdowns
 - Result cards with details
@@ -1146,6 +1240,7 @@ export default async function middleware(req: NextRequest) {
 - Status filters (admin)
 
 ### Profile Page
+
 - Tabbed interface:
   - Personal Info
   - Contact Details
@@ -1156,6 +1251,7 @@ export default async function middleware(req: NextRequest) {
 - Save button
 
 ### Admin Dashboard
+
 - Statistics cards
 - Pending approvals table
 - Multi-select checkboxes
@@ -1170,6 +1266,7 @@ export default async function middleware(req: NextRequest) {
 ### Vercel Deployment (Recommended)
 
 1. **Push to GitHub**
+
 ```bash
 git init
 git add .
@@ -1179,12 +1276,14 @@ git push -u origin main
 ```
 
 2. **Connect to Vercel**
+
 - Visit vercel.com
 - Import repository
 - Configure environment variables
 - Deploy
 
 3. **Environment Variables on Vercel**
+
 ```
 MONGODB_URI=<your-mongodb-atlas-uri>
 NEXTAUTH_SECRET=<generate-new-secret>
@@ -1224,32 +1323,40 @@ NODE_ENV=production
 ### Common Issues
 
 #### 1. OTP Not Received
+
 **Problem:** Email OTP not arriving  
 **Solution:**
+
 - Check SMTP credentials in `.env.local`
 - Use dev mode: Set `NEXT_PUBLIC_USE_TEST_OTP=true`
 - Dev OTP is always: `123456`
 - Check spam folder
 
 #### 2. Lines Not Showing in Family Tree
+
 **Problem:** Family tree nodes appear but no connection lines  
 **Solution:**
+
 - Hard refresh: `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
 - Check browser console for errors
 - Verify relationships exist in database
 - Check edge count in top-left panel
 
 #### 3. MongoDB Connection Failed
+
 **Problem:** Cannot connect to database  
 **Solution:**
+
 - Verify MongoDB is running: `mongod`
 - Check connection string in `.env.local`
 - Ensure database port is open (27017)
 - Check network connectivity
 
 #### 4. Cannot Login After Registration
+
 **Problem:** User redirected to pending approval  
 **Solution:**
+
 - This is expected behavior
 - Admin must approve user
 - Login as admin: `admin@avs.com` / `admin123`
@@ -1258,8 +1365,10 @@ NODE_ENV=production
 - Try logging in again
 
 #### 5. Search Not Working
+
 **Problem:** Search returns no results  
 **Solution:**
+
 - Type at least 2 characters
 - Check network tab for API calls
 - Verify users are approved (for non-admins)
@@ -1267,16 +1376,20 @@ NODE_ENV=production
 - Seed database with test data
 
 #### 6. Build Errors
+
 **Problem:** `npm run build` fails  
 **Solution:**
+
 - Clear `.next` folder: `rm -rf .next`
 - Delete `node_modules`: `rm -rf node_modules`
 - Reinstall: `npm install`
 - Check TypeScript errors: `npm run type-check`
 
 #### 7. Relationship Not Appearing in Tree
+
 **Problem:** Added relationship but tree doesn't show it  
 **Solution:**
+
 - Refresh the page
 - Check if relationship is approved
 - Verify both users exist
@@ -1294,6 +1407,7 @@ NEXT_PUBLIC_DEBUG=true
 ```
 
 Check browser console for:
+
 - 🌳 Family Tree Debug logs
 - 📊 Node count
 - 🔗 Edge count
@@ -1315,28 +1429,33 @@ Check browser console for:
 
 1. **Fork the Repository**
 2. **Create Feature Branch**
+
 ```bash
 git checkout -b feature/your-feature-name
 ```
 
 3. **Make Changes**
+
 - Follow existing code style
 - Add comments for complex logic
 - Update documentation
 
 4. **Test Thoroughly**
+
 ```bash
 npm run dev
 # Test all affected features
 ```
 
 5. **Commit Changes**
+
 ```bash
 git add .
 git commit -m "feat: Add your feature description"
 ```
 
 6. **Push and Create PR**
+
 ```bash
 git push origin feature/your-feature-name
 ```
@@ -1419,6 +1538,7 @@ All rights reserved.
 ## 🗺 Roadmap
 
 ### Phase 1 (Completed) ✅
+
 - ✅ User authentication & registration
 - ✅ Profile management
 - ✅ Family tree visualization
@@ -1427,12 +1547,14 @@ All rights reserved.
 - ✅ Admin dashboard
 
 ### Phase 2 (In Progress) 🚧
+
 - 🔄 Matrimony enhancements
 - 🔄 Event management improvements
 - 🔄 Mobile app development
 - 🔄 Advanced analytics
 
 ### Phase 3 (Planned) 📅
+
 - 📅 AI-powered match suggestions
 - 📅 Video profiles
 - 📅 Chat system
@@ -1471,4 +1593,4 @@ npm run dev
 
 **Built with ❤️ for the AVS Community**
 
-*Connecting Generations, Preserving Heritage, Building Futures*
+_Connecting Generations, Preserving Heritage, Building Futures_
