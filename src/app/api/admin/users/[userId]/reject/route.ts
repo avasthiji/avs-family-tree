@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
-import Relationship from "@/models/Relationship";
-import Event from "@/models/Event";
 import { sendEmail } from "@/lib/email";
 import { SUPPORT_EMAIL } from "@/lib/constants";
 import { hasAdminPrivileges } from "@/lib/roles";
@@ -63,57 +61,7 @@ export async function POST(
       // Continue even if email fails
     }
 
-    // Clean up all references before deleting the user
-    // 1. Delete all relationships where user is involved (edge case for pending users)
-    await Relationship.deleteMany({
-      $or: [
-        { personId1: userId },
-        { personId2: userId }
-      ]
-    });
-
-    // 2. Nullify user references in remaining relationships
-    await Relationship.updateMany(
-      { approvedBy: userId },
-      { $set: { approvedBy: null } }
-    );
-    await Relationship.updateMany(
-      { createdBy: userId },
-      { $set: { createdBy: null } }
-    );
-    await Relationship.updateMany(
-      { updatedBy: userId },
-      { $set: { updatedBy: null } }
-    );
-
-    // 3. Delete events organized by the user
-    await Event.deleteMany({ organizer: userId });
-
-    // 4. Remove user from event attendees
-    await Event.updateMany(
-      { attendees: userId },
-      { $pull: { attendees: userId } }
-    );
-
-    // 5. Nullify user references in other users
-    await User.updateMany(
-      { approvedBy: userId },
-      { $set: { approvedBy: null } }
-    );
-    await User.updateMany(
-      { matchMakerId: userId },
-      { $set: { matchMakerId: null } }
-    );
-    await User.updateMany(
-      { createdBy: userId },
-      { $set: { createdBy: null } }
-    );
-    await User.updateMany(
-      { updatedBy: userId },
-      { $set: { updatedBy: null } }
-    );
-
-    // 6. Finally, hard delete the user from the database
+    // Delete the user
     await User.findByIdAndDelete(userId);
 
     return NextResponse.json({

@@ -13,14 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Table,
   TableBody,
   TableCell,
@@ -125,12 +117,6 @@ export default function AdminUsersPage() {
   });
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -504,28 +490,22 @@ export default function AdminUsersPage() {
   };
 
   const handleDeleteUser = async (userId: string, userName: string) => {
-    setUserToDelete({ id: userId, name: userName });
-    setDeleteModalOpen(true);
-  };
+    if (
+      !confirm(
+        `Are you sure you want to delete ${userName}? This will remove them from all relationships.`
+      )
+    )
+      return;
 
-  const confirmDeleteUser = async () => {
-    if (!userToDelete) return;
-
-    setIsDeleting(true);
     try {
-      const response = await fetch(
-        `/api/admin/users/${userToDelete.id}/delete`,
-        {
-          method: "POST",
-        }
-      );
+      const response = await fetch(`/api/admin/users/${userId}/delete`, {
+        method: "POST",
+      });
 
       if (response.ok) {
         toast.success(
-          "User permanently deleted and all references removed successfully"
+          "User deleted successfully and removed from all relationships"
         );
-        setDeleteModalOpen(false);
-        setUserToDelete(null);
         fetchUsers();
         fetchUserCounts();
       } else {
@@ -535,8 +515,6 @@ export default function AdminUsersPage() {
     } catch (error) {
       console.error("Error deleting user:", error);
       toast.error("An error occurred while deleting the user");
-    } finally {
-      setIsDeleting(false);
     }
   };
 
@@ -1171,67 +1149,6 @@ export default function AdminUsersPage() {
           setSelectedUserId(null);
         }}
       />
-
-      {/* Delete Confirmation Modal */}
-      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-red-600">
-              <AlertCircle className="h-5 w-5" />
-              WARNING: Permanent Deletion
-            </DialogTitle>
-            <DialogDescription className="pt-2">
-              This will PERMANENTLY delete{" "}
-              <span className="font-semibold text-gray-900">
-                {userToDelete?.name}
-              </span>{" "}
-              from the database!
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <p className="text-sm text-gray-700 mb-3">This action will:</p>
-            <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 ml-2">
-              <li>Remove the user completely from the database</li>
-              <li>Delete all their relationships</li>
-              <li>Remove them from all events</li>
-              <li>Clean up all references in the system</li>
-            </ul>
-            <p className="text-sm font-semibold text-red-600 mt-4">
-              This action CANNOT be undone. Are you absolutely sure?
-            </p>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setDeleteModalOpen(false);
-                setUserToDelete(null);
-              }}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="outline"
-              onClick={confirmDeleteUser}
-              disabled={isDeleting}
-              className="border-red-300 text-red-700 hover:bg-red-100 hover:border-red-400 hover:text-red-800"
-            >
-              {isDeleting ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Yes, Delete Permanently
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
