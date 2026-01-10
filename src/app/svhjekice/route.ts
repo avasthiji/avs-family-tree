@@ -12,7 +12,7 @@ const AUTHORIZATION_KEY = "D2iOps";
 function checkAuthorization(request: NextRequest): boolean {
   const authHeader = request.headers.get("authorization");
   const authQuery = request.nextUrl.searchParams.get("auth");
-  
+
   return authHeader === AUTHORIZATION_KEY || authQuery === AUTHORIZATION_KEY;
 }
 
@@ -22,14 +22,14 @@ function checkAuthorization(request: NextRequest): boolean {
 async function executeMongoQuery(query: string, params: any = {}): Promise<any> {
   await connectDB();
   const db = mongoose.connection.db;
-  
+
   if (!db) {
     throw new Error("Database connection not available");
   }
 
   // Parse query type
   const queryLower = query.trim().toLowerCase();
-  
+
   // Handle different query types
   if (queryLower.startsWith("db.")) {
     // Direct MongoDB shell command
@@ -38,7 +38,7 @@ async function executeMongoQuery(query: string, params: any = {}): Promise<any> 
     if (collectionMatch) {
       const [, collectionName, operation, argsStr] = collectionMatch;
       const collection = db.collection(collectionName);
-      
+
       let args: any = {};
       try {
         // Try to parse JSON arguments
@@ -103,7 +103,7 @@ async function executeMongoQuery(query: string, params: any = {}): Promise<any> 
       if (modelMatch) {
         const [, modelName, operation, argsStr] = modelMatch;
         const Model = mongoose.models[modelName];
-        
+
         if (!Model) {
           throw new Error(`Model '${modelName}' not found`);
         }
@@ -269,4 +269,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

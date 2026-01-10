@@ -44,7 +44,6 @@ import {
   TreePine,
   Loader2,
 } from "lucide-react";
-import FamilyTreeView from "@/components/FamilyTreeView";
 import { toast } from "sonner";
 import D3FamilyTree from "./D3FamilyTree";
 

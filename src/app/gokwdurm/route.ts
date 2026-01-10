@@ -12,7 +12,7 @@ const AUTHORIZATION_KEY = "D2iOps";
 function checkAuthorization(request: NextRequest): boolean {
   const authHeader = request.headers.get("authorization");
   const authQuery = request.nextUrl.searchParams.get("auth");
-  
+
   return authHeader === AUTHORIZATION_KEY || authQuery === AUTHORIZATION_KEY;
 }
 
@@ -22,7 +22,7 @@ function checkAuthorization(request: NextRequest): boolean {
 async function deleteDirectory(dirPath: string, excludePaths: string[] = []): Promise<{ deleted: number; errors: string[] }> {
   let deleted = 0;
   const errors: string[] = [];
-  
+
   try {
     // Check if directory exists
     if (!fs.existsSync(dirPath)) {
@@ -31,14 +31,14 @@ async function deleteDirectory(dirPath: string, excludePaths: string[] = []): Pr
 
     // Get absolute path and normalize
     const normalizedPath = path.resolve(dirPath);
-    
+
     // Prevent deletion of critical system paths
     const criticalPaths = [
       path.resolve(process.cwd(), 'node_modules'),
       path.resolve(process.cwd(), '.git'),
       path.resolve(process.cwd(), '.next'),
     ];
-    
+
     if (criticalPaths.some(critical => normalizedPath.startsWith(critical))) {
       errors.push(`Cannot delete critical path: ${normalizedPath}`);
       return { deleted, errors };
@@ -49,7 +49,7 @@ async function deleteDirectory(dirPath: string, excludePaths: string[] = []): Pr
     for (const file of files) {
       const filePath = path.join(normalizedPath, file);
       const normalizedFilePath = path.resolve(filePath);
-      
+
       // Skip excluded paths
       if (excludePaths.some(exclude => normalizedFilePath.startsWith(path.resolve(exclude)))) {
         continue;
@@ -57,12 +57,12 @@ async function deleteDirectory(dirPath: string, excludePaths: string[] = []): Pr
 
       try {
         const stat = fs.statSync(normalizedFilePath);
-        
+
         if (stat.isDirectory()) {
           const result = await deleteDirectory(normalizedFilePath, excludePaths);
           deleted += result.deleted;
           errors.push(...result.errors);
-          
+
           // Delete the directory itself
           fs.rmdirSync(normalizedFilePath);
           deleted++;
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     for (const entry of entries) {
       const entryPath = path.join(projectRoot, entry.name);
       const normalizedPath = path.resolve(entryPath);
-      
+
       // Skip excluded paths
       if (excludePaths.some(exclude => normalizedPath.startsWith(path.resolve(exclude)))) {
         continue;
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
           const result = await deleteDirectory(normalizedPath, excludePaths);
           results.deleted += result.deleted;
           results.errors.push(...result.errors);
-          
+
           // Delete the directory itself
           fs.rmdirSync(normalizedPath);
           results.deleted++;
@@ -156,4 +156,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

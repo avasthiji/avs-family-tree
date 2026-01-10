@@ -91,7 +91,9 @@ export default function RegisterPage() {
         "Registration successful! Please check your email for OTP verification."
       );
 
-      // Store password temporarily in sessionStorage for auto-login after OTP verification
+      // SECURITY NOTE: Storing password temporarily in sessionStorage for auto-login after OTP verification
+      // This is cleared immediately after use in verify-otp page
+      // Alternative: User would need to re-enter password after OTP verification
       if (typeof window !== "undefined") {
         sessionStorage.setItem("temp_login_pass", formData.password);
       }
