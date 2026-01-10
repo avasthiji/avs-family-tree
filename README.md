@@ -3,10 +3,10 @@
 **Complete Family Tree & Matrimony Management System**  
 _Connecting the Akhil Bharatiya Vellalar Sangam (AVS) Community_
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.5.4-black)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Latest-green)](https://www.mongodb.com/)
-[![React Flow](https://img.shields.io/badge/React%20Flow-11.0-purple)](https://reactflow.dev/)
+[![React Flow](https://img.shields.io/badge/React%20Flow-11.11.4-purple)](https://reactflow.dev/)
 
 ---
 
@@ -49,6 +49,7 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 - ✅ **Admin Dashboard** - Comprehensive user and content management
 - ✅ **Multi-Role System** - Admin, Matchmaker, and User roles
 - ✅ **Secure Authentication** - OTP-based verification with admin approval
+- ✅ **404 Error Handling** - Automatic redirect to home page for not-found routes
 - ✅ **Mobile Responsive** - Works seamlessly on all devices
 
 ---
@@ -116,6 +117,13 @@ The AVS Family Tree Application is a comprehensive digital platform designed to 
 - Event registration
 - Calendar integration
 - Announcements and updates
+
+#### 8. **Error Handling**
+
+- Custom 404 page with automatic redirect to home
+- Error boundary for graceful error handling
+- Global error handler for critical failures
+- User-friendly error messages with retry options
 
 ---
 
@@ -377,14 +385,14 @@ Step 5: Save & Activate
 
 ### Frontend
 
-- **Framework:** Next.js 15.5.4 (App Router)
+- **Framework:** Next.js 16.1.1 (App Router)
 - **Language:** TypeScript
 - **UI Library:** React 19
-- **Styling:** Tailwind CSS
+- **Styling:** Tailwind CSS 4
 - **Components:** Shadcn/UI
-- **Family Tree:** React Flow 11.0
+- **Family Tree:** React Flow 11.11.4 (@xyflow/react 12.8.6)
 - **Forms:** React Hook Form
-- **State:** React Context + Hooks
+- **State:** React Context + Hooks + Zustand
 - **Icons:** Lucide React
 - **Notifications:** Sonner (Toast)
 
@@ -392,12 +400,12 @@ Step 5: Save & Activate
 
 - **Runtime:** Node.js 20+
 - **API:** Next.js API Routes
-- **Database:** MongoDB with Mongoose
-- **Authentication:** NextAuth.js v5
-- **Password Hashing:** bcryptjs
-- **Email:** Nodemailer
+- **Database:** MongoDB 6.20+ with Mongoose 8.19+
+- **Authentication:** NextAuth.js v5 (beta.29)
+- **Password Hashing:** bcryptjs 3.0+
+- **Email:** Nodemailer 7.0+
 - **OTP:** Crypto (Node.js)
-- **Validation:** Zod
+- **Validation:** Zod 4.1+
 
 ### DevOps & Tools
 
@@ -411,16 +419,19 @@ Step 5: Save & Activate
 
 ```json
 {
-  "next": "15.5.4",
+  "next": "^16.1.1",
   "react": "19.0.0",
-  "next-auth": "^5.0.0-beta.22",
-  "mongoose": "^8.8.4",
+  "react-dom": "19.0.0",
+  "next-auth": "^5.0.0-beta.29",
+  "mongoose": "^8.19.1",
   "reactflow": "^11.11.4",
-  "tailwindcss": "^3.4.1",
+  "@xyflow/react": "^12.8.6",
+  "tailwindcss": "^4",
   "@radix-ui/react-*": "Latest",
-  "bcryptjs": "^2.4.3",
-  "nodemailer": "^6.9.16",
-  "zod": "^3.23.8"
+  "bcryptjs": "^3.0.2",
+  "nodemailer": "^7.0.7",
+  "zod": "^4.1.12",
+  "mongodb": "^6.20.0"
 }
 ```
 
@@ -440,7 +451,7 @@ Step 5: Save & Activate
 1. **Clone the Repository**
 
    ```bash
-   cd /Users/abhisheksaraswst/Desktop/familytreeavs
+   git clone <repository-url>
    cd avs-family-tree
    ```
 
@@ -474,11 +485,20 @@ NEXT_PUBLIC_USE_TEST_OTP=true
 4. **Seed Database**
 
 ```bash
-# Seed complete family tree (10 users, 24 relationships)
+# Seed complete family tree (recommended)
+npm run seed
+
+# Or seed complete family tree directly
 npx tsx src/lib/seed-complete-family.ts
 
 # Or seed basic data
 npx tsx src/lib/seed-data.ts
+
+# Seed master data (Gothiram, Kuladeivam, etc.)
+npm run seed:masters
+
+# Or use the API endpoint (requires server running)
+# POST /api/admin/seed with body: { "type": "complete", "clearFirst": true }
 ```
 
 5. **Start Development Server**
@@ -493,6 +513,11 @@ npx tsx src/lib/seed-data.ts
 - **Admin:** admin@avs.com / admin123
 - **Main User:** arun.ramesh@avs.com / password123
 
+7. **Test Features**
+
+- Visit any non-existent route (e.g., `/nonexistent-page`) to test 404 redirect
+- All 404 pages will automatically redirect to the home page (`/`)
+
 ---
 
 ## 📁 Project Structure
@@ -501,29 +526,47 @@ npx tsx src/lib/seed-data.ts
 avs-family-tree/
 ├── src/
 │   ├── app/                          # Next.js App Router
-│   │   ├── (pages)/
-│   │   │   ├── dashboard/            # User dashboard
-│   │   │   ├── profile/              # User profile page
-│   │   │   ├── family-tree/          # Family tree visualization
-│   │   │   ├── relationships/        # Relationship management
-│   │   │   ├── search/               # Advanced search
-│   │   │   ├── matrimony/            # Matrimony profiles
-│   │   │   └── pending-approval/     # Pending approval screen
-│   │   ├── admin/
+│   │   ├── dashboard/                # User dashboard
+│   │   ├── profile/                  # User profile page
+│   │   ├── family-tree/              # Family tree visualization
+│   │   ├── relationships/            # Relationship management
+│   │   ├── search/                   # Advanced search
+│   │   ├── pending-approval/         # Pending approval screen
+│   │   ├── admin/                    # Admin routes
 │   │   │   ├── dashboard/            # Admin dashboard
-│   │   │   └── reports/              # Admin reports
-│   │   ├── auth/
+│   │   │   ├── users/                # User management
+│   │   │   ├── reports/              # Admin reports
+│   │   │   ├── gothiram/             # Gothiram management
+│   │   │   └── kuladeivam/           # Kuladeivam management
+│   │   ├── auth/                     # Authentication pages
 │   │   │   ├── login/                # Login page
 │   │   │   ├── register/             # Registration page
-│   │   │   └── verify-otp/           # OTP verification
+│   │   │   ├── verify-otp/           # OTP verification
+│   │   │   ├── forgot-password/      # Password recovery
+│   │   │   └── reset-password/       # Password reset
 │   │   ├── api/                      # API Routes
 │   │   │   ├── auth/                 # Authentication APIs
+│   │   │   │   ├── [...nextauth]/    # NextAuth handler
+│   │   │   │   ├── register/         # Registration API
+│   │   │   │   ├── verify-otp/       # OTP verification API
+│   │   │   │   └── ...               # Other auth endpoints
 │   │   │   ├── users/                # User management APIs
 │   │   │   ├── relationships/        # Relationship APIs
 │   │   │   ├── search/               # Search APIs
-│   │   │   └── admin/                # Admin APIs
+│   │   │   ├── admin/                # Admin APIs
+│   │   │   │   ├── seed/             # Database seeding
+│   │   │   │   ├── users/            # User management
+│   │   │   │   ├── stats/            # Statistics
+│   │   │   │   └── ...               # Other admin endpoints
+│   │   │   ├── family-tree/          # Family tree APIs
+│   │   │   ├── gothiram/             # Gothiram APIs
+│   │   │   ├── kuladeivam/           # Kuladeivam APIs
+│   │   │   └── ...                   # Other API endpoints
+│   │   ├── page.tsx                  # Landing page (home)
+│   │   ├── not-found.tsx             # 404 page (redirects to home)
+│   │   ├── error.tsx                 # Error boundary
+│   │   ├── global-error.tsx          # Global error handler
 │   │   ├── layout.tsx                # Root layout
-│   │   ├── page.tsx                  # Landing page
 │   │   └── globals.css               # Global styles
 │   ├── components/
 │   │   ├── ui/                       # Shadcn/UI components
@@ -1018,10 +1061,18 @@ Reject a user.
 
 #### Public Routes (No Auth Required)
 
-- `/` - Landing page
+- `/` - Landing page (home)
 - `/auth/login` - Login page
 - `/auth/register` - Registration page
 - `/auth/verify-otp` - OTP verification
+- `/auth/forgot-password` - Password recovery
+- `/auth/reset-password` - Password reset
+- `/mission` - AVS Mission page
+- `/history` - AVS History page
+- `/roles` - Roles & Responsibility page
+- `/contact` - Contact Us page
+- `/events` - Community Events page (if enabled)
+- `/*` - Any other route redirects to home (404 handling)
 
 #### Protected Routes (Auth Required)
 
@@ -1031,13 +1082,16 @@ Reject a user.
 - `/relationships` - Relationship management
 - `/search` - Member search
 - `/matrimony` - Matrimony profiles
+- `/history` - Personal history (if different from public)
+- `/seed` - Database seeding page (development/admin)
 
 #### Admin Routes (Admin Role Required)
 
 - `/admin/dashboard` - Admin dashboard
 - `/admin/reports` - Reports and analytics
 - `/admin/users` - User management
-- `/admin/events` - Event management
+- `/admin/gothiram` - Gothiram management
+- `/admin/kuladeivam` - Kuladeivam management
 
 #### Pending Approval Route
 
@@ -1303,18 +1357,22 @@ NODE_ENV=production
 
 ### Production Checklist
 
-- [ ] Update NEXTAUTH_SECRET
-- [ ] Configure production MongoDB
-- [ ] Set up email service (SendGrid/AWS SES)
+- [ ] Update NEXTAUTH_SECRET (32+ characters)
+- [ ] Configure production MongoDB (Atlas recommended)
+- [ ] Set up email service (SendGrid/AWS SES/Nodemailer)
 - [ ] Enable HTTPS
-- [ ] Configure CORS
+- [ ] Configure CORS if needed
 - [ ] Set up error tracking (Sentry)
 - [ ] Configure analytics
 - [ ] Set up backup strategy
 - [ ] Test OTP email delivery
 - [ ] Test all role permissions
+- [ ] Test 404 redirect functionality
+- [ ] Verify error boundaries work
 - [ ] Load testing
 - [ ] Security audit
+- [ ] Test database seeding scripts
+- [ ] Configure PM2 or process manager
 
 ---
 
@@ -1395,6 +1453,17 @@ NODE_ENV=production
 - Verify both users exist
 - Check console for errors
 - Try switching to List view
+
+#### 8. 404 Page Not Redirecting
+
+**Problem:** 404 page shows content instead of redirecting  
+**Solution:**
+
+- Verify `src/app/not-found.tsx` exists
+- Check that it uses `useRouter` from `next/navigation`
+- Clear `.next` cache: `rm -rf .next`
+- Restart dev server
+- Verify the redirect logic in `useEffect`
 
 ### Debug Mode
 
@@ -1571,20 +1640,30 @@ All rights reserved.
 npm install
 
 # 2. Create .env.local with MongoDB URI
+# See Getting Started section for required variables
 
-# 3. Seed database
-npx tsx src/lib/seed-complete-family.ts
+# 3. Seed database (choose one method)
+npm run seed                      # Basic seed via npm script
+npx tsx src/lib/seed-complete-family.ts  # Complete family tree
+npm run seed:masters              # Seed master data (Gothiram, Kuladeivam)
 
-# 4. Start development
+# 4. Start development server
 npm run dev
 
-# 5. Login as admin
+# 5. Access application
+# URL: http://localhost:3000
+
+# 6. Login as admin
 # Email: admin@avs.com
 # Password: admin123
 
-# 6. Or login as user
+# 7. Or login as user (from seeded data)
 # Email: arun.ramesh@avs.com
 # Password: password123
+
+# 8. Test 404 redirect
+# Visit any non-existent route (e.g., /nonexistent-page)
+# Should automatically redirect to home page (/)
 ```
 
 **That's it! You're ready to explore the AVS Family Tree application.** 🌳
