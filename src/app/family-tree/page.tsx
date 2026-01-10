@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import FamilyTreeView from "@/components/FamilyTreeView";
 import { Loader } from "@/components/ui/loader";
 import AppHeader from "@/components/AppHeader";
 import BackButton from "@/components/BackButton";
