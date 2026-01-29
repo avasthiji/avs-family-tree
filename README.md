@@ -10,7 +10,7 @@ _Connecting the Akhil Bharatiya Vellalar Sangam (AVS) Community_
 
 ---
 
-## 📋 Table of Contents
+## 📋 Table of Contents.
 
 - [Overview](#overview)
 - [Features](#features)
