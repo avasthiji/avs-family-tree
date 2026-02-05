@@ -83,20 +83,20 @@ export default function Home() {
               {/* Quick Stats */}
               <div className="grid grid-cols-4 gap-3">
                 <div>
-                  <div className="text-2xl font-bold text-red-500">500+</div>
+                  <div className="text-2xl font-bold text-red-500">100+</div>
                   <div className="text-xs text-gray-600">Families</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-teal-500">2.5K+</div>
+                  <div className="text-2xl font-bold text-teal-500">500 plus+</div>
                   <div className="text-xs text-gray-600">Members</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-orange-500">150+</div>
+                  <div className="text-2xl font-bold text-orange-500">100+</div>
                   <div className="text-xs text-gray-600">Matches</div>
                 </div>
                 {EVENT_ENABLED && (
                   <div>
-                    <div className="text-2xl font-bold text-purple-500">50+</div>
+                    <div className="text-2xl font-bold text-purple-500">20+</div>
                     <div className="text-xs text-gray-600">Events</div>
                   </div>
                 )}
