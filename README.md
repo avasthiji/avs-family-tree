@@ -1,6 +1,6 @@
 # 🌳 AVS Family Tree Application
 
-**Complete Family Tree & Matrimony Management System.**  
+**Complete Family Tree & Matrimony Management System**  
 _Connecting the Akhil Bharatiya Vellalar Sangam (AVS) Community_
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.5.4-black)](https://nextjs.org/)
